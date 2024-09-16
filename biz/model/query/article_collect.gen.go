@@ -16,14 +16,14 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"github.com/qingyggg/blog_server/biz/model/model"
+	"github.com/qingyggg/blog_server/biz/model/orm_gen"
 )
 
 func newArticleCollect(db *gorm.DB, opts ...gen.DOOption) articleCollect {
 	_articleCollect := articleCollect{}
 
 	_articleCollect.articleCollectDo.UseDB(db, opts...)
-	_articleCollect.articleCollectDo.UseModel(&model.ArticleCollect{})
+	_articleCollect.articleCollectDo.UseModel(&orm_gen.ArticleCollect{})
 
 	tableName := _articleCollect.articleCollectDo.TableName()
 	_articleCollect.ALL = field.NewAsterisk(tableName)
@@ -138,17 +138,17 @@ type IArticleCollectDo interface {
 	Count() (count int64, err error)
 	Scopes(funcs ...func(gen.Dao) gen.Dao) IArticleCollectDo
 	Unscoped() IArticleCollectDo
-	Create(values ...*model.ArticleCollect) error
-	CreateInBatches(values []*model.ArticleCollect, batchSize int) error
-	Save(values ...*model.ArticleCollect) error
-	First() (*model.ArticleCollect, error)
-	Take() (*model.ArticleCollect, error)
-	Last() (*model.ArticleCollect, error)
-	Find() ([]*model.ArticleCollect, error)
-	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.ArticleCollect, err error)
-	FindInBatches(result *[]*model.ArticleCollect, batchSize int, fc func(tx gen.Dao, batch int) error) error
+	Create(values ...*orm_gen.ArticleCollect) error
+	CreateInBatches(values []*orm_gen.ArticleCollect, batchSize int) error
+	Save(values ...*orm_gen.ArticleCollect) error
+	First() (*orm_gen.ArticleCollect, error)
+	Take() (*orm_gen.ArticleCollect, error)
+	Last() (*orm_gen.ArticleCollect, error)
+	Find() ([]*orm_gen.ArticleCollect, error)
+	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*orm_gen.ArticleCollect, err error)
+	FindInBatches(result *[]*orm_gen.ArticleCollect, batchSize int, fc func(tx gen.Dao, batch int) error) error
 	Pluck(column field.Expr, dest interface{}) error
-	Delete(...*model.ArticleCollect) (info gen.ResultInfo, err error)
+	Delete(...*orm_gen.ArticleCollect) (info gen.ResultInfo, err error)
 	Update(column field.Expr, value interface{}) (info gen.ResultInfo, err error)
 	UpdateSimple(columns ...field.AssignExpr) (info gen.ResultInfo, err error)
 	Updates(value interface{}) (info gen.ResultInfo, err error)
@@ -160,9 +160,9 @@ type IArticleCollectDo interface {
 	Assign(attrs ...field.AssignExpr) IArticleCollectDo
 	Joins(fields ...field.RelationField) IArticleCollectDo
 	Preload(fields ...field.RelationField) IArticleCollectDo
-	FirstOrInit() (*model.ArticleCollect, error)
-	FirstOrCreate() (*model.ArticleCollect, error)
-	FindByPage(offset int, limit int) (result []*model.ArticleCollect, count int64, err error)
+	FirstOrInit() (*orm_gen.ArticleCollect, error)
+	FirstOrCreate() (*orm_gen.ArticleCollect, error)
+	FindByPage(offset int, limit int) (result []*orm_gen.ArticleCollect, count int64, err error)
 	ScanByPage(result interface{}, offset int, limit int) (count int64, err error)
 	Scan(result interface{}) (err error)
 	Returning(value interface{}, columns ...string) IArticleCollectDo
@@ -262,57 +262,57 @@ func (a articleCollectDo) Unscoped() IArticleCollectDo {
 	return a.withDO(a.DO.Unscoped())
 }
 
-func (a articleCollectDo) Create(values ...*model.ArticleCollect) error {
+func (a articleCollectDo) Create(values ...*orm_gen.ArticleCollect) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return a.DO.Create(values)
 }
 
-func (a articleCollectDo) CreateInBatches(values []*model.ArticleCollect, batchSize int) error {
+func (a articleCollectDo) CreateInBatches(values []*orm_gen.ArticleCollect, batchSize int) error {
 	return a.DO.CreateInBatches(values, batchSize)
 }
 
 // Save : !!! underlying implementation is different with GORM
 // The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).Create(values)
-func (a articleCollectDo) Save(values ...*model.ArticleCollect) error {
+func (a articleCollectDo) Save(values ...*orm_gen.ArticleCollect) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return a.DO.Save(values)
 }
 
-func (a articleCollectDo) First() (*model.ArticleCollect, error) {
+func (a articleCollectDo) First() (*orm_gen.ArticleCollect, error) {
 	if result, err := a.DO.First(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.ArticleCollect), nil
+		return result.(*orm_gen.ArticleCollect), nil
 	}
 }
 
-func (a articleCollectDo) Take() (*model.ArticleCollect, error) {
+func (a articleCollectDo) Take() (*orm_gen.ArticleCollect, error) {
 	if result, err := a.DO.Take(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.ArticleCollect), nil
+		return result.(*orm_gen.ArticleCollect), nil
 	}
 }
 
-func (a articleCollectDo) Last() (*model.ArticleCollect, error) {
+func (a articleCollectDo) Last() (*orm_gen.ArticleCollect, error) {
 	if result, err := a.DO.Last(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.ArticleCollect), nil
+		return result.(*orm_gen.ArticleCollect), nil
 	}
 }
 
-func (a articleCollectDo) Find() ([]*model.ArticleCollect, error) {
+func (a articleCollectDo) Find() ([]*orm_gen.ArticleCollect, error) {
 	result, err := a.DO.Find()
-	return result.([]*model.ArticleCollect), err
+	return result.([]*orm_gen.ArticleCollect), err
 }
 
-func (a articleCollectDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.ArticleCollect, err error) {
-	buf := make([]*model.ArticleCollect, 0, batchSize)
+func (a articleCollectDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*orm_gen.ArticleCollect, err error) {
+	buf := make([]*orm_gen.ArticleCollect, 0, batchSize)
 	err = a.DO.FindInBatches(&buf, batchSize, func(tx gen.Dao, batch int) error {
 		defer func() { results = append(results, buf...) }()
 		return fc(tx, batch)
@@ -320,7 +320,7 @@ func (a articleCollectDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch i
 	return results, err
 }
 
-func (a articleCollectDo) FindInBatches(result *[]*model.ArticleCollect, batchSize int, fc func(tx gen.Dao, batch int) error) error {
+func (a articleCollectDo) FindInBatches(result *[]*orm_gen.ArticleCollect, batchSize int, fc func(tx gen.Dao, batch int) error) error {
 	return a.DO.FindInBatches(result, batchSize, fc)
 }
 
@@ -346,23 +346,23 @@ func (a articleCollectDo) Preload(fields ...field.RelationField) IArticleCollect
 	return &a
 }
 
-func (a articleCollectDo) FirstOrInit() (*model.ArticleCollect, error) {
+func (a articleCollectDo) FirstOrInit() (*orm_gen.ArticleCollect, error) {
 	if result, err := a.DO.FirstOrInit(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.ArticleCollect), nil
+		return result.(*orm_gen.ArticleCollect), nil
 	}
 }
 
-func (a articleCollectDo) FirstOrCreate() (*model.ArticleCollect, error) {
+func (a articleCollectDo) FirstOrCreate() (*orm_gen.ArticleCollect, error) {
 	if result, err := a.DO.FirstOrCreate(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.ArticleCollect), nil
+		return result.(*orm_gen.ArticleCollect), nil
 	}
 }
 
-func (a articleCollectDo) FindByPage(offset int, limit int) (result []*model.ArticleCollect, count int64, err error) {
+func (a articleCollectDo) FindByPage(offset int, limit int) (result []*orm_gen.ArticleCollect, count int64, err error) {
 	result, err = a.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
@@ -391,7 +391,7 @@ func (a articleCollectDo) Scan(result interface{}) (err error) {
 	return a.DO.Scan(result)
 }
 
-func (a articleCollectDo) Delete(models ...*model.ArticleCollect) (result gen.ResultInfo, err error) {
+func (a articleCollectDo) Delete(models ...*orm_gen.ArticleCollect) (result gen.ResultInfo, err error) {
 	return a.DO.Delete(models)
 }
 

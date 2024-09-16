@@ -16,14 +16,14 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"github.com/qingyggg/blog_server/biz/model/model"
+	"github.com/qingyggg/blog_server/biz/model/orm_gen"
 )
 
 func newComment(db *gorm.DB, opts ...gen.DOOption) comment {
 	_comment := comment{}
 
 	_comment.commentDo.UseDB(db, opts...)
-	_comment.commentDo.UseModel(&model.Comment{})
+	_comment.commentDo.UseModel(&orm_gen.Comment{})
 
 	tableName := _comment.commentDo.TableName()
 	_comment.ALL = field.NewAsterisk(tableName)
@@ -146,17 +146,17 @@ type ICommentDo interface {
 	Count() (count int64, err error)
 	Scopes(funcs ...func(gen.Dao) gen.Dao) ICommentDo
 	Unscoped() ICommentDo
-	Create(values ...*model.Comment) error
-	CreateInBatches(values []*model.Comment, batchSize int) error
-	Save(values ...*model.Comment) error
-	First() (*model.Comment, error)
-	Take() (*model.Comment, error)
-	Last() (*model.Comment, error)
-	Find() ([]*model.Comment, error)
-	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.Comment, err error)
-	FindInBatches(result *[]*model.Comment, batchSize int, fc func(tx gen.Dao, batch int) error) error
+	Create(values ...*orm_gen.Comment) error
+	CreateInBatches(values []*orm_gen.Comment, batchSize int) error
+	Save(values ...*orm_gen.Comment) error
+	First() (*orm_gen.Comment, error)
+	Take() (*orm_gen.Comment, error)
+	Last() (*orm_gen.Comment, error)
+	Find() ([]*orm_gen.Comment, error)
+	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*orm_gen.Comment, err error)
+	FindInBatches(result *[]*orm_gen.Comment, batchSize int, fc func(tx gen.Dao, batch int) error) error
 	Pluck(column field.Expr, dest interface{}) error
-	Delete(...*model.Comment) (info gen.ResultInfo, err error)
+	Delete(...*orm_gen.Comment) (info gen.ResultInfo, err error)
 	Update(column field.Expr, value interface{}) (info gen.ResultInfo, err error)
 	UpdateSimple(columns ...field.AssignExpr) (info gen.ResultInfo, err error)
 	Updates(value interface{}) (info gen.ResultInfo, err error)
@@ -168,9 +168,9 @@ type ICommentDo interface {
 	Assign(attrs ...field.AssignExpr) ICommentDo
 	Joins(fields ...field.RelationField) ICommentDo
 	Preload(fields ...field.RelationField) ICommentDo
-	FirstOrInit() (*model.Comment, error)
-	FirstOrCreate() (*model.Comment, error)
-	FindByPage(offset int, limit int) (result []*model.Comment, count int64, err error)
+	FirstOrInit() (*orm_gen.Comment, error)
+	FirstOrCreate() (*orm_gen.Comment, error)
+	FindByPage(offset int, limit int) (result []*orm_gen.Comment, count int64, err error)
 	ScanByPage(result interface{}, offset int, limit int) (count int64, err error)
 	Scan(result interface{}) (err error)
 	Returning(value interface{}, columns ...string) ICommentDo
@@ -270,57 +270,57 @@ func (c commentDo) Unscoped() ICommentDo {
 	return c.withDO(c.DO.Unscoped())
 }
 
-func (c commentDo) Create(values ...*model.Comment) error {
+func (c commentDo) Create(values ...*orm_gen.Comment) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return c.DO.Create(values)
 }
 
-func (c commentDo) CreateInBatches(values []*model.Comment, batchSize int) error {
+func (c commentDo) CreateInBatches(values []*orm_gen.Comment, batchSize int) error {
 	return c.DO.CreateInBatches(values, batchSize)
 }
 
 // Save : !!! underlying implementation is different with GORM
 // The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).Create(values)
-func (c commentDo) Save(values ...*model.Comment) error {
+func (c commentDo) Save(values ...*orm_gen.Comment) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return c.DO.Save(values)
 }
 
-func (c commentDo) First() (*model.Comment, error) {
+func (c commentDo) First() (*orm_gen.Comment, error) {
 	if result, err := c.DO.First(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Comment), nil
+		return result.(*orm_gen.Comment), nil
 	}
 }
 
-func (c commentDo) Take() (*model.Comment, error) {
+func (c commentDo) Take() (*orm_gen.Comment, error) {
 	if result, err := c.DO.Take(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Comment), nil
+		return result.(*orm_gen.Comment), nil
 	}
 }
 
-func (c commentDo) Last() (*model.Comment, error) {
+func (c commentDo) Last() (*orm_gen.Comment, error) {
 	if result, err := c.DO.Last(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Comment), nil
+		return result.(*orm_gen.Comment), nil
 	}
 }
 
-func (c commentDo) Find() ([]*model.Comment, error) {
+func (c commentDo) Find() ([]*orm_gen.Comment, error) {
 	result, err := c.DO.Find()
-	return result.([]*model.Comment), err
+	return result.([]*orm_gen.Comment), err
 }
 
-func (c commentDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.Comment, err error) {
-	buf := make([]*model.Comment, 0, batchSize)
+func (c commentDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*orm_gen.Comment, err error) {
+	buf := make([]*orm_gen.Comment, 0, batchSize)
 	err = c.DO.FindInBatches(&buf, batchSize, func(tx gen.Dao, batch int) error {
 		defer func() { results = append(results, buf...) }()
 		return fc(tx, batch)
@@ -328,7 +328,7 @@ func (c commentDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) err
 	return results, err
 }
 
-func (c commentDo) FindInBatches(result *[]*model.Comment, batchSize int, fc func(tx gen.Dao, batch int) error) error {
+func (c commentDo) FindInBatches(result *[]*orm_gen.Comment, batchSize int, fc func(tx gen.Dao, batch int) error) error {
 	return c.DO.FindInBatches(result, batchSize, fc)
 }
 
@@ -354,23 +354,23 @@ func (c commentDo) Preload(fields ...field.RelationField) ICommentDo {
 	return &c
 }
 
-func (c commentDo) FirstOrInit() (*model.Comment, error) {
+func (c commentDo) FirstOrInit() (*orm_gen.Comment, error) {
 	if result, err := c.DO.FirstOrInit(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Comment), nil
+		return result.(*orm_gen.Comment), nil
 	}
 }
 
-func (c commentDo) FirstOrCreate() (*model.Comment, error) {
+func (c commentDo) FirstOrCreate() (*orm_gen.Comment, error) {
 	if result, err := c.DO.FirstOrCreate(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Comment), nil
+		return result.(*orm_gen.Comment), nil
 	}
 }
 
-func (c commentDo) FindByPage(offset int, limit int) (result []*model.Comment, count int64, err error) {
+func (c commentDo) FindByPage(offset int, limit int) (result []*orm_gen.Comment, count int64, err error) {
 	result, err = c.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
@@ -399,7 +399,7 @@ func (c commentDo) Scan(result interface{}) (err error) {
 	return c.DO.Scan(result)
 }
 
-func (c commentDo) Delete(models ...*model.Comment) (result gen.ResultInfo, err error) {
+func (c commentDo) Delete(models ...*orm_gen.Comment) (result gen.ResultInfo, err error) {
 	return c.DO.Delete(models)
 }
 

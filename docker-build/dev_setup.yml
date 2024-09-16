@@ -5,7 +5,7 @@ services:
     image: 'mysql:latest'
     container_name: mysql
     volumes:
-      - ./pkg/configs/sql:/docker-entrypoint-initdb.d
+      - ../pkg/configs/sql:/docker-entrypoint-initdb.d
     ports:
       - "18000:3306"
     environment:
@@ -25,8 +25,8 @@ services:
       MINIO_ACCESS_KEY: douyin
       MINIO_SECRET_KEY: douyin123
     volumes:
-      - ./pkg/data/minio/:/data
-      - ./pkg/configs/minio/:/root/.minio
+      - ../pkg/data/minio/:/data
+      - ../pkg/configs/minio/:/root/.minio
     command: server --console-address ':9001' /data
     privileged: true
     restart: always
@@ -37,8 +37,8 @@ services:
     ports:
       - "18003:6379"
     volumes:
-      - ./pkg/configs/redis/redis.conf:/usr/local/etc/redis/redis.conf
-      - ./pkg/data/redis/:/data
+      - ../pkg/configs/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ../pkg/data/redis/:/data
     command: redis-server /usr/local/etc/redis/redis.conf
     restart: always
 

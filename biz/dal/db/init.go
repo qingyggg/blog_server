@@ -1,6 +1,7 @@
 package db
 
 import (
+	"github.com/qingyggg/blog_server/biz/model/query"
 	"github.com/qingyggg/blog_server/pkg/constants"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -8,6 +9,7 @@ import (
 )
 
 var DB *gorm.DB
+var QDB *query.Query
 
 // Init init DB
 func Init() {
@@ -25,4 +27,5 @@ func Init() {
 	if err = DB.Use(gormopentracing.New()); err != nil {
 		panic(err)
 	}
+	QDB = query.Use(DB)
 }

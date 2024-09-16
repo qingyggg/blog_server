@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package favorite;
+
+import 'api.proto';
+import "common.proto";
+
+option go_package = "hertz/interact/favorite";
+
+message FavoriteActionRequest {
+  int64 comment_id = 1;
+  int64 uid=2;
+  int32 action_type = 3; // 1-like, 2-unlike ,3-nor like,nor unlike
+  int64 article_id =4;
+}
+
+message FavoriteActionResponse {
+  int32 status_code = 1[(api.go_tag)='json:"status_code"']; // 0 - success, other values - failure
+  string status_msg = 2; // status description
+}
+
+
+
+service FavoriteHandler {
+  rpc CommentFavoriteAction(FavoriteActionRequest) returns(FavoriteActionResponse) {
+      option (api.post) = "/blog_server/favorite/action/comment";
+      // Like and unlike operations of the logged-in user on the video.
+  }
+  rpc ArticleFavoriteAction(FavoriteActionRequest) returns(FavoriteActionResponse) {
+    option (api.post) = "/blog_server/favorite/action/article";
+    // Like and unlike operations of the logged-in user on the video.
+  }
+}
+

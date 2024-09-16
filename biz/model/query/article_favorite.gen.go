@@ -16,14 +16,14 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"github.com/qingyggg/blog_server/biz/model/model"
+	"github.com/qingyggg/blog_server/biz/model/orm_gen"
 )
 
 func newArticleFavorite(db *gorm.DB, opts ...gen.DOOption) articleFavorite {
 	_articleFavorite := articleFavorite{}
 
 	_articleFavorite.articleFavoriteDo.UseDB(db, opts...)
-	_articleFavorite.articleFavoriteDo.UseModel(&model.ArticleFavorite{})
+	_articleFavorite.articleFavoriteDo.UseModel(&orm_gen.ArticleFavorite{})
 
 	tableName := _articleFavorite.articleFavoriteDo.TableName()
 	_articleFavorite.ALL = field.NewAsterisk(tableName)
@@ -138,17 +138,17 @@ type IArticleFavoriteDo interface {
 	Count() (count int64, err error)
 	Scopes(funcs ...func(gen.Dao) gen.Dao) IArticleFavoriteDo
 	Unscoped() IArticleFavoriteDo
-	Create(values ...*model.ArticleFavorite) error
-	CreateInBatches(values []*model.ArticleFavorite, batchSize int) error
-	Save(values ...*model.ArticleFavorite) error
-	First() (*model.ArticleFavorite, error)
-	Take() (*model.ArticleFavorite, error)
-	Last() (*model.ArticleFavorite, error)
-	Find() ([]*model.ArticleFavorite, error)
-	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.ArticleFavorite, err error)
-	FindInBatches(result *[]*model.ArticleFavorite, batchSize int, fc func(tx gen.Dao, batch int) error) error
+	Create(values ...*orm_gen.ArticleFavorite) error
+	CreateInBatches(values []*orm_gen.ArticleFavorite, batchSize int) error
+	Save(values ...*orm_gen.ArticleFavorite) error
+	First() (*orm_gen.ArticleFavorite, error)
+	Take() (*orm_gen.ArticleFavorite, error)
+	Last() (*orm_gen.ArticleFavorite, error)
+	Find() ([]*orm_gen.ArticleFavorite, error)
+	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*orm_gen.ArticleFavorite, err error)
+	FindInBatches(result *[]*orm_gen.ArticleFavorite, batchSize int, fc func(tx gen.Dao, batch int) error) error
 	Pluck(column field.Expr, dest interface{}) error
-	Delete(...*model.ArticleFavorite) (info gen.ResultInfo, err error)
+	Delete(...*orm_gen.ArticleFavorite) (info gen.ResultInfo, err error)
 	Update(column field.Expr, value interface{}) (info gen.ResultInfo, err error)
 	UpdateSimple(columns ...field.AssignExpr) (info gen.ResultInfo, err error)
 	Updates(value interface{}) (info gen.ResultInfo, err error)
@@ -160,9 +160,9 @@ type IArticleFavoriteDo interface {
 	Assign(attrs ...field.AssignExpr) IArticleFavoriteDo
 	Joins(fields ...field.RelationField) IArticleFavoriteDo
 	Preload(fields ...field.RelationField) IArticleFavoriteDo
-	FirstOrInit() (*model.ArticleFavorite, error)
-	FirstOrCreate() (*model.ArticleFavorite, error)
-	FindByPage(offset int, limit int) (result []*model.ArticleFavorite, count int64, err error)
+	FirstOrInit() (*orm_gen.ArticleFavorite, error)
+	FirstOrCreate() (*orm_gen.ArticleFavorite, error)
+	FindByPage(offset int, limit int) (result []*orm_gen.ArticleFavorite, count int64, err error)
 	ScanByPage(result interface{}, offset int, limit int) (count int64, err error)
 	Scan(result interface{}) (err error)
 	Returning(value interface{}, columns ...string) IArticleFavoriteDo
@@ -262,57 +262,57 @@ func (a articleFavoriteDo) Unscoped() IArticleFavoriteDo {
 	return a.withDO(a.DO.Unscoped())
 }
 
-func (a articleFavoriteDo) Create(values ...*model.ArticleFavorite) error {
+func (a articleFavoriteDo) Create(values ...*orm_gen.ArticleFavorite) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return a.DO.Create(values)
 }
 
-func (a articleFavoriteDo) CreateInBatches(values []*model.ArticleFavorite, batchSize int) error {
+func (a articleFavoriteDo) CreateInBatches(values []*orm_gen.ArticleFavorite, batchSize int) error {
 	return a.DO.CreateInBatches(values, batchSize)
 }
 
 // Save : !!! underlying implementation is different with GORM
 // The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).Create(values)
-func (a articleFavoriteDo) Save(values ...*model.ArticleFavorite) error {
+func (a articleFavoriteDo) Save(values ...*orm_gen.ArticleFavorite) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return a.DO.Save(values)
 }
 
-func (a articleFavoriteDo) First() (*model.ArticleFavorite, error) {
+func (a articleFavoriteDo) First() (*orm_gen.ArticleFavorite, error) {
 	if result, err := a.DO.First(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.ArticleFavorite), nil
+		return result.(*orm_gen.ArticleFavorite), nil
 	}
 }
 
-func (a articleFavoriteDo) Take() (*model.ArticleFavorite, error) {
+func (a articleFavoriteDo) Take() (*orm_gen.ArticleFavorite, error) {
 	if result, err := a.DO.Take(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.ArticleFavorite), nil
+		return result.(*orm_gen.ArticleFavorite), nil
 	}
 }
 
-func (a articleFavoriteDo) Last() (*model.ArticleFavorite, error) {
+func (a articleFavoriteDo) Last() (*orm_gen.ArticleFavorite, error) {
 	if result, err := a.DO.Last(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.ArticleFavorite), nil
+		return result.(*orm_gen.ArticleFavorite), nil
 	}
 }
 
-func (a articleFavoriteDo) Find() ([]*model.ArticleFavorite, error) {
+func (a articleFavoriteDo) Find() ([]*orm_gen.ArticleFavorite, error) {
 	result, err := a.DO.Find()
-	return result.([]*model.ArticleFavorite), err
+	return result.([]*orm_gen.ArticleFavorite), err
 }
 
-func (a articleFavoriteDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.ArticleFavorite, err error) {
-	buf := make([]*model.ArticleFavorite, 0, batchSize)
+func (a articleFavoriteDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*orm_gen.ArticleFavorite, err error) {
+	buf := make([]*orm_gen.ArticleFavorite, 0, batchSize)
 	err = a.DO.FindInBatches(&buf, batchSize, func(tx gen.Dao, batch int) error {
 		defer func() { results = append(results, buf...) }()
 		return fc(tx, batch)
@@ -320,7 +320,7 @@ func (a articleFavoriteDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch 
 	return results, err
 }
 
-func (a articleFavoriteDo) FindInBatches(result *[]*model.ArticleFavorite, batchSize int, fc func(tx gen.Dao, batch int) error) error {
+func (a articleFavoriteDo) FindInBatches(result *[]*orm_gen.ArticleFavorite, batchSize int, fc func(tx gen.Dao, batch int) error) error {
 	return a.DO.FindInBatches(result, batchSize, fc)
 }
 
@@ -346,23 +346,23 @@ func (a articleFavoriteDo) Preload(fields ...field.RelationField) IArticleFavori
 	return &a
 }
 
-func (a articleFavoriteDo) FirstOrInit() (*model.ArticleFavorite, error) {
+func (a articleFavoriteDo) FirstOrInit() (*orm_gen.ArticleFavorite, error) {
 	if result, err := a.DO.FirstOrInit(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.ArticleFavorite), nil
+		return result.(*orm_gen.ArticleFavorite), nil
 	}
 }
 
-func (a articleFavoriteDo) FirstOrCreate() (*model.ArticleFavorite, error) {
+func (a articleFavoriteDo) FirstOrCreate() (*orm_gen.ArticleFavorite, error) {
 	if result, err := a.DO.FirstOrCreate(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.ArticleFavorite), nil
+		return result.(*orm_gen.ArticleFavorite), nil
 	}
 }
 
-func (a articleFavoriteDo) FindByPage(offset int, limit int) (result []*model.ArticleFavorite, count int64, err error) {
+func (a articleFavoriteDo) FindByPage(offset int, limit int) (result []*orm_gen.ArticleFavorite, count int64, err error) {
 	result, err = a.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
@@ -391,7 +391,7 @@ func (a articleFavoriteDo) Scan(result interface{}) (err error) {
 	return a.DO.Scan(result)
 }
 
-func (a articleFavoriteDo) Delete(models ...*model.ArticleFavorite) (result gen.ResultInfo, err error) {
+func (a articleFavoriteDo) Delete(models ...*orm_gen.ArticleFavorite) (result gen.ResultInfo, err error) {
 	return a.DO.Delete(models)
 }
 

@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+option go_package = "hertz/common";
+
+message UserProfile{
+  string avatar = 1; // user avatar URL
+  string background_image =2; // image at the top of the user's personal page
+  string signature = 3; // user profile
+}
+
+message User {
+  int64 id = 1; // user id
+  string name = 2; // user name
+  int64 follow_count = 3; // total number of people the user follows
+  int64 follower_count = 4; // total number of fans
+  bool is_follow = 5; // whether the currently logged-in user follows this user
+  UserProfile profile =6;
+  int64 total_favorited = 7; // number of articles for articles published by user
+  int64 work_count = 8; // number of articles published by user
+}
+
+message ArticleBasePreload{
+  string note=1;
+  string title=2;
+  string cover_url=3;
+}
+
+message ArticleBase{
+  ArticleBasePreload preload=1;
+  string content=3;
+}
+
+message ArticleInfo{
+  int64 like_count = 1; // total number of likes for the video
+  int64 comment_count = 2; // total number of comments on the video
+  bool is_favorite = 3; // true-Liked，false-did not like
+  int64 dislike_count = 4;
+  int64 viewed_count=5;
+  string author_name=6;
+}
+
+message ArticleCard{
+  int64 id=1;
+  ArticleInfo info=2;
+  ArticleBasePreload pre=3;
+  User author = 4; // author information
+}
+
+message Article {
+  int64 id = 1; // video id
+  User author = 2; // author information
+  ArticleCard info=3;
+  ArticleBase base=4;
+}
+

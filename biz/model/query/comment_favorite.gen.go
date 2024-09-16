@@ -16,14 +16,14 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"github.com/qingyggg/blog_server/biz/model/model"
+	"github.com/qingyggg/blog_server/biz/model/orm_gen"
 )
 
 func newCommentFavorite(db *gorm.DB, opts ...gen.DOOption) commentFavorite {
 	_commentFavorite := commentFavorite{}
 
 	_commentFavorite.commentFavoriteDo.UseDB(db, opts...)
-	_commentFavorite.commentFavoriteDo.UseModel(&model.CommentFavorite{})
+	_commentFavorite.commentFavoriteDo.UseModel(&orm_gen.CommentFavorite{})
 
 	tableName := _commentFavorite.commentFavoriteDo.TableName()
 	_commentFavorite.ALL = field.NewAsterisk(tableName)
@@ -134,17 +134,17 @@ type ICommentFavoriteDo interface {
 	Count() (count int64, err error)
 	Scopes(funcs ...func(gen.Dao) gen.Dao) ICommentFavoriteDo
 	Unscoped() ICommentFavoriteDo
-	Create(values ...*model.CommentFavorite) error
-	CreateInBatches(values []*model.CommentFavorite, batchSize int) error
-	Save(values ...*model.CommentFavorite) error
-	First() (*model.CommentFavorite, error)
-	Take() (*model.CommentFavorite, error)
-	Last() (*model.CommentFavorite, error)
-	Find() ([]*model.CommentFavorite, error)
-	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.CommentFavorite, err error)
-	FindInBatches(result *[]*model.CommentFavorite, batchSize int, fc func(tx gen.Dao, batch int) error) error
+	Create(values ...*orm_gen.CommentFavorite) error
+	CreateInBatches(values []*orm_gen.CommentFavorite, batchSize int) error
+	Save(values ...*orm_gen.CommentFavorite) error
+	First() (*orm_gen.CommentFavorite, error)
+	Take() (*orm_gen.CommentFavorite, error)
+	Last() (*orm_gen.CommentFavorite, error)
+	Find() ([]*orm_gen.CommentFavorite, error)
+	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*orm_gen.CommentFavorite, err error)
+	FindInBatches(result *[]*orm_gen.CommentFavorite, batchSize int, fc func(tx gen.Dao, batch int) error) error
 	Pluck(column field.Expr, dest interface{}) error
-	Delete(...*model.CommentFavorite) (info gen.ResultInfo, err error)
+	Delete(...*orm_gen.CommentFavorite) (info gen.ResultInfo, err error)
 	Update(column field.Expr, value interface{}) (info gen.ResultInfo, err error)
 	UpdateSimple(columns ...field.AssignExpr) (info gen.ResultInfo, err error)
 	Updates(value interface{}) (info gen.ResultInfo, err error)
@@ -156,9 +156,9 @@ type ICommentFavoriteDo interface {
 	Assign(attrs ...field.AssignExpr) ICommentFavoriteDo
 	Joins(fields ...field.RelationField) ICommentFavoriteDo
 	Preload(fields ...field.RelationField) ICommentFavoriteDo
-	FirstOrInit() (*model.CommentFavorite, error)
-	FirstOrCreate() (*model.CommentFavorite, error)
-	FindByPage(offset int, limit int) (result []*model.CommentFavorite, count int64, err error)
+	FirstOrInit() (*orm_gen.CommentFavorite, error)
+	FirstOrCreate() (*orm_gen.CommentFavorite, error)
+	FindByPage(offset int, limit int) (result []*orm_gen.CommentFavorite, count int64, err error)
 	ScanByPage(result interface{}, offset int, limit int) (count int64, err error)
 	Scan(result interface{}) (err error)
 	Returning(value interface{}, columns ...string) ICommentFavoriteDo
@@ -258,57 +258,57 @@ func (c commentFavoriteDo) Unscoped() ICommentFavoriteDo {
 	return c.withDO(c.DO.Unscoped())
 }
 
-func (c commentFavoriteDo) Create(values ...*model.CommentFavorite) error {
+func (c commentFavoriteDo) Create(values ...*orm_gen.CommentFavorite) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return c.DO.Create(values)
 }
 
-func (c commentFavoriteDo) CreateInBatches(values []*model.CommentFavorite, batchSize int) error {
+func (c commentFavoriteDo) CreateInBatches(values []*orm_gen.CommentFavorite, batchSize int) error {
 	return c.DO.CreateInBatches(values, batchSize)
 }
 
 // Save : !!! underlying implementation is different with GORM
 // The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).Create(values)
-func (c commentFavoriteDo) Save(values ...*model.CommentFavorite) error {
+func (c commentFavoriteDo) Save(values ...*orm_gen.CommentFavorite) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return c.DO.Save(values)
 }
 
-func (c commentFavoriteDo) First() (*model.CommentFavorite, error) {
+func (c commentFavoriteDo) First() (*orm_gen.CommentFavorite, error) {
 	if result, err := c.DO.First(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.CommentFavorite), nil
+		return result.(*orm_gen.CommentFavorite), nil
 	}
 }
 
-func (c commentFavoriteDo) Take() (*model.CommentFavorite, error) {
+func (c commentFavoriteDo) Take() (*orm_gen.CommentFavorite, error) {
 	if result, err := c.DO.Take(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.CommentFavorite), nil
+		return result.(*orm_gen.CommentFavorite), nil
 	}
 }
 
-func (c commentFavoriteDo) Last() (*model.CommentFavorite, error) {
+func (c commentFavoriteDo) Last() (*orm_gen.CommentFavorite, error) {
 	if result, err := c.DO.Last(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.CommentFavorite), nil
+		return result.(*orm_gen.CommentFavorite), nil
 	}
 }
 
-func (c commentFavoriteDo) Find() ([]*model.CommentFavorite, error) {
+func (c commentFavoriteDo) Find() ([]*orm_gen.CommentFavorite, error) {
 	result, err := c.DO.Find()
-	return result.([]*model.CommentFavorite), err
+	return result.([]*orm_gen.CommentFavorite), err
 }
 
-func (c commentFavoriteDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.CommentFavorite, err error) {
-	buf := make([]*model.CommentFavorite, 0, batchSize)
+func (c commentFavoriteDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*orm_gen.CommentFavorite, err error) {
+	buf := make([]*orm_gen.CommentFavorite, 0, batchSize)
 	err = c.DO.FindInBatches(&buf, batchSize, func(tx gen.Dao, batch int) error {
 		defer func() { results = append(results, buf...) }()
 		return fc(tx, batch)
@@ -316,7 +316,7 @@ func (c commentFavoriteDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch 
 	return results, err
 }
 
-func (c commentFavoriteDo) FindInBatches(result *[]*model.CommentFavorite, batchSize int, fc func(tx gen.Dao, batch int) error) error {
+func (c commentFavoriteDo) FindInBatches(result *[]*orm_gen.CommentFavorite, batchSize int, fc func(tx gen.Dao, batch int) error) error {
 	return c.DO.FindInBatches(result, batchSize, fc)
 }
 
@@ -342,23 +342,23 @@ func (c commentFavoriteDo) Preload(fields ...field.RelationField) ICommentFavori
 	return &c
 }
 
-func (c commentFavoriteDo) FirstOrInit() (*model.CommentFavorite, error) {
+func (c commentFavoriteDo) FirstOrInit() (*orm_gen.CommentFavorite, error) {
 	if result, err := c.DO.FirstOrInit(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.CommentFavorite), nil
+		return result.(*orm_gen.CommentFavorite), nil
 	}
 }
 
-func (c commentFavoriteDo) FirstOrCreate() (*model.CommentFavorite, error) {
+func (c commentFavoriteDo) FirstOrCreate() (*orm_gen.CommentFavorite, error) {
 	if result, err := c.DO.FirstOrCreate(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.CommentFavorite), nil
+		return result.(*orm_gen.CommentFavorite), nil
 	}
 }
 
-func (c commentFavoriteDo) FindByPage(offset int, limit int) (result []*model.CommentFavorite, count int64, err error) {
+func (c commentFavoriteDo) FindByPage(offset int, limit int) (result []*orm_gen.CommentFavorite, count int64, err error) {
 	result, err = c.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
@@ -387,7 +387,7 @@ func (c commentFavoriteDo) Scan(result interface{}) (err error) {
 	return c.DO.Scan(result)
 }
 
-func (c commentFavoriteDo) Delete(models ...*model.CommentFavorite) (result gen.ResultInfo, err error) {
+func (c commentFavoriteDo) Delete(models ...*orm_gen.CommentFavorite) (result gen.ResultInfo, err error) {
 	return c.DO.Delete(models)
 }
 
