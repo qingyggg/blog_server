@@ -18,6 +18,9 @@ package utils
 
 import (
 	"errors"
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/qingyggg/blog_server/biz/model/hertz/basic/user"
 	"github.com/qingyggg/blog_server/pkg/errno"
 )
 
@@ -47,4 +50,12 @@ func baseResp(err errno.ErrNo) *BaseResp {
 		StatusCode: err.ErrCode,
 		StatusMsg:  err.ErrMsg,
 	}
+}
+
+func ErrResp(c *app.RequestContext, err error) {
+	resp := BuildBaseResp(err)
+	c.JSON(consts.StatusOK, user.UserActionResponse{
+		StatusCode: resp.StatusCode,
+		StatusMsg:  resp.StatusMsg,
+	})
 }

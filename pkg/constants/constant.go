@@ -18,7 +18,7 @@ package constants
 
 // connection information
 const (
-	MySQLDefaultDSN = "storybook:123456@tcp(127.0.0.1:18000)/storybook?charset=utf8&parseTime=True&loc=Local"
+	MySQLDefaultDSN = "storybook:storybook123@tcp(127.0.0.1:18000)/storybook?charset=utf8&parseTime=True&loc=Local"
 
 	MinioEndPoint        = "localhost:18001"
 	MinioAccessKeyID     = "storybook"

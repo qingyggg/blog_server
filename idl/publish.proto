@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package publish;
+
+import "api.proto";
+import "common.proto";
+
+option go_package = "hertz/basic/publish";
+
+message PublishActionRequest {
+  int64 uid=1;
+  ArticleBase payload=2;
+}
+
+message PublishActionDelRequest{//jwt verify
+  int64 uid=1;
+  int64 article_id=2;
+}
+
+message PublishActionResponse {
+  int32 status_code = 1[(api.go_tag)='json:"status_code"'];
+  string status_msg = 2;
+}
+
+message PublishRequest{
+  int64 article_id=1;
+}
+
+message PublishListRequest {
+  int64 user_id = 1;//如果id为0，则根据时间的先后去请求文章列表
+  int64 offset=2;
+}
+
+message PublishResponse{
+  int32 status_code = 1[(api.go_tag)='json:"status_code"'];
+  string status_msg = 2;
+  Article article=3;
+}
+
+message PublishListResponse {
+  int32 status_code = 1[(api.go_tag)='json:"status_code"'];
+  string status_msg = 2;
+  repeated ArticleCard list=3;
+}
+
+service PublishHandler {
+  rpc PublishAction(PublishActionRequest) returns(PublishActionResponse) {
+    option (api.post) = "/blog_server/publish/action/create";
+  }
+  rpc PublishModifyAction(PublishActionRequest) returns(PublishActionResponse) {
+    option (api.post) = "/blog_server/publish/action/modify";
+  }
+  rpc PublishDelAction(PublishActionDelRequest) returns(PublishActionResponse) {
+    option (api.post) = "/blog_server/publish/action/delete";
+    // Logged in user selects video to upload.
+  }
+  rpc PublishList(PublishListRequest) returns(PublishListResponse) {
+    option (api.get) = "/blog_server/publish/list";
+    // Get logged-in to the user's video publishing list, and directly list all the videos that the user has contributed.
+  }
+  rpc PublishDetail(PublishRequest) returns(PublishResponse) {
+    option (api.get) = "/blog_server/publish/detail";
+    // Get logged-in to the user's video publishing list, and directly list all the videos that the user has contributed.
+  }
+}
+

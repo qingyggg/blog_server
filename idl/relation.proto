@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package relation;
+
+import "api.proto";
+import "common.proto";
+
+option go_package = "hertz/social/relation";
+
+message RelationActionRequest {
+  int64 to_user_id = 2;
+  int32 action_type = 3; // 1-Follow, 2-Unfollow
+}
+
+message RelationActionResponse {
+  int32 status_code = 1[(api.go_tag)='json:"status_code"'];
+  string status_msg = 2;
+}
+
+message RelationFollowListRequest { //follow list
+  int64 user_id = 1;
+}
+
+message RelationFollowListResponse {
+  int32 status_code = 1[(api.go_tag)='json:"status_code"'];
+  string status_msg = 2;
+  repeated User user_list = 3; // User information list
+}
+
+message RelationFriendListRequest {
+  int64 user_id = 1;
+}
+
+service RelationHandler {
+  rpc RelationAction(RelationActionRequest) returns(RelationActionResponse) {
+    option (api.post) = "/blog_server/relation/action";
+    // Logged-in users follow or unfollow other users.
+  }
+
+  rpc RelationFollowList(RelationFollowListRequest) returns(RelationFollowListResponse) {
+    option (api.get) = "/blog_server/relation/follow/list"; // follow list
+    // Get a list of all users followed by the logged in user.
+  }
+
+  rpc RelationFollowerList(RelationFollowListRequest) returns(RelationFollowListResponse) {
+    option (api.get) = "/blog_server/relation/follower/list"; // fan list
+    // Get a list of all fans following the logged in user.
+  }
+}
+

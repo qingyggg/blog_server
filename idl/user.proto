@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package user;
+
+import "api.proto";
+import "common.proto";
+
+option go_package = "hertz/basic/user";
+
+message UserActionRequest {
+  string username = 1; // registered user name
+  string password = 2;
+}
+
+message UserActionResponse {
+  int32 status_code = 1[(api.go_tag)='json:"status_code"'];
+  string status_msg = 2;
+  int64 user_id = 3; // user id
+}
+
+message UserActionPwdModifyRequest {
+  string username = 1; // registered user name
+  string new_password = 2;
+  string old_password = 3;
+}
+
+message UserActionProfileModifyRequest{
+  int64 user_id=1;
+  UserProfile user=2;
+}
+
+message UserRequest {
+  int64 user_id = 1;
+}
+
+message UserResponse {
+  int32 status_code = 1[(api.go_tag)='json:"status_code"'];
+  string status_msg = 2;
+  User user = 3; // User Info
+}
+
+service UserHandler {
+  rpc User(UserRequest) returns(UserResponse) {
+    option (api.get) = "/blog_server/user/";
+  }
+
+  rpc UserRegister(UserActionRequest) returns(UserActionResponse) {
+    option (api.post) = "/blog_server/user/register/";
+    // When a new user registers, just provide a user name, password, and nickname, and the user name needs to be unique.
+    // After successful creation, return the user id and permission token.
+  }
+
+  rpc UserLogin(UserActionRequest) returns(UserActionResponse) {
+    option (api.post) = "/blog_server/user/login/";
+    // When a new user registers, just provide a user name, password, and nickname, and the user name needs to be unique.
+    // After successful creation, return the user id and permission token.
+  }
+
+  rpc UserPwdModify(UserActionPwdModifyRequest) returns(UserActionResponse){
+    option (api.post) = "/blog_server/user/pwd_modify/";
+  }
+
+  rpc UserProfileModify(UserActionProfileModifyRequest) returns(UserActionResponse){
+    option (api.post) = "/blog_server/user/profile_modify/";
+  }
+}
+

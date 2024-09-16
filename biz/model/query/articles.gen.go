@@ -16,14 +16,14 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"github.com/qingyggg/blog_server/biz/model/model"
+	"github.com/qingyggg/blog_server/biz/model/orm_gen"
 )
 
 func newArticle(db *gorm.DB, opts ...gen.DOOption) article {
 	_article := article{}
 
 	_article.articleDo.UseDB(db, opts...)
-	_article.articleDo.UseModel(&model.Article{})
+	_article.articleDo.UseModel(&orm_gen.Article{})
 
 	tableName := _article.articleDo.TableName()
 	_article.ALL = field.NewAsterisk(tableName)
@@ -150,17 +150,17 @@ type IArticleDo interface {
 	Count() (count int64, err error)
 	Scopes(funcs ...func(gen.Dao) gen.Dao) IArticleDo
 	Unscoped() IArticleDo
-	Create(values ...*model.Article) error
-	CreateInBatches(values []*model.Article, batchSize int) error
-	Save(values ...*model.Article) error
-	First() (*model.Article, error)
-	Take() (*model.Article, error)
-	Last() (*model.Article, error)
-	Find() ([]*model.Article, error)
-	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.Article, err error)
-	FindInBatches(result *[]*model.Article, batchSize int, fc func(tx gen.Dao, batch int) error) error
+	Create(values ...*orm_gen.Article) error
+	CreateInBatches(values []*orm_gen.Article, batchSize int) error
+	Save(values ...*orm_gen.Article) error
+	First() (*orm_gen.Article, error)
+	Take() (*orm_gen.Article, error)
+	Last() (*orm_gen.Article, error)
+	Find() ([]*orm_gen.Article, error)
+	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*orm_gen.Article, err error)
+	FindInBatches(result *[]*orm_gen.Article, batchSize int, fc func(tx gen.Dao, batch int) error) error
 	Pluck(column field.Expr, dest interface{}) error
-	Delete(...*model.Article) (info gen.ResultInfo, err error)
+	Delete(...*orm_gen.Article) (info gen.ResultInfo, err error)
 	Update(column field.Expr, value interface{}) (info gen.ResultInfo, err error)
 	UpdateSimple(columns ...field.AssignExpr) (info gen.ResultInfo, err error)
 	Updates(value interface{}) (info gen.ResultInfo, err error)
@@ -172,9 +172,9 @@ type IArticleDo interface {
 	Assign(attrs ...field.AssignExpr) IArticleDo
 	Joins(fields ...field.RelationField) IArticleDo
 	Preload(fields ...field.RelationField) IArticleDo
-	FirstOrInit() (*model.Article, error)
-	FirstOrCreate() (*model.Article, error)
-	FindByPage(offset int, limit int) (result []*model.Article, count int64, err error)
+	FirstOrInit() (*orm_gen.Article, error)
+	FirstOrCreate() (*orm_gen.Article, error)
+	FindByPage(offset int, limit int) (result []*orm_gen.Article, count int64, err error)
 	ScanByPage(result interface{}, offset int, limit int) (count int64, err error)
 	Scan(result interface{}) (err error)
 	Returning(value interface{}, columns ...string) IArticleDo
@@ -274,57 +274,57 @@ func (a articleDo) Unscoped() IArticleDo {
 	return a.withDO(a.DO.Unscoped())
 }
 
-func (a articleDo) Create(values ...*model.Article) error {
+func (a articleDo) Create(values ...*orm_gen.Article) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return a.DO.Create(values)
 }
 
-func (a articleDo) CreateInBatches(values []*model.Article, batchSize int) error {
+func (a articleDo) CreateInBatches(values []*orm_gen.Article, batchSize int) error {
 	return a.DO.CreateInBatches(values, batchSize)
 }
 
 // Save : !!! underlying implementation is different with GORM
 // The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).Create(values)
-func (a articleDo) Save(values ...*model.Article) error {
+func (a articleDo) Save(values ...*orm_gen.Article) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return a.DO.Save(values)
 }
 
-func (a articleDo) First() (*model.Article, error) {
+func (a articleDo) First() (*orm_gen.Article, error) {
 	if result, err := a.DO.First(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Article), nil
+		return result.(*orm_gen.Article), nil
 	}
 }
 
-func (a articleDo) Take() (*model.Article, error) {
+func (a articleDo) Take() (*orm_gen.Article, error) {
 	if result, err := a.DO.Take(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Article), nil
+		return result.(*orm_gen.Article), nil
 	}
 }
 
-func (a articleDo) Last() (*model.Article, error) {
+func (a articleDo) Last() (*orm_gen.Article, error) {
 	if result, err := a.DO.Last(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Article), nil
+		return result.(*orm_gen.Article), nil
 	}
 }
 
-func (a articleDo) Find() ([]*model.Article, error) {
+func (a articleDo) Find() ([]*orm_gen.Article, error) {
 	result, err := a.DO.Find()
-	return result.([]*model.Article), err
+	return result.([]*orm_gen.Article), err
 }
 
-func (a articleDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.Article, err error) {
-	buf := make([]*model.Article, 0, batchSize)
+func (a articleDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*orm_gen.Article, err error) {
+	buf := make([]*orm_gen.Article, 0, batchSize)
 	err = a.DO.FindInBatches(&buf, batchSize, func(tx gen.Dao, batch int) error {
 		defer func() { results = append(results, buf...) }()
 		return fc(tx, batch)
@@ -332,7 +332,7 @@ func (a articleDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) err
 	return results, err
 }
 
-func (a articleDo) FindInBatches(result *[]*model.Article, batchSize int, fc func(tx gen.Dao, batch int) error) error {
+func (a articleDo) FindInBatches(result *[]*orm_gen.Article, batchSize int, fc func(tx gen.Dao, batch int) error) error {
 	return a.DO.FindInBatches(result, batchSize, fc)
 }
 
@@ -358,23 +358,23 @@ func (a articleDo) Preload(fields ...field.RelationField) IArticleDo {
 	return &a
 }
 
-func (a articleDo) FirstOrInit() (*model.Article, error) {
+func (a articleDo) FirstOrInit() (*orm_gen.Article, error) {
 	if result, err := a.DO.FirstOrInit(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Article), nil
+		return result.(*orm_gen.Article), nil
 	}
 }
 
-func (a articleDo) FirstOrCreate() (*model.Article, error) {
+func (a articleDo) FirstOrCreate() (*orm_gen.Article, error) {
 	if result, err := a.DO.FirstOrCreate(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Article), nil
+		return result.(*orm_gen.Article), nil
 	}
 }
 
-func (a articleDo) FindByPage(offset int, limit int) (result []*model.Article, count int64, err error) {
+func (a articleDo) FindByPage(offset int, limit int) (result []*orm_gen.Article, count int64, err error) {
 	result, err = a.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
@@ -403,7 +403,7 @@ func (a articleDo) Scan(result interface{}) (err error) {
 	return a.DO.Scan(result)
 }
 
-func (a articleDo) Delete(models ...*model.Article) (result gen.ResultInfo, err error) {
+func (a articleDo) Delete(models ...*orm_gen.Article) (result gen.ResultInfo, err error) {
 	return a.DO.Delete(models)
 }
 

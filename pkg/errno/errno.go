@@ -40,7 +40,7 @@ const (
 	MessageAddFailedErrCode
 	FriendListNoPermissionErrCode
 
-	VideoIsNotExistErrCode
+	ArticleIsNotExistErrCode
 	CommentIsNotExistErrCode
 )
 
@@ -54,7 +54,7 @@ const (
 
 	MessageAddFailedErrMsg    = "message add failed"
 	FriendListNoPermissionMsg = "You can't query his friend list"
-	VideoIsNotExistErrMsg     = "video is not exist"
+	ArticleIsNotExistErrMsg   = "article is not exist"
 	CommentIsNotExistErrMsg   = "comment is not exist"
 )
 
@@ -92,7 +92,7 @@ var (
 
 	MessageAddFailedErr       = NewErrNo(MessageAddFailedErrCode, MessageAddFailedErrMsg)
 	FriendListNoPermissionErr = NewErrNo(FriendListNoPermissionErrCode, FriendListNoPermissionMsg)
-	VideoIsNotExistErr        = NewErrNo(VideoIsNotExistErrCode, VideoIsNotExistErrMsg)
+	ArticleIsNotExistErr      = NewErrNo(ArticleIsNotExistErrCode, ArticleIsNotExistErrMsg)
 	CommentIsNotExistErr      = NewErrNo(CommentIsNotExistErrCode, CommentIsNotExistErrMsg)
 )
 
