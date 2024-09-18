@@ -19,24 +19,181 @@
     "host": "localhost:18005",
     "basePath": "/",
     "paths": {
-        "/blog_server/user/": {
+        "/blog_server/publish/action/create": {
+            "post": {
+                "responses": {}
+            }
+        },
+        "/blog_server/publish/action/delete": {
+            "post": {
+                "responses": {}
+            }
+        },
+        "/blog_server/publish/action/modify": {
+            "post": {
+                "responses": {}
+            }
+        },
+        "/blog_server/publish/detail": {
             "get": {
                 "responses": {}
             }
         },
+        "/blog_server/publish/list": {
+            "get": {
+                "responses": {}
+            }
+        },
+        "/blog_server/user/": {
+            "get": {
+                "description": "根据用户请求获取对应的用户信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关接口"
+                ],
+                "summary": "获取用户信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "用户ID",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功获取用户信息",
+                        "schema": {
+                            "$ref": "#/definitions/user.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/blog_server/user/login/": {
             "post": {
-                "responses": {}
+                "description": "用户通过提供用户名和密码登录账户",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关接口"
+                ],
+                "summary": "用户登录",
+                "parameters": [
+                    {
+                        "description": "用户登录请求参数",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功返回用户ID及状态信息",
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误或其他错误信息",
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionResponse"
+                        }
+                    }
+                }
             }
         },
         "/blog_server/user/profile_modify/": {
             "post": {
-                "responses": {}
+                "description": "用户通过上传新的头像，背景图片，或者更改用户签名来进行修改资料",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关接口"
+                ],
+                "summary": "用户修改资料",
+                "parameters": [
+                    {
+                        "description": "用户修改资料请求参数",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionProfileModifyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功返回用户ID及状态信息",
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionResponse"
+                        }
+                    }
+                }
             }
         },
         "/blog_server/user/pwd_modify/": {
             "post": {
-                "responses": {}
+                "description": "用户通过提供用户名，旧密码，新密码进行修改账户密码",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关接口"
+                ],
+                "summary": "用户修改密码",
+                "parameters": [
+                    {
+                        "description": "用户修改密码请求参数",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionPwdModifyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功返回用户ID及状态信息",
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误或其他错误信息",
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionResponse"
+                        }
+                    }
+                }
             }
         },
         "/blog_server/user/register/": {
@@ -79,21 +236,162 @@
                 }
             }
         },
-        "/ping": {
-            "get": {
-                "description": "测试 Description",
+        "/upload/file": {
+            "post": {
+                "description": "用户可以通过该接口上传文件",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "测试 Summary",
-                "responses": {}
+                "tags": [
+                    "文件上传接口"
+                ],
+                "summary": "上传文件",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "上传的文件",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "上传的类型，是头像还是背景图片",
+                        "name": "image_type",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功返回文件信息",
+                        "schema": {
+                            "$ref": "#/definitions/common.UploadResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
             }
         }
     },
     "definitions": {
+        "common.BaseResponse": {
+            "type": "object",
+            "properties": {
+                "status_code": {
+                    "description": "status code, 0-success, other values-failure",
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "description": "status description",
+                    "type": "string"
+                }
+            }
+        },
+        "common.UploadResponse": {
+            "type": "object",
+            "properties": {
+                "fileUrl": {
+                    "description": "文件存储的URL",
+                    "type": "string"
+                },
+                "status_code": {
+                    "description": "status code, 0-success, other values-failure",
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "description": "status description",
+                    "type": "string"
+                }
+            }
+        },
+        "common.User": {
+            "type": "object",
+            "properties": {
+                "follow_count": {
+                    "description": "total number of people the user follows",
+                    "type": "integer"
+                },
+                "follower_count": {
+                    "description": "total number of fans",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "user id",
+                    "type": "integer"
+                },
+                "is_follow": {
+                    "description": "whether the currently logged-in user follows this user",
+                    "type": "boolean"
+                },
+                "name": {
+                    "description": "user name",
+                    "type": "string"
+                },
+                "profile": {
+                    "$ref": "#/definitions/common.UserProfile"
+                },
+                "total_favorited": {
+                    "description": "number of articles for articles published by user",
+                    "type": "integer"
+                },
+                "work_count": {
+                    "description": "number of articles published by user",
+                    "type": "integer"
+                }
+            }
+        },
+        "common.UserProfile": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "description": "user avatar URL",
+                    "type": "string"
+                },
+                "background_image": {
+                    "description": "image at the top of the user's personal page",
+                    "type": "string"
+                },
+                "signature": {
+                    "description": "user profile",
+                    "type": "string"
+                }
+            }
+        },
+        "user.UserActionProfileModifyRequest": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/common.UserProfile"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "user.UserActionPwdModifyRequest": {
+            "type": "object",
+            "properties": {
+                "new_password": {
+                    "type": "string"
+                },
+                "old_password": {
+                    "type": "string"
+                },
+                "username": {
+                    "description": "registered user name",
+                    "type": "string"
+                }
+            }
+        },
         "user.UserActionRequest": {
             "type": "object",
             "properties": {
@@ -118,6 +416,25 @@
                 "user_id": {
                     "description": "user id",
                     "type": "integer"
+                }
+            }
+        },
+        "user.UserResponse": {
+            "type": "object",
+            "properties": {
+                "status_code": {
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                },
+                "user": {
+                    "description": "User Info",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/common.User"
+                        }
+                    ]
                 }
             }
         }

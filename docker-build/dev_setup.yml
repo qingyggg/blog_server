@@ -22,8 +22,8 @@ services:
       - "18001:9000"
       - "18002:9001"
     environment:
-      MINIO_ACCESS_KEY: douyin
-      MINIO_SECRET_KEY: douyin123
+      MINIO_ACCESS_KEY: blog_server
+      MINIO_SECRET_KEY: blog_server123
     volumes:
       - ../pkg/data/minio/:/data
       - ../pkg/configs/minio/:/root/.minio

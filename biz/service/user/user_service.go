@@ -68,15 +68,23 @@ func (s *UserService) UserInfo(req *user.UserRequest) (*common.User, error) {
 	if !exists {
 		currentUserId = 0
 	}
-	return s.GetUserInfo(queryUserId, currentUserId.(int64))
+	return s.GetUserInfo(queryUserId, currentUserId.(int))
 }
 
 func (s *UserService) UserProfileModify(req *user.UserActionProfileModifyRequest) error {
 	uid := req.UserId
-	profile := make(map[string]string)
-	profile["signature"] = req.User.Signature
-	profile["avatar"] = req.User.Avatar
-	profile["background_image"] = req.User.BackgroundImage
+	profile := map[string]interface{}{
+		"signature":        req.User.Signature,
+		"avatar":           req.User.Avatar,
+		"background_image": req.User.BackgroundImage,
+	}
+
+	// 过滤空字符串的字段
+	for key, value := range profile {
+		if value == "" {
+			delete(profile, key)
+		}
+	}
 	err := db.UserProfileModify(uid, profile)
 	if err != nil {
 		return err
@@ -84,9 +92,9 @@ func (s *UserService) UserProfileModify(req *user.UserActionProfileModifyRequest
 	return nil
 }
 
-func (s *UserService) GetUserInfo(queryUserId int64, userId int64) (*common.User, error) {
-	u := &common.User{}
-	errChan := make(chan error, 7)
+func (s *UserService) GetUserInfo(queryUserId int64, userId int) (*common.User, error) {
+	u := new(common.User)
+	errChan := make(chan error, 5)
 	defer close(errChan)
 	var wg sync.WaitGroup
 	wg.Add(5)
@@ -96,6 +104,7 @@ func (s *UserService) GetUserInfo(queryUserId int64, userId int64) (*common.User
 			errChan <- err
 		} else {
 			u.Name = dbUser.UserName
+			u.Profile = new(common.UserProfile)
 			u.Profile.Avatar = utils.URLconvert(s.ctx, s.c, dbUser.Avatar)
 			u.Profile.BackgroundImage = utils.URLconvert(s.ctx, s.c, dbUser.BackgroundImage)
 			u.Profile.Signature = dbUser.Signature
@@ -135,8 +144,8 @@ func (s *UserService) GetUserInfo(queryUserId int64, userId int64) (*common.User
 	}()
 
 	go func() {
-		if userId != 0 {
-			IsFollow, err := db.QueryFollowExist(userId, queryUserId)
+		if userId != 0 && int64(userId) != queryUserId {
+			IsFollow, err := db.QueryFollowExist(int64(userId), queryUserId)
 			if err != nil {
 				errChan <- err
 			} else {
@@ -151,7 +160,7 @@ func (s *UserService) GetUserInfo(queryUserId int64, userId int64) (*common.User
 	wg.Wait()
 	select {
 	case result := <-errChan:
-		return &common.User{}, result
+		return nil, result
 	default:
 	}
 	u.Id = queryUserId

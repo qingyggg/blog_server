@@ -16,6 +16,15 @@ import (
 
 // User .
 //
+// @Summary 获取用户信息
+// @Description 根据用户请求获取对应的用户信息
+// @Tags 用户相关接口
+// @Accept json
+// @Produce json
+// @Param user_id query int true "用户ID"
+// @Success 200 {object} user.UserResponse "成功获取用户信息"
+// @Failure 400 {object} user.UserActionResponse "请求参数错误"
+//
 //	@router	/blog_server/user/ [GET]
 func User(ctx context.Context, c *app.RequestContext) {
 	var err error
@@ -69,8 +78,16 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	})
 }
 
-// UserLogin .
+// UserLogin 登录接口
 //
+//	@Summary		用户登录
+//	@Description	用户通过提供用户名和密码登录账户
+//	@Tags			用户相关接口
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		user.UserActionRequest	true	"用户登录请求参数"
+//	@Success		200		{object}	user.UserActionResponse	"成功返回用户ID及状态信息"
+//	@Failure		400		{object}	user.UserActionResponse	"请求参数错误或其他错误信息"
 //	@router	/blog_server/user/login/ [POST]
 func UserLogin(ctx context.Context, c *app.RequestContext) {
 	var err error
@@ -90,8 +107,16 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 	})
 }
 
-// UserPwdModify .
+// UserPwdModify 密码修改接口
 //
+//	@Summary		用户修改密码
+//	@Description	用户通过提供用户名，旧密码，新密码进行修改账户密码
+//	@Tags			用户相关接口
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		user.UserActionPwdModifyRequest	true	"用户修改密码请求参数"
+//	@Success		200		{object}	user.UserActionResponse	"成功返回用户ID及状态信息"
+//	@Failure		400		{object}	user.UserActionResponse	"请求参数错误或其他错误信息"
 //	@router	/blog_server/user/pwd_modify/ [POST]
 func UserPwdModify(ctx context.Context, c *app.RequestContext) {
 	var err error
@@ -115,6 +140,13 @@ func UserPwdModify(ctx context.Context, c *app.RequestContext) {
 
 // UserProfileModify .
 //
+//	@Summary		用户修改资料
+//	@Description	用户通过上传新的头像，背景图片，或者更改用户签名来进行修改资料
+//	@Tags			用户相关接口
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		user.UserActionProfileModifyRequest	true	"用户修改资料请求参数"
+//	@Success		200		{object}	user.UserActionResponse	"成功返回用户ID及状态信息"
 //	@router	/blog_server/user/profile_modify/ [POST]
 func UserProfileModify(ctx context.Context, c *app.RequestContext) {
 	var err error

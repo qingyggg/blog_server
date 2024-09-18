@@ -21,7 +21,7 @@ func AddNewFavorite(favorite *orm_gen.ArticleFavorite) (bool, error) {
 			return err
 		}
 		if status == 1 {
-			_, err := tx.Article.Where(tx.Article.ID.Eq(favorite.ArticleID)).UpdateSimple(a.LikeCount.Add(1))
+			_, err := tx.Article.Where(tx.Article.ID.Eq(favorite.ArticleID)).UpdateSimple(query.Article.LikeCount.Add(1))
 			if err != nil {
 				return err
 			}
@@ -52,7 +52,7 @@ func DeleteFavorite(favorite *orm_gen.ArticleFavorite) (bool, error) {
 			return err
 		}
 		if favorite.Status == 1 {
-			_, err := tx.Article.Where(tx.Article.ID.Eq(favorite.ArticleID)).UpdateSimple(a.LikeCount.Sub(1))
+			_, err := tx.Article.Where(tx.Article.ID.Eq(favorite.ArticleID)).UpdateSimple(query.Article.LikeCount.Sub(1))
 			if err != nil {
 				return err
 			}
@@ -91,6 +91,7 @@ func QueryFavoriteStatus(uid, aid int64) (string, error) {
 // QueryTotalFavoritedByAuthorID query the like num of all the video published by  the user
 func QueryTotalFavoritedByAuthorID(auid int64) (int64, error) {
 	var sum int64
+	var a = query.Article
 	err := a.Select(a.LikeCount.Sum()).Where(a.UserID.Eq(auid)).Scan(&sum)
 	if err != nil {
 		return 0, err

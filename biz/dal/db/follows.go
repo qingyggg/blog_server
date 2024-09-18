@@ -6,12 +6,11 @@ import (
 	"github.com/qingyggg/blog_server/biz/mw/redis"
 )
 
-var f = query.Follow
-
 // register redis operate strategy
 var rdFollows redis.Follows
 
 func AddNewFollow(follow *orm_gen.Follow) (bool, error) {
+	var f = query.Follow
 	err := f.Create(follow)
 	if err != nil {
 		return false, err
@@ -29,6 +28,7 @@ func AddNewFollow(follow *orm_gen.Follow) (bool, error) {
 
 // DeleteFollow delete follow relation in db and update redis
 func DeleteFollow(follow *orm_gen.Follow) (bool, error) {
+	var f = query.Follow
 	_, err := f.Where(f.UserID.Eq(follow.UserID), f.FollowerID.Eq(follow.FollowerID)).Delete()
 	if err != nil {
 		return false, err
@@ -45,6 +45,7 @@ func DeleteFollow(follow *orm_gen.Follow) (bool, error) {
 
 // QueryFollowExist check the relation of user and follower
 func QueryFollowExist(user_id, follower_id int64) (bool, error) {
+	var f = query.Follow
 	if rdFollows.CheckFollow(follower_id) {
 		return rdFollows.ExistFollow(user_id, follower_id), nil
 	}
@@ -109,6 +110,7 @@ func addFollowerRelationToRedis(user_id int64, followers []int64) {
 
 // getFollowIdList find user_id follow id list in db
 func getFollowIdList(follower_id int64) ([]int64, error) {
+	var f = query.Follow
 	follows, err := f.Where(f.FollowerID.Eq(follower_id)).Find()
 	if err != nil {
 		return nil, err
@@ -130,6 +132,7 @@ func GetFollowIdList(follower_id int64) ([]int64, error) {
 
 // getFollowerIdList get follower id list in db
 func getFollowerIdList(user_id int64) ([]int64, error) {
+	var f = query.Follow
 	follows, err := f.Where(f.UserID.Eq(user_id)).Find()
 	if err != nil {
 		return nil, err

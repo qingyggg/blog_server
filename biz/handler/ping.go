@@ -10,13 +10,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
-// Ping PingHandler 测试 handler
-//
-//	@Summary		测试 Summary
-//	@Description	测试 Description
-//	@Accept			application/json
-//	@Produce		application/json
-//	@Router			/ping [get]
+// Ping .
 func Ping(ctx context.Context, c *app.RequestContext) {
 	c.JSON(consts.StatusOK, utils.H{
 		"message": "pong",

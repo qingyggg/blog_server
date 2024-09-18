@@ -1,5 +1,81 @@
 basePath: /
 definitions:
+  common.BaseResponse:
+    properties:
+      status_code:
+        description: status code, 0-success, other values-failure
+        type: integer
+      status_msg:
+        description: status description
+        type: string
+    type: object
+  common.UploadResponse:
+    properties:
+      fileUrl:
+        description: 文件存储的URL
+        type: string
+      status_code:
+        description: status code, 0-success, other values-failure
+        type: integer
+      status_msg:
+        description: status description
+        type: string
+    type: object
+  common.User:
+    properties:
+      follow_count:
+        description: total number of people the user follows
+        type: integer
+      follower_count:
+        description: total number of fans
+        type: integer
+      id:
+        description: user id
+        type: integer
+      is_follow:
+        description: whether the currently logged-in user follows this user
+        type: boolean
+      name:
+        description: user name
+        type: string
+      profile:
+        $ref: '#/definitions/common.UserProfile'
+      total_favorited:
+        description: number of articles for articles published by user
+        type: integer
+      work_count:
+        description: number of articles published by user
+        type: integer
+    type: object
+  common.UserProfile:
+    properties:
+      avatar:
+        description: user avatar URL
+        type: string
+      background_image:
+        description: image at the top of the user's personal page
+        type: string
+      signature:
+        description: user profile
+        type: string
+    type: object
+  user.UserActionProfileModifyRequest:
+    properties:
+      user:
+        $ref: '#/definitions/common.UserProfile'
+      user_id:
+        type: integer
+    type: object
+  user.UserActionPwdModifyRequest:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+      username:
+        description: registered user name
+        type: string
+    type: object
   user.UserActionRequest:
     properties:
       password:
@@ -18,6 +94,17 @@ definitions:
         description: user id
         type: integer
     type: object
+  user.UserResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/common.User'
+        description: User Info
+    type: object
 host: localhost:18005
 info:
   contact:
@@ -30,18 +117,120 @@ info:
   title: blog_server tests
   version: "1.0"
 paths:
-  /blog_server/user/:
+  /blog_server/publish/action/create:
+    post:
+      responses: {}
+  /blog_server/publish/action/delete:
+    post:
+      responses: {}
+  /blog_server/publish/action/modify:
+    post:
+      responses: {}
+  /blog_server/publish/detail:
     get:
       responses: {}
+  /blog_server/publish/list:
+    get:
+      responses: {}
+  /blog_server/user/:
+    get:
+      consumes:
+      - application/json
+      description: 根据用户请求获取对应的用户信息
+      parameters:
+      - description: 用户ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功获取用户信息
+          schema:
+            $ref: '#/definitions/user.UserResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/user.UserActionResponse'
+      summary: 获取用户信息
+      tags:
+      - 用户相关接口
   /blog_server/user/login/:
     post:
-      responses: {}
+      consumes:
+      - application/json
+      description: 用户通过提供用户名和密码登录账户
+      parameters:
+      - description: 用户登录请求参数
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功返回用户ID及状态信息
+          schema:
+            $ref: '#/definitions/user.UserActionResponse'
+        "400":
+          description: 请求参数错误或其他错误信息
+          schema:
+            $ref: '#/definitions/user.UserActionResponse'
+      summary: 用户登录
+      tags:
+      - 用户相关接口
   /blog_server/user/profile_modify/:
     post:
-      responses: {}
+      consumes:
+      - application/json
+      description: 用户通过上传新的头像，背景图片，或者更改用户签名来进行修改资料
+      parameters:
+      - description: 用户修改资料请求参数
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserActionProfileModifyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功返回用户ID及状态信息
+          schema:
+            $ref: '#/definitions/user.UserActionResponse'
+      summary: 用户修改资料
+      tags:
+      - 用户相关接口
   /blog_server/user/pwd_modify/:
     post:
-      responses: {}
+      consumes:
+      - application/json
+      description: 用户通过提供用户名，旧密码，新密码进行修改账户密码
+      parameters:
+      - description: 用户修改密码请求参数
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserActionPwdModifyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功返回用户ID及状态信息
+          schema:
+            $ref: '#/definitions/user.UserActionResponse'
+        "400":
+          description: 请求参数错误或其他错误信息
+          schema:
+            $ref: '#/definitions/user.UserActionResponse'
+      summary: 用户修改密码
+      tags:
+      - 用户相关接口
   /blog_server/user/register/:
     post:
       consumes:
@@ -68,15 +257,36 @@ paths:
       summary: 用户注册
       tags:
       - 用户相关接口
-  /ping:
-    get:
+  /upload/file:
+    post:
       consumes:
-      - application/json
-      description: 测试 Description
+      - multipart/form-data
+      description: 用户可以通过该接口上传文件
+      parameters:
+      - description: 上传的文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: 上传的类型，是头像还是背景图片
+        in: formData
+        name: image_type
+        required: true
+        type: string
       produces:
       - application/json
-      responses: {}
-      summary: 测试 Summary
+      responses:
+        "200":
+          description: 成功返回文件信息
+          schema:
+            $ref: '#/definitions/common.UploadResponse'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 上传文件
+      tags:
+      - 文件上传接口
 schemes:
 - http
 swagger: "2.0"

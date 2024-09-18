@@ -5,9 +5,8 @@ import (
 	"github.com/qingyggg/blog_server/biz/model/query"
 )
 
-var a = query.Article
-
 func CreateArticle(article *orm_gen.Article) (aid int64, err error) {
+	var a = query.Article
 	err = a.Create(article)
 	if err != nil {
 		return 0, err
@@ -25,6 +24,7 @@ func CreateArticle(article *orm_gen.Article) (aid int64, err error) {
 //}
 
 func GetArticlesByUserID(uid int64) (articles []*orm_gen.Article, err error) {
+	var a = query.Article
 	articles, err = a.Where(a.UserID.Eq(uid)).Find()
 	if err != nil {
 		return nil, err
@@ -34,6 +34,7 @@ func GetArticlesByUserID(uid int64) (articles []*orm_gen.Article, err error) {
 
 // GetWorkCount get the num of video published by the user
 func GetWorkCount(uid int64) (count int64, err error) {
+	var a = query.Article
 	count, err = a.Where(a.ID.Eq(uid)).Count()
 	if err != nil {
 		return 0, err
@@ -43,6 +44,7 @@ func GetWorkCount(uid int64) (count int64, err error) {
 
 // CheckArticleExistById  query if video exist
 func CheckArticleExistById(aid int64) (bool, error) {
+	var a = query.Article
 	count, err := a.Where(a.ID.Eq(aid)).Count()
 	if err != nil {
 		return false, err

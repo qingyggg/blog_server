@@ -58,7 +58,7 @@ func GetCommentListByArticleID(aid int64) (comments []*orm_gen.Comment, err erro
 }
 
 func CheckCommentExistById(cid int64) (bool, error) {
-	count, err := a.Where(c.ID.Eq(cid)).Count()
+	count, err := c.Where(c.ID.Eq(cid)).Count()
 	if err != nil {
 		return false, err
 	} else if count != 0 {

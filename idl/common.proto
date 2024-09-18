@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 option go_package = "hertz/common";
-
+import "api.proto";
 message UserProfile{
   string avatar = 1; // user avatar URL
   string background_image =2; // image at the top of the user's personal page
@@ -53,3 +53,14 @@ message Article {
   ArticleBase base=4;
 }
 
+message BaseResponse{
+  int32 status_code = 1[(api.go_tag)='json:"status_code"']; // status code, 0-success, other values-failure
+  string status_msg = 2; // status description
+}
+
+// 文件上传响应消息
+message UploadResponse {
+  int32 status_code = 1[(api.go_tag)='json:"status_code"']; // status code, 0-success, other values-failure
+  string status_msg = 2; // status description
+  string fileUrl = 3;  // 文件存储的URL
+}

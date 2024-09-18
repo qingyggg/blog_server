@@ -89,8 +89,6 @@ func Init() {
 		log.Fatalln("minio连接错误: ", err)
 	}
 
-	log.Printf("%#v\n", Client)
-
 	MakeBucket(ctx, constants.MinioVideoBucketName)
 	MakeBucket(ctx, constants.MinioImgBucketName)
 }
