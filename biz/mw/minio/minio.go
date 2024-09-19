@@ -19,12 +19,12 @@ package minio
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/qingyggg/blog_server/pkg/constants"
-	"log"
 	"mime/multipart"
+	"net/http"
 	"net/url"
 	"time"
 )
@@ -35,20 +35,19 @@ var (
 )
 
 // MakeBucket create a bucket with a specified name
-func MakeBucket(ctx context.Context, bucketName string) {
+func MakeBucket(ctx context.Context, bucketName string) error {
 	exists, err := Client.BucketExists(ctx, bucketName)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 	if !exists {
 		err = Client.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{})
 		if err != nil {
-			fmt.Println(err)
-			return
+			return err
 		}
-		fmt.Printf("Successfully created mybucket %v\n", bucketName)
+		hlog.Infof("Successfully created mybucket %v\n", bucketName)
 	}
+	return nil
 }
 
 // PutToBucket put the file into the bucket by *multipart.FileHeader
@@ -79,16 +78,32 @@ func PutToBucketByFilePath(ctx context.Context, bucketName, filename, filepath s
 	return info, err
 }
 
+// DelObject delete file in bucket
+func DelObject(ctx context.Context, bucketName, fileName string) error {
+
+	// 执行删除操作
+	err = Client.RemoveObject(ctx, bucketName, fileName, minio.RemoveObjectOptions{})
+	return err
+}
+
 func Init() {
 	ctx := context.Background()
+	httpClient := &http.Client{
+		Timeout: 10 * time.Second, // 设置连接超时时间为 10 秒
+	}
 	Client, err = minio.New(constants.MinioEndPoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(constants.MinioAccessKeyID, constants.MinioSecretAccessKey, ""),
-		Secure: constants.MiniouseSSL,
+		Creds:     credentials.NewStaticV4(constants.MinioAccessKeyID, constants.MinioSecretAccessKey, ""),
+		Secure:    constants.MiniouseSSL,
+		Transport: httpClient.Transport, // 使用自定义 http.Client
 	})
 	if err != nil {
-		log.Fatalln("minio连接错误: ", err)
+		hlog.Fatal("minio连接错误: ", err)
 	}
 
-	MakeBucket(ctx, constants.MinioVideoBucketName)
-	MakeBucket(ctx, constants.MinioImgBucketName)
+	err := MakeBucket(ctx, constants.MinioImgBucketName)
+	if err != nil {
+		hlog.Fatal("minio初始化失败")
+	} else {
+		hlog.Info("成功连接minio")
+	}
 }

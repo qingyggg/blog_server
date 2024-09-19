@@ -51,6 +51,9 @@ func QueryUserById(userId int64) (*orm_gen.User, error) {
 func VerifyUser(userName string, password string) (int64, error) {
 	user, err := QueryUser(userName)
 	if err != nil {
+		if err.Error() == "record not found" {
+			return 0, errno.UserIsNotExistErr
+		}
 		return 0, err
 	}
 	if ok := utils.VerifyPassword(password, user.Password); !ok {

@@ -2,13 +2,16 @@ package service
 
 import (
 	"context"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/qingyggg/blog_server/biz/dal/db"
 	"github.com/qingyggg/blog_server/biz/model/hertz/basic/user"
 	"github.com/qingyggg/blog_server/biz/model/hertz/common"
 	"github.com/qingyggg/blog_server/biz/model/orm_gen"
+	"github.com/qingyggg/blog_server/biz/mw/minio"
 	"github.com/qingyggg/blog_server/pkg/constants"
 	"github.com/qingyggg/blog_server/pkg/errno"
 	"github.com/qingyggg/blog_server/pkg/utils"
+	"strconv"
 	"sync"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -41,7 +44,25 @@ func (s *UserService) UserRegister(req *user.UserActionRequest) (user_id int64, 
 		BackgroundImage: constants.TestBackground,
 		Signature:       constants.TestSign,
 	})
+	if err != nil {
+		return 0, err
+	}
+	err = initUserSpace(s.ctx, user_id)
+	if err != nil {
+		return 0, err
+	}
 	return user_id, nil
+}
+
+// initUserSpace 为新建立的用户分配minio存储空间
+func initUserSpace(ctx context.Context, uid int64) error {
+	buckName := "user-" + strconv.FormatInt(uid, 10) //username:userid
+	err := minio.MakeBucket(ctx, buckName)
+	if err != nil {
+		hlog.Error("初始化用户桶失败")
+		return err
+	}
+	return nil
 }
 
 func (s *UserService) PwdModify(req *user.UserActionPwdModifyRequest) (userId int64, err error) {

@@ -43,4 +43,16 @@ services:
     restart: always
 
 
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "18006:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=blog_server
+      - MONGO_INITDB_ROOT_PASSWORD=blog_server123
+    volumes:
+      - ../pkg/data/mongo:/data/db
+    restart: always
+
 

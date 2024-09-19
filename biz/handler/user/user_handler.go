@@ -97,7 +97,12 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 		utils.ErrResp(c, err)
 		return
 	}
+	//在这里使用jwt login handler进行,如果登录成功，这个中间件会设置cookie,但若是失败了，或者用户他不存在，那么这个插件会自动进行错误响应，因此，该loginhandler不需要再c.json....
 	jwt.JwtMiddleware.LoginHandler(ctx, c)
+	hasErr, _ := c.Get("hasErr")
+	if hasErr.(bool) {
+		return
+	}
 	v, _ := c.Get("user_id")
 	user_id := v.(int64)
 	c.JSON(consts.StatusOK, user.UserActionResponse{

@@ -32,12 +32,15 @@ func Init() {
 			//var loginRequest
 			user := new(user.UserActionRequest)
 			if err := c.BindAndValidate(user); err != nil {
+				c.Set("hasErr", true)
 				return nil, err
 			}
 			uid, err := db.VerifyUser(user.Username, user.Password)
 			if err != nil {
+				c.Set("hasErr", true)
 				return nil, err
 			}
+			c.Set("hasErr", false)
 			c.Set("user_id", uid)
 			return uid, nil
 		},

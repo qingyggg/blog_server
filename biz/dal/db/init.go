@@ -1,6 +1,7 @@
 package db
 
 import (
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/qingyggg/blog_server/biz/model/query"
 	"github.com/qingyggg/blog_server/pkg/constants"
 	"gorm.io/driver/mysql"
@@ -21,7 +22,7 @@ func Init() {
 		},
 	)
 	if err != nil {
-		panic(err)
+		hlog.Fatal(err)
 	}
 
 	if err = DB.Use(gormopentracing.New()); err != nil {

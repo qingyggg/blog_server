@@ -75,7 +75,6 @@ CREATE TABLE `articles` (
                           `collect_count` BIGINT NOT NULL COMMENT '收藏数目',
                           `title`         VARCHAR(255) NOT NULL COMMENT '文章标题',
                           `note`          TINYTEXT NOT NULL COMMENT '文章小记',
-                          `content`       MEDIUMTEXT NOT NULL COMMENT '文章内容',
                           `cover_url`     VARCHAR(255) NOT NULL COMMENT '背景图URL',
                           `publish_time` timestamp NOT NULL COMMENT '发布时间戳',
                           INDEX `userIdIdx` (`user_id`)
