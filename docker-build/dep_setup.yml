@@ -1,3 +1,5 @@
+name: api.marisa.site
+
 networks:
   blog_server:
     driver: bridge
@@ -35,6 +37,8 @@ services:
     environment:
       MINIO_ACCESS_KEY: blog_server
       MINIO_SECRET_KEY: blog_server123
+      MINIO_SERVER_URL: https://api.marisa.site  # 设置服务器的 URL，使用 HTTPS
+      MINIO_DOMAIN: api.marisa.site  # 配置自定义域名
     volumes:
       - minio-data:/data  # 使用命名卷持久化 MinIO 数据
       - ../pkg/configs/minio/:/root/.minio
@@ -93,7 +97,7 @@ services:
     image: nginx:latest
     container_name: nginx
     ports:
-      - "18007:443"  # HTTP 端口
+      - "443:443"  # HTTP 端口
     networks:
       - blog_server
     volumes:

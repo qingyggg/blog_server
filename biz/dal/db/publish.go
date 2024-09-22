@@ -76,7 +76,7 @@ func GetArticleInfos(uid string, offset int) (aInfos []*orm_gen.Article, err err
 	} else {
 		expr = a.Where()
 	}
-	aInfos, err = expr.Limit(10).Offset(offset).Find()
+	aInfos, err = expr.Order(a.ID.Desc()).Limit(15).Offset(offset).Find()
 	if err != nil {
 		return nil, err
 	}

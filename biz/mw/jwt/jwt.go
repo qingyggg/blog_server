@@ -56,7 +56,7 @@ func Init() {
 		// build login response if verify password successfully
 		LoginResponse: func(ctx context.Context, c *app.RequestContext, code int, token string, expire time.Time) {
 			hlog.CtxInfof(ctx, "Login success ，token is issued clientIP: "+c.ClientIP())
-			c.SetCookie("token", token, int(24*time.Hour), "/", "localhost", protocol.CookieSameSiteNoneMode, true, true)
+			c.SetCookie("token", token, int(24*time.Hour), "/", "api.marisa.site", protocol.CookieSameSiteNoneMode, true, true)
 		},
 		// Verify token and get the id of logged-in user
 		Authorizator: func(data interface{}, ctx context.Context, c *app.RequestContext) bool {

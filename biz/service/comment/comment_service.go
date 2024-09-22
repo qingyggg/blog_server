@@ -100,7 +100,7 @@ func (c *CommentService) GetTopCmtList(req *comment.CommentListRequest) (err err
 	if err != nil {
 		return err, nil
 	}
-	err, cmts := c.getCmtList(firstList)
+	err, cmts := c.getCmtList(firstList, 1)
 	if err != nil {
 		return err, nil
 	}
@@ -112,14 +112,14 @@ func (c *CommentService) GetSubCmtList(req *comment.CommentListRequest) (err err
 	if err != nil {
 		return err, nil
 	}
-	err, cmts = c.getCmtList(firstList)
+	err, cmts = c.getCmtList(firstList, 2)
 	if err != nil {
 		return err, nil
 	}
 	return nil, cmts
 }
 
-func (c *CommentService) getCmtList(cmtList []*mongo.CommentItem) (err error, cmts []*comment.Comment) {
+func (c *CommentService) getCmtList(cmtList []*mongo.CommentItem, degree int32) (err error, cmts []*comment.Comment) {
 	//获取uid,cid
 	var uids []string
 	var cids []string
@@ -180,21 +180,22 @@ func (c *CommentService) getCmtList(cmtList []*mongo.CommentItem) (err error, cm
 	var isFavorite bool
 	var curUserPayload *orm_gen.User
 	for _, cmt := range cmtList {
-		curUserPayload = UInfoMaps[cmt.UserID]
+		curUserPayload = UInfoMaps[cmt.UserID] //用户信息附加
 		if CInfoMaps[cmt.HashID] == 1 {
 			isFavorite = true
 		} else {
 			isFavorite = false
 		}
 		curPayload := comment.Comment{
-			CHashId:       cmt.HashID,
-			AHashId:       cmt.ArticleID,
-			Content:       cmt.Content,
-			ChildNum:      cmt.ChildNum,
-			User:          service.UserAssign(curUserPayload),
-			CreateDate:    utils.ConvertBsonTimeToString(cmt.CreateTime),
-			FavoriteCount: CCtMaps[cmt.HashID], //后续完善
-			IsFavorite:    isFavorite,
+			CHashId:        cmt.HashID,
+			AHashId:        cmt.ArticleID,
+			Content:        cmt.Content,
+			ChildNum:       cmt.ChildNum,
+			User:           service.NewUserService(c.ctx, c.c).UserAssign(curUserPayload),
+			CreateDate:     utils.ConvertBsonTimeToString(cmt.CreateTime),
+			FavoriteCount:  CCtMaps[cmt.HashID], //后续完善
+			IsFavorite:     isFavorite,
+			RepliedUHashId: cmt.ParentUID,
 		}
 		cmts = append(cmts, &curPayload)
 	}

@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	ExpireTime  = time.Hour * 1
+	ExpireTime = time.Hour * 3
+	//ExpireTime  = time.Second
 	rdbCollect  *redis.Client
 	rdbFavorite *redis.Client
 	rdbComment  *redis.Client

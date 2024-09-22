@@ -89,61 +89,77 @@ func (s *UserService) PwdModify(req *user.UserActionPwdModifyRequest) (uid int64
 // UserInfo the function of user api
 func (s *UserService) UserInfo(req *user.UserRequest) (*common.User, error) {
 	queryUserId := req.UHashID
-	exist, err := db.CheckUserExistByHashId(queryUserId)
-	if err != nil {
-		return nil, err
-	}
-	if !exist {
-		return nil, errno.UserIsNotExistErr
+	if queryUserId != "current" {
+		exist, err := db.CheckUserExistByHashId(queryUserId)
+		if err != nil {
+			return nil, err
+		}
+		if !exist {
+			return nil, errno.UserIsNotExistErr
+		}
 	}
 
 	return s.GetUserInfo(queryUserId)
 }
 
-func (s *UserService) UserProfileModify(req *user.UserActionProfileModifyRequest) error {
+func (s *UserService) UserProfileModify(req *user.UserActionProfileModifyRequest) (error, string, int64) {
 	uid := service_utils.GetUid(s.c)
+	user, err := db.QueryUserById(uid)
+	if err != nil {
+		return err, "", 0
+	}
 	profile := map[string]interface{}{
 		"signature":        req.User.Signature,
 		"avatar":           utils.UrlConvertReverse(s.ctx, req.User.Avatar),
 		"background_image": utils.UrlConvertReverse(s.ctx, req.User.BackgroundImage),
 	}
-
 	// 过滤空字符串的字段
 	for key, value := range profile {
 		if value == "" {
 			delete(profile, key)
 		}
 	}
-	err := db.UserProfileModify(uid, profile)
+	err = db.UserProfileModify(uid, profile)
 	if err != nil {
-		return err
+		return err, "", 0
 	}
-	return nil
+	return nil, utils.ConvertByteHashToString(user.HashID), uid
 }
 
 func (s *UserService) GetUserInfo(queryUHashId string) (*common.User, error) {
 	u := new(common.User)
-	errChan := make(chan error, 5)
+	errChan := make(chan error, 4)
 	defer close(errChan)
 	var wg sync.WaitGroup
-	wg.Add(5)
+	wg.Add(4)
 
-	go func() { //
-		dbUser, err := db.QueryUserByHashId(queryUHashId)
-		if err != nil {
-			errChan <- err
-			return
-		} else {
-			u.Base = new(common.UserBase)
-			u.Base.Name = dbUser.UserName
-			u.Base.Profile = new(common.UserProfile)
-			u.Base.Profile.Avatar = utils.URLconvert(s.ctx, s.c, dbUser.Avatar)
-			u.Base.Profile.BackgroundImage = utils.URLconvert(s.ctx, s.c, dbUser.BackgroundImage)
-			u.Base.Profile.Signature = dbUser.Signature
-			u.Base.HashId = utils.ConvertByteHashToString(dbUser.HashID)
-		}
-		wg.Done()
-	}()
+	uid := service_utils.GetUid(s.c)
+	var isLoginedUser bool
+	if queryUHashId == "current" {
+		isLoginedUser = true
+	} else {
+		isLoginedUser = false
+	}
+
+	//判断请求的用户信息是否为登录的用户-->queryUHashId=='current'
+	var dbUser *orm_gen.User
+	var err error
+	if isLoginedUser {
+		dbUser, err = db.QueryUserById(uid)
+	} else {
+		dbUser, err = db.QueryUserByHashId(queryUHashId)
+	}
+	if err != nil {
+		return nil, err
+	} else {
+		u.Base = new(common.UserBase)
+		u.Base.Name = dbUser.UserName
+		u.Base.Profile = new(common.UserProfile)
+		u.Base.Profile.Avatar = utils.URLconvert(s.ctx, s.c, dbUser.Avatar)
+		u.Base.Profile.BackgroundImage = utils.URLconvert(s.ctx, s.c, dbUser.BackgroundImage)
+		u.Base.Profile.Signature = dbUser.Signature
+		u.Base.HashId = utils.ConvertByteHashToString(dbUser.HashID)
+	}
 
 	go func() {
 		WorkCount, err := db.GetWorkCount(queryUHashId)
@@ -153,7 +169,7 @@ func (s *UserService) GetUserInfo(queryUHashId string) (*common.User, error) {
 		} else {
 			u.WorkCount = WorkCount
 		}
-		wg.Done()
+		defer wg.Done()
 	}()
 
 	go func() {
@@ -161,11 +177,10 @@ func (s *UserService) GetUserInfo(queryUHashId string) (*common.User, error) {
 		if err != nil {
 			errChan <- err
 			return
-			return
 		} else {
 			u.FollowCount = FollowCount
 		}
-		wg.Done()
+		defer wg.Done()
 	}()
 
 	go func() {
@@ -176,11 +191,14 @@ func (s *UserService) GetUserInfo(queryUHashId string) (*common.User, error) {
 		} else {
 			u.FollowerCount = FollowerCount
 		}
-		wg.Done()
+		defer wg.Done()
 	}()
 
 	go func() {
-		uid := service_utils.GetUid(s.c) //检查用户登录状态
+		defer wg.Done()
+		if isLoginedUser {
+			return
+		}
 		user, err := db.QueryUserById(uid)
 		if err != nil {
 			errChan <- err
@@ -196,7 +214,6 @@ func (s *UserService) GetUserInfo(queryUHashId string) (*common.User, error) {
 				u.IsFollow = IsFollow
 			}
 		}
-		wg.Done()
 	}()
 
 	wg.Wait()

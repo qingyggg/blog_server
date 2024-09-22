@@ -39,25 +39,24 @@ func _userloginMw() []app.HandlerFunc {
 }
 
 func _profile_modifyMw() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		jwt.JwtMiddleware.MiddlewareFunc(),
-	}
+	return nil
 }
 
 func _userprofilemodifyMw() []app.HandlerFunc {
 	// your code...
-	return nil
-}
-
-func _pwd_modifyMw() []app.HandlerFunc {
 	return []app.HandlerFunc{
 		jwt.JwtMiddleware.MiddlewareFunc(),
 	}
 }
 
-func _userpwdmodifyMw() []app.HandlerFunc {
-	// your code...
+func _pwd_modifyMw() []app.HandlerFunc {
 	return nil
+}
+
+func _userpwdmodifyMw() []app.HandlerFunc {
+	return []app.HandlerFunc{
+		jwt.JwtMiddleware.MiddlewareFunc(),
+	}
 }
 
 func _registerMw() []app.HandlerFunc {
