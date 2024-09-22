@@ -4,14 +4,13 @@ package user
 
 import (
 	"context"
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	user "github.com/qingyggg/blog_server/biz/model/hertz/basic/user"
 	"github.com/qingyggg/blog_server/biz/mw/jwt"
 	service "github.com/qingyggg/blog_server/biz/service/user"
 	"github.com/qingyggg/blog_server/pkg/errno"
 	"github.com/qingyggg/blog_server/pkg/utils"
-
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	user "github.com/qingyggg/blog_server/biz/model/hertz/basic/user"
 )
 
 // User .
@@ -62,7 +61,11 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		utils.ErrResp(c, err)
 		return
 	}
-
+	err = utils.ValidatePassword(req.Password)
+	if err != nil {
+		utils.ErrResp(c, err) //密码格式不对
+		return
+	}
 	_, err = service.NewUserService(ctx, c).UserRegister(req)
 	if err != nil {
 		utils.ErrResp(c, err)
