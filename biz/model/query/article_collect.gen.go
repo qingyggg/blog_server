@@ -45,8 +45,8 @@ type articleCollect struct {
 
 	ALL         field.Asterisk
 	ID          field.Int64  // 自增主键
-	UserID      field.Int64  // 用户id
-	ArticleID   field.Int64  // 文章id
+	UserID      field.Int64  // 用户ID
+	ArticleID   field.Int64  // 文章ID
 	CollectName field.String // 收藏的类型
 	CreatedAt   field.Time   // 收藏创建时间
 	DeletedAt   field.Field  // 收藏删除时间

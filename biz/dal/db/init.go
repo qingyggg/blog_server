@@ -26,7 +26,8 @@ func Init() {
 	}
 
 	if err = DB.Use(gormopentracing.New()); err != nil {
-		panic(err)
+		hlog.Fatal(err)
 	}
 	QDB = query.Use(DB)
+	hlog.Info("mysql数据库初始化成功")
 }

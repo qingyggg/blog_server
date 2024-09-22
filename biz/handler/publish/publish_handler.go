@@ -4,88 +4,187 @@ package publish
 
 import (
 	"context"
+	service "github.com/qingyggg/blog_server/biz/service/publish"
+	"github.com/qingyggg/blog_server/pkg/errno"
+	"github.com/qingyggg/blog_server/pkg/utils"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	publish "github.com/qingyggg/blog_server/biz/model/hertz/basic/publish"
 )
 
-// PublishAction .
-// @router /blog_server/publish/action/create [POST]
+// PublishAction 发表文章接口
+// @Summary 发表文章
+// @Description 用户可以通过此接口发表一篇文章
+// @Tags 文章管理
+// @Accept  json
+// @Produce  json
+// @Param  data  body  publish.ArticleCreateActionRequest  true  "文章创建请求参数"
+// @Success 200 {object} publish.ArticleActionResponse "成功响应"
+// @Failure 400 {object} publish.ArticleActionResponse "请求参数错误"
+// @Failure 500 {object} publish.ArticleActionResponse "服务器内部错误"
+// @Router /blog_server/publish/action [post]
 func PublishAction(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req publish.PublishActionRequest
-	err = c.BindAndValidate(&req)
+	req := new(publish.ArticleCreateActionRequest)
+	err = c.BindAndValidate(req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		utils.ErrResp(c, err)
+		return
+	}
+	err = service.NewPublishService(ctx, c).PublishCreate(req)
+	if err != nil {
+		utils.ErrResp(c, err)
 		return
 	}
 
-	resp := new(publish.PublishActionResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	c.JSON(consts.StatusOK, &publish.ArticleActionResponse{
+		StatusCode: errno.SuccessCode,
+		StatusMsg:  errno.SuccessMsg,
+	})
 }
 
-// PublishModifyAction .
-// @router /blog_server/publish/action/modify [POST]
+// PublishModifyAction 修改文章接口
+// @Summary 修改文章
+// @Description 用户可以通过此接口修改一篇文章
+// @Tags 文章管理
+// @Accept  json
+// @Produce  json
+// @Param  data  body  publish.ArticleModifyActionRequest  true  "文章修改请求参数"
+// @Success 200 {object} publish.ArticleActionResponse "成功响应"
+// @Failure 400 {object} publish.ArticleActionResponse "请求参数错误"
+// @Failure 500 {object} publish.ArticleActionResponse "服务器内部错误"
+// @Router /blog_server/publish/action [patch]
 func PublishModifyAction(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req publish.PublishActionRequest
-	err = c.BindAndValidate(&req)
+	req := new(publish.ArticleModifyActionRequest)
+	err = c.BindAndValidate(req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		utils.ErrResp(c, err)
 		return
 	}
-
-	resp := new(publish.PublishActionResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	err = service.NewPublishService(ctx, c).PublishModify(req)
+	if err != nil {
+		utils.ErrResp(c, err)
+		return
+	}
+	c.JSON(consts.StatusOK, &publish.ArticleActionResponse{
+		StatusCode: errno.SuccessCode,
+		StatusMsg:  errno.SuccessMsg,
+	})
 }
 
-// PublishDelAction .
-// @router /blog_server/publish/action/delete [POST]
+// PublishDelAction 删除文章接口
+// @Summary 删除文章
+// @Description 用户可以通过此接口删除一篇文章
+// @Tags 文章管理
+// @Accept  json
+// @Produce  json
+// @Param  data  body  publish.ArticleBaseActionRequest  true  "文章删除请求参数"
+// @Success 200 {object} publish.ArticleActionResponse "成功响应"
+// @Failure 400 {object} publish.ArticleActionResponse "请求参数错误"
+// @Failure 500 {object} publish.ArticleActionResponse "服务器内部错误"
+// @Router /blog_server/publish/action [delete]
 func PublishDelAction(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req publish.PublishActionDelRequest
-	err = c.BindAndValidate(&req)
+	req := new(publish.ArticleBaseActionRequest)
+	err = c.BindAndValidate(req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		utils.ErrResp(c, err)
 		return
 	}
-
-	resp := new(publish.PublishActionResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	err = service.NewPublishService(ctx, c).PublishDelete(req)
+	if err != nil {
+		utils.ErrResp(c, err)
+		return
+	}
+	c.JSON(consts.StatusOK, &publish.ArticleActionResponse{
+		StatusCode: errno.SuccessCode,
+		StatusMsg:  errno.SuccessMsg,
+	})
 }
 
-// PublishList .
-// @router /blog_server/publish/list [GET]
+// PublishList 获取文章列表接口
+// @Summary 获取文章列表
+// @Description 用户可以通过此接口获取文章列表
+// @Tags 文章管理
+// @Accept  json
+// @Produce  json
+// @Param  data  query  publish.ArticleCardsRequest  true  "文章列表请求参数"
+// @Success 200 {object} publish.ArticleCardsResponse "成功响应，返回文章列表"
+// @Failure 400 {object} publish.ArticleActionResponse "请求参数错误"
+// @Failure 500 {object} publish.ArticleActionResponse "服务器内部错误"
+// @Router /blog_server/publish/list [get]
 func PublishList(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req publish.PublishListRequest
-	err = c.BindAndValidate(&req)
+	req := new(publish.ArticleCardsRequest)
+	err = c.BindAndValidate(req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		utils.ErrResp(c, err)
 		return
 	}
+	cards, err := service.NewPublishService(ctx, c).PublishList(req)
 
-	resp := new(publish.PublishListResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	c.JSON(consts.StatusOK, &publish.ArticleCardsResponse{
+		List: cards,
+	})
 }
 
-// PublishDetail .
-// @router /blog_server/publish/detail [GET]
+// PublishDetail 获取文章详情接口
+// @Summary 获取文章详情
+// @Description 用户可以通过此接口获取某篇文章的详细信息
+// @Tags 文章管理
+// @Accept  json
+// @Produce  json
+// @Param  data  query  publish.ArticleBaseActionRequest  true  "文章详情请求参数"
+// @Success 200 {object} publish.ArticleResponse "成功响应，返回文章详情"
+// @Failure 400 {object} publish.ArticleActionResponse "请求参数错误"
+// @Failure 500 {object} publish.ArticleActionResponse "服务器内部错误"
+// @Router /blog_server/publish/detail [get]
 func PublishDetail(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req publish.PublishRequest
-	err = c.BindAndValidate(&req)
+	req := new(publish.ArticleBaseActionRequest)
+	err = c.BindAndValidate(req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		utils.ErrResp(c, err)
 		return
 	}
+	detail, err := service.NewPublishService(ctx, c).PublishDetail(req)
+	if err != nil {
+		utils.ErrResp(c, err)
+		return
+	}
+	c.JSON(consts.StatusOK, &publish.ArticleResponse{
+		Article: detail,
+	})
+}
 
-	resp := new(publish.PublishResponse)
-
-	c.JSON(consts.StatusOK, resp)
+// PublishViewCountAdd 增加文章阅读数接口
+// @Summary 增加文章阅读数
+// @Description 用户可以通过此接口增加某篇文章的阅读数
+// @Tags 文章管理
+// @Accept  json
+// @Produce  json
+// @Param  data  body  publish.ArticleBaseActionRequest  true  "文章阅读数增加请求参数"
+// @Success 200 {object} publish.ArticleActionResponse "成功响应"
+// @Failure 400 {object} publish.ArticleActionResponse "请求参数错误"
+// @Failure 500 {object} publish.ArticleActionResponse "服务器内部错误"
+// @Router /blog_server/publish/view_add [post]
+func PublishViewCountAdd(ctx context.Context, c *app.RequestContext) {
+	var err error
+	req := new(publish.ArticleBaseActionRequest)
+	err = c.BindAndValidate(req)
+	if err != nil {
+		utils.ErrResp(c, err)
+		return
+	}
+	err = service.NewPublishService(ctx, c).AddViewCount(req)
+	if err != nil {
+		utils.ErrResp(c, err)
+		return
+	}
+	c.JSON(consts.StatusOK, &publish.ArticleActionResponse{
+		StatusCode: errno.SuccessCode,
+		StatusMsg:  errno.SuccessMsg,
+	})
 }

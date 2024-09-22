@@ -9,14 +9,18 @@ message UserProfile{
 }
 
 message User {
+  int64 follow_count = 1; // total number of people the user follows
+  int64 follower_count = 2; // total number of fans
+  bool is_follow = 3; // whether the currently logged-in user follows this user
+  int64 total_favorited = 4; // number of articles for articles published by user
+  int64 work_count = 5; // number of articles published by user
+  UserBase base=6;
+}
+
+message UserBase{
   int64 id = 1; // user id
   string name = 2; // user name
-  int64 follow_count = 3; // total number of people the user follows
-  int64 follower_count = 4; // total number of fans
-  bool is_follow = 5; // whether the currently logged-in user follows this user
-  UserProfile profile =6;
-  int64 total_favorited = 7; // number of articles for articles published by user
-  int64 work_count = 8; // number of articles published by user
+  UserProfile profile =3;
 }
 
 message ArticleBasePreload{
@@ -36,21 +40,22 @@ message ArticleInfo{
   bool is_favorite = 3; // true-Liked，false-did not like
   int64 dislike_count = 4;
   int64 viewed_count=5;
-  string author_name=6;
 }
 
 message ArticleCard{
   int64 id=1;
   ArticleInfo info=2;
   ArticleBasePreload pre=3;
-  User author = 4; // author information
+  UserBase author = 4; // author information
+  string hashId=5;
 }
 
 message Article {
   int64 id = 1; // video id
   User author = 2; // author information
-  ArticleCard info=3;
+  ArticleInfo info=3;
   ArticleBase base=4;
+  string hashId=5;
 }
 
 message BaseResponse{

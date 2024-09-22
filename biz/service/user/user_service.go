@@ -119,16 +119,18 @@ func (s *UserService) GetUserInfo(queryUserId int64, userId int) (*common.User, 
 	defer close(errChan)
 	var wg sync.WaitGroup
 	wg.Add(5)
-	go func() {
+
+	go func() { //
 		dbUser, err := db.QueryUserById(queryUserId)
 		if err != nil {
 			errChan <- err
 		} else {
-			u.Name = dbUser.UserName
-			u.Profile = new(common.UserProfile)
-			u.Profile.Avatar = utils.URLconvert(s.ctx, s.c, dbUser.Avatar)
-			u.Profile.BackgroundImage = utils.URLconvert(s.ctx, s.c, dbUser.BackgroundImage)
-			u.Profile.Signature = dbUser.Signature
+			u.Base = new(common.UserBase)
+			u.Base.Name = dbUser.UserName
+			u.Base.Profile = new(common.UserProfile)
+			u.Base.Profile.Avatar = utils.URLconvert(s.ctx, s.c, dbUser.Avatar)
+			u.Base.Profile.BackgroundImage = utils.URLconvert(s.ctx, s.c, dbUser.BackgroundImage)
+			u.Base.Profile.Signature = dbUser.Signature
 		}
 		wg.Done()
 	}()
@@ -184,6 +186,6 @@ func (s *UserService) GetUserInfo(queryUserId int64, userId int) (*common.User, 
 		return nil, result
 	default:
 	}
-	u.Id = queryUserId
+	u.Base.Id = queryUserId
 	return u, nil
 }

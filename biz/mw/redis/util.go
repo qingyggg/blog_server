@@ -38,6 +38,12 @@ func del(c *redis.Client, k string, v int64) {
 	tx.Exec()
 }
 
+// deleteKey removes the entire key and its associated data from Redis
+func deleteKey(c *redis.Client, k string) {
+	// Use DEL command to delete the key
+	_, _ = c.Del(k).Result()
+}
+
 // check the set of k if exist
 func check(c *redis.Client, k string) bool {
 	if e, _ := c.Exists(k).Result(); e > 0 {

@@ -7,60 +7,65 @@ import "common.proto";
 
 option go_package = "hertz/basic/publish";
 
-message PublishActionRequest {
+message ArticleBaseActionRequest{
+  int64 uid=1;//作者id
+  string aHashID=2;//文章的hashid
+}
+//文章的创建
+message ArticleCreateActionRequest {
   int64 uid=1;
   ArticleBase payload=2;
 }
 
-message PublishActionDelRequest{//jwt verify
-  int64 uid=1;
-  int64 article_id=2;
+//文章的修改
+message ArticleModifyActionRequest {
+  ArticleBaseActionRequest base=1;
+  ArticleBase payload=2;
 }
 
-message PublishActionResponse {
+message ArticleActionResponse {
   int32 status_code = 1[(api.go_tag)='json:"status_code"'];
   string status_msg = 2;
 }
-
-message PublishRequest{
-  int64 article_id=1;
-}
-
-message PublishListRequest {
+//文章卡片列表
+message ArticleCardsRequest {
   int64 user_id = 1;//如果id为0，则根据时间的先后去请求文章列表
-  int64 offset=2;
+  int32 offset=2;
 }
 
-message PublishResponse{
+message ArticleResponse{
   int32 status_code = 1[(api.go_tag)='json:"status_code"'];
   string status_msg = 2;
   Article article=3;
 }
 
-message PublishListResponse {
+message ArticleCardsResponse {
   int32 status_code = 1[(api.go_tag)='json:"status_code"'];
   string status_msg = 2;
   repeated ArticleCard list=3;
 }
 
 service PublishHandler {
-  rpc PublishAction(PublishActionRequest) returns(PublishActionResponse) {
-    option (api.post) = "/blog_server/publish/action/create";
+  rpc PublishAction(ArticleCreateActionRequest) returns(ArticleActionResponse) {
+    option (api.post) = "/blog_server/publish/action";
   }
-  rpc PublishModifyAction(PublishActionRequest) returns(PublishActionResponse) {
-    option (api.post) = "/blog_server/publish/action/modify";
+  rpc PublishModifyAction(ArticleModifyActionRequest) returns(ArticleActionResponse) {
+    option (api.patch) = "/blog_server/publish/action";
   }
-  rpc PublishDelAction(PublishActionDelRequest) returns(PublishActionResponse) {
-    option (api.post) = "/blog_server/publish/action/delete";
+  rpc PublishDelAction(ArticleBaseActionRequest) returns(ArticleActionResponse) {
+    option (api.delete) = "/blog_server/publish/action";
     // Logged in user selects video to upload.
   }
-  rpc PublishList(PublishListRequest) returns(PublishListResponse) {
+  rpc PublishList(ArticleCardsRequest) returns(ArticleCardsResponse) {
     option (api.get) = "/blog_server/publish/list";
     // Get logged-in to the user's video publishing list, and directly list all the videos that the user has contributed.
   }
-  rpc PublishDetail(PublishRequest) returns(PublishResponse) {
+  rpc PublishDetail(ArticleBaseActionRequest) returns(ArticleResponse) {
     option (api.get) = "/blog_server/publish/detail";
     // Get logged-in to the user's video publishing list, and directly list all the videos that the user has contributed.
+  }
+  rpc PublishViewCountAdd(ArticleBaseActionRequest) returns(ArticleActionResponse){
+    option (api.post) ="/blog_server/publish/view_add";
   }
 }
 

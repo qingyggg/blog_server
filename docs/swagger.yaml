@@ -1,5 +1,68 @@
 basePath: /
 definitions:
+  common.Article:
+    properties:
+      author:
+        allOf:
+        - $ref: '#/definitions/common.User'
+        description: author information
+      base:
+        $ref: '#/definitions/common.ArticleBase'
+      hashId:
+        type: string
+      id:
+        description: video id
+        type: integer
+      info:
+        $ref: '#/definitions/common.ArticleInfo'
+    type: object
+  common.ArticleBase:
+    properties:
+      content:
+        type: string
+      preload:
+        $ref: '#/definitions/common.ArticleBasePreload'
+    type: object
+  common.ArticleBasePreload:
+    properties:
+      cover_url:
+        type: string
+      note:
+        type: string
+      title:
+        type: string
+    type: object
+  common.ArticleCard:
+    properties:
+      author:
+        allOf:
+        - $ref: '#/definitions/common.UserBase'
+        description: author information
+      hashId:
+        type: string
+      id:
+        type: integer
+      info:
+        $ref: '#/definitions/common.ArticleInfo'
+      pre:
+        $ref: '#/definitions/common.ArticleBasePreload'
+    type: object
+  common.ArticleInfo:
+    properties:
+      comment_count:
+        description: total number of comments on the video
+        type: integer
+      dislike_count:
+        type: integer
+      is_favorite:
+        description: true-Liked，false-did not like
+        type: boolean
+      like_count:
+        description: total number of likes for the video
+        type: integer
+      viewed_count:
+        type: integer
+    type: object
   common.BaseResponse:
     properties:
       status_code:
@@ -23,29 +86,34 @@ definitions:
     type: object
   common.User:
     properties:
+      base:
+        $ref: '#/definitions/common.UserBase'
       follow_count:
         description: total number of people the user follows
         type: integer
       follower_count:
         description: total number of fans
         type: integer
-      id:
-        description: user id
-        type: integer
       is_follow:
         description: whether the currently logged-in user follows this user
         type: boolean
-      name:
-        description: user name
-        type: string
-      profile:
-        $ref: '#/definitions/common.UserProfile'
       total_favorited:
         description: number of articles for articles published by user
         type: integer
       work_count:
         description: number of articles published by user
         type: integer
+    type: object
+  common.UserBase:
+    properties:
+      id:
+        description: user id
+        type: integer
+      name:
+        description: user name
+        type: string
+      profile:
+        $ref: '#/definitions/common.UserProfile'
     type: object
   common.UserProfile:
     properties:
@@ -57,6 +125,56 @@ definitions:
         type: string
       signature:
         description: user profile
+        type: string
+    type: object
+  publish.ArticleActionResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  publish.ArticleBaseActionRequest:
+    properties:
+      aHashID:
+        description: 文章的hashid
+        type: string
+      uid:
+        description: 作者id
+        type: integer
+    type: object
+  publish.ArticleCardsResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/common.ArticleCard'
+        type: array
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  publish.ArticleCreateActionRequest:
+    properties:
+      payload:
+        $ref: '#/definitions/common.ArticleBase'
+      uid:
+        type: integer
+    type: object
+  publish.ArticleModifyActionRequest:
+    properties:
+      base:
+        $ref: '#/definitions/publish.ArticleBaseActionRequest'
+      payload:
+        $ref: '#/definitions/common.ArticleBase'
+    type: object
+  publish.ArticleResponse:
+    properties:
+      article:
+        $ref: '#/definitions/common.Article'
+      status_code:
+        type: integer
+      status_msg:
         type: string
     type: object
   user.UserActionProfileModifyRequest:
@@ -117,21 +235,187 @@ info:
   title: blog_server tests
   version: "1.0"
 paths:
-  /blog_server/publish/action/create:
+  /blog_server/publish/action:
+    delete:
+      consumes:
+      - application/json
+      description: 用户可以通过此接口删除一篇文章
+      parameters:
+      - description: 文章删除请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/publish.ArticleBaseActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+      summary: 删除文章
+      tags:
+      - 文章管理
+    patch:
+      consumes:
+      - application/json
+      description: 用户可以通过此接口修改一篇文章
+      parameters:
+      - description: 文章修改请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/publish.ArticleModifyActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+      summary: 修改文章
+      tags:
+      - 文章管理
     post:
-      responses: {}
-  /blog_server/publish/action/delete:
-    post:
-      responses: {}
-  /blog_server/publish/action/modify:
-    post:
-      responses: {}
+      consumes:
+      - application/json
+      description: 用户可以通过此接口发表一篇文章
+      parameters:
+      - description: 文章创建请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/publish.ArticleCreateActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+      summary: 发表文章
+      tags:
+      - 文章管理
   /blog_server/publish/detail:
     get:
-      responses: {}
+      consumes:
+      - application/json
+      description: 用户可以通过此接口获取某篇文章的详细信息
+      parameters:
+      - description: 文章的hashid
+        in: query
+        name: aHashID
+        type: string
+      - description: 作者id
+        in: query
+        name: uid
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应，返回文章详情
+          schema:
+            $ref: '#/definitions/publish.ArticleResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+      summary: 获取文章详情
+      tags:
+      - 文章管理
   /blog_server/publish/list:
     get:
-      responses: {}
+      consumes:
+      - application/json
+      description: 用户可以通过此接口获取文章列表
+      parameters:
+      - in: query
+        name: offset
+        type: integer
+      - description: 如果id为0，则根据时间的先后去请求文章列表
+        in: query
+        name: user_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应，返回文章列表
+          schema:
+            $ref: '#/definitions/publish.ArticleCardsResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+      summary: 获取文章列表
+      tags:
+      - 文章管理
+  /blog_server/publish/view_add:
+    post:
+      consumes:
+      - application/json
+      description: 用户可以通过此接口增加某篇文章的阅读数
+      parameters:
+      - description: 文章阅读数增加请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/publish.ArticleBaseActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/publish.ArticleActionResponse'
+      summary: 增加文章阅读数
+      tags:
+      - 文章管理
   /blog_server/user/:
     get:
       consumes:
@@ -270,7 +554,7 @@ paths:
         type: file
       - description: 上传的类型，是头像还是背景图片
         in: formData
-        name: image_type
+        name: file_type
         required: true
         type: string
       produces:
