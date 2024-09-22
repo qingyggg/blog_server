@@ -45,9 +45,9 @@ type articleFavorite struct {
 
 	ALL       field.Asterisk
 	ID        field.Int64 // 自增主键
-	UserID    field.Int64 // 点赞用户id
-	ArticleID field.Int64 // 被点赞的文章id
-	Status    field.Int32 // -1：踩,1：点赞
+	UserID    field.Int64 // 点赞用户ID
+	ArticleID field.Int64 // 被点赞的文章ID
+	Status    field.Int32 // -1：踩, 1：点赞
 	CreatedAt field.Time  // 点赞创建时间
 	DeletedAt field.Field // 点赞删除时间
 

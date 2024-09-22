@@ -47,7 +47,7 @@ type commentFavorite struct {
 	ArticleID field.Int64 // 评论文章ID
 	CommentID field.Int64 // 被点赞或踩的评论 ID
 	UserID    field.Int64 // 用户ID
-	Status    field.Int32 // -1：踩,1：点赞
+	Status    field.Int32 // -1：踩, 1：点赞
 
 	fieldMap map[string]field.Expr
 }

@@ -20,33 +20,31 @@ import (
 // @Accept mpfd
 // @Produce json
 // @Param file formData file true "上传的文件"
-// @Param image_type formData string true  "上传的类型，是头像还是背景图片"
+// @Param file_type formData string true  "上传的类型，是头像还是背景图片"
 // @Success 200 {object} common.UploadResponse "成功返回文件信息"
 // @Failure 400 {object} common.BaseResponse "请求错误"
 // @Router /upload/file [post]
 func FileUpload(ctx context.Context, c *app.RequestContext) {
 	// single file
 	file, err := c.FormFile("file")
-	imageType := c.FormValue("bucket_type") //avatar,background image
+	//fileType is equal to bucket name
+	fileType := c.FormValue("file_type") //avatar,background image
 	if err != nil {
 		utils.ErrResp(c, err)
 		return
 	}
 	// Upload the file to specific dst
-	_, err = minio.PutToBucket(ctx, string(imageType), file)
+	_, err = minio.PutToBucket(ctx, string(fileType), file)
 	if err != nil {
 		utils.ErrResp(c, err)
 		return
 	}
-	url, err := minio.GetObjURL(ctx, string(imageType), file.Filename)
-	if err != nil {
-		utils.ErrResp(c, err)
-		return
-	}
+	//url, err := minio.GetObjURL(ctx, string(fileType), file.Filename)
+	fullUri := utils.URLconvert(ctx, c, string(fileType)+"/"+file.Filename)
 	c.JSON(consts.StatusOK, common.UploadResponse{
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
-		FileUrl:    url.String(),
+		FileUrl:    fullUri,
 	})
 }
 

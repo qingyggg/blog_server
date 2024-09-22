@@ -17,6 +17,8 @@
 package utils
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -37,4 +39,15 @@ func VerifyPassword(password, hashedPassword string) bool {
 		return false
 	}
 	return true
+}
+
+func GetSHA256String(data string) string {
+	// 生成 SHA256 哈希
+	hash := sha256.New()
+	hash.Write([]byte(data))
+	hashedData := hash.Sum(nil)
+
+	// 将哈希转换为十六进制字符串
+	hashString := hex.EncodeToString(hashedData)
+	return hashString
 }

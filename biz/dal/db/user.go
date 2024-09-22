@@ -107,3 +107,26 @@ func UserProfileModify(user_id int64, payload map[string]interface{}) error {
 	_, err := u.Where(u.ID.Eq(user_id)).Updates(payload)
 	return err //err =err or err=nil
 }
+
+// map[user id] : user payload
+func QueryUserByIds(uids []int64) (*map[int64]*orm_gen.User, error) {
+	var u = query.User
+	//对uids进行去重操作
+	uMaps := make(map[int64]*orm_gen.User)
+	var uniqueIDs []int64
+	for _, uid := range uids {
+		uMaps[uid] = new(orm_gen.User)
+	}
+	for k := range uMaps {
+		uniqueIDs = append(uniqueIDs, k)
+	}
+	users, err := u.Where(u.ID.In(uniqueIDs...)).Find()
+	if err != nil {
+		return nil, err
+	}
+	for _, cu := range users {
+		uMaps[cu.ID] = cu
+	}
+
+	return &uMaps, nil
+}

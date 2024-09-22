@@ -50,3 +50,8 @@ func _publishmodifyactionMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _publishviewcountaddMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

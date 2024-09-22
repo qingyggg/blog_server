@@ -16,7 +16,7 @@ CREATE TABLE `comments` (
                           `deleted_at`         TIMESTAMP NULL COMMENT '评论删除时间',
                           INDEX `articleIdIdx` (`article_id`) COMMENT '根据文章ID，评论 ID 索引',
                           INDEX `repliedIdIdx` (`replied_comment_id`) COMMENT '根据被回复的评论ID，评论 ID 索引'
-) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb3 COMMENT = '评论表';
+) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb4 COMMENT = '评论表';
 
 -- ----------------------------
 -- Table structure for comment_favorite
@@ -31,7 +31,7 @@ CREATE TABLE `comment_favorite` (
                                   INDEX `commentIdIdx` (`comment_id`),
                                   INDEX `userIdIdx` (`user_id`),
                                   INDEX `user_comment_IdIdx` (`user_id`, `comment_id`)
-) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb3 COMMENT = '用户对评论的点赞或者踩';
+) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb4 COMMENT = '用户对评论的点赞或者踩';
 
 -- ----------------------------
 -- Table structure for follows
@@ -46,7 +46,7 @@ CREATE TABLE `follows` (
                          INDEX `FollowerIdIdx` (`follower_id`),
                          INDEX `userIdIdx` (`user_id`),
                          INDEX `userIdToFollowerIdIdx` (`user_id`, `follower_id`)
-) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb3 COMMENT = '关注表';
+) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb4 COMMENT = '关注表';
 
 -- ----------------------------
 -- Table structure for users
@@ -60,7 +60,7 @@ CREATE TABLE `users` (
                        `background_image` VARCHAR(255) NOT NULL COMMENT '用户个人页顶部大图',
                        `signature`        VARCHAR(255) NOT NULL COMMENT '个人简介',
                        INDEX `user_name_password_idx` (`user_name`, `password`)
-) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb3 COMMENT = '用户表';
+) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb4 COMMENT = '用户表';
 
 -- ----------------------------
 -- Table structure for articles
@@ -75,10 +75,13 @@ CREATE TABLE `articles` (
                           `collect_count` BIGINT NOT NULL COMMENT '收藏数目',
                           `title`         VARCHAR(255) NOT NULL COMMENT '文章标题',
                           `note`          TINYTEXT NOT NULL COMMENT '文章小记',
-                          `cover_url`     VARCHAR(255) NOT NULL COMMENT '背景图URL',
-                          `publish_time` timestamp NOT NULL COMMENT '发布时间戳',
-                          INDEX `userIdIdx` (`user_id`)
-) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb3 COMMENT = '文章表';
+                          `cover_url`     TEXT NOT NULL COMMENT '背景图URL',
+                          `publish_time`  timestamp NOT NULL COMMENT '发布时间戳',
+                          `hash_id`          CHAR(64) NOT NULL UNIQUE COMMENT '文章的hashID值',
+                          `view_count`    BIGINT NOT NULL COMMENT '阅览数目',
+                          INDEX `userIdIdx` (`user_id`),
+                          INDEX `userIdToHashIdIdx` (`user_id`, `hash_id`)
+) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb4 COMMENT = '文章表';
 
 -- ----------------------------
 -- Table structure for article_favorite
@@ -94,7 +97,7 @@ CREATE TABLE `article_favorite` (
                                   INDEX `articleIdx` (`article_id`),
                                   INDEX `userIdIdx` (`user_id`),
                                   INDEX `userIdtoArticleIdIdx` (`user_id`, `article_id`)
-) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb3 COMMENT = '点赞表';
+) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb4 COMMENT = '点赞表';
 
 -- ----------------------------
 -- Table structure for article_collect
@@ -109,6 +112,6 @@ CREATE TABLE `article_collect` (
                                  `deleted_at`   TIMESTAMP NULL COMMENT '收藏删除时间',
                                  INDEX `articleIdx` (`article_id`),
                                  INDEX `userIdIdx` (`user_id`)
-) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb3 COMMENT = '收藏表';
+) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb4 COMMENT = '收藏表';
 
 SET FOREIGN_KEY_CHECKS = 1;

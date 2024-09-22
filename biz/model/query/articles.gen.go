@@ -30,12 +30,15 @@ func newArticle(db *gorm.DB, opts ...gen.DOOption) article {
 	_article.ID = field.NewInt64(tableName, "id")
 	_article.UserID = field.NewInt64(tableName, "user_id")
 	_article.LikeCount = field.NewInt64(tableName, "like_count")
+	_article.DislikeCount = field.NewInt64(tableName, "dislike_count")
 	_article.CommentCount = field.NewInt64(tableName, "comment_count")
 	_article.CollectCount = field.NewInt64(tableName, "collect_count")
 	_article.Title = field.NewString(tableName, "title")
 	_article.Note = field.NewString(tableName, "note")
-	_article.Content = field.NewString(tableName, "content")
 	_article.CoverURL = field.NewString(tableName, "cover_url")
+	_article.PublishTime = field.NewTime(tableName, "publish_time")
+	_article.HashID = field.NewString(tableName, "hash_id")
+	_article.ViewCount = field.NewInt64(tableName, "view_count")
 
 	_article.fillFieldMap()
 
@@ -48,14 +51,17 @@ type article struct {
 
 	ALL          field.Asterisk
 	ID           field.Int64  // 文章ID
-	UserID       field.Int64  // 作者id
+	UserID       field.Int64  // 作者ID
 	LikeCount    field.Int64  // 点赞用户数目
+	DislikeCount field.Int64  // 踩的用户数目
 	CommentCount field.Int64  // 评论数目
 	CollectCount field.Int64  // 收藏数目
 	Title        field.String // 文章标题
 	Note         field.String // 文章小记
-	Content      field.String // 文章内容
-	CoverURL     field.String // 背景图url
+	CoverURL     field.String // 背景图URL
+	PublishTime  field.Time   // 发布时间戳
+	HashID       field.String // 文章的hashID值
+	ViewCount    field.Int64  // 阅览数目
 
 	fieldMap map[string]field.Expr
 }
@@ -75,12 +81,15 @@ func (a *article) updateTableName(table string) *article {
 	a.ID = field.NewInt64(table, "id")
 	a.UserID = field.NewInt64(table, "user_id")
 	a.LikeCount = field.NewInt64(table, "like_count")
+	a.DislikeCount = field.NewInt64(table, "dislike_count")
 	a.CommentCount = field.NewInt64(table, "comment_count")
 	a.CollectCount = field.NewInt64(table, "collect_count")
 	a.Title = field.NewString(table, "title")
 	a.Note = field.NewString(table, "note")
-	a.Content = field.NewString(table, "content")
 	a.CoverURL = field.NewString(table, "cover_url")
+	a.PublishTime = field.NewTime(table, "publish_time")
+	a.HashID = field.NewString(table, "hash_id")
+	a.ViewCount = field.NewInt64(table, "view_count")
 
 	a.fillFieldMap()
 
@@ -97,16 +106,19 @@ func (a *article) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (a *article) fillFieldMap() {
-	a.fieldMap = make(map[string]field.Expr, 9)
+	a.fieldMap = make(map[string]field.Expr, 12)
 	a.fieldMap["id"] = a.ID
 	a.fieldMap["user_id"] = a.UserID
 	a.fieldMap["like_count"] = a.LikeCount
+	a.fieldMap["dislike_count"] = a.DislikeCount
 	a.fieldMap["comment_count"] = a.CommentCount
 	a.fieldMap["collect_count"] = a.CollectCount
 	a.fieldMap["title"] = a.Title
 	a.fieldMap["note"] = a.Note
-	a.fieldMap["content"] = a.Content
 	a.fieldMap["cover_url"] = a.CoverURL
+	a.fieldMap["publish_time"] = a.PublishTime
+	a.fieldMap["hash_id"] = a.HashID
+	a.fieldMap["view_count"] = a.ViewCount
 }
 
 func (a article) clone(db *gorm.DB) article {

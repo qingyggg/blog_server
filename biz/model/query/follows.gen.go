@@ -44,8 +44,8 @@ type follow struct {
 
 	ALL        field.Asterisk
 	ID         field.Int64 // 自增主键
-	UserID     field.Int64 // 用户id
-	FollowerID field.Int64 // 粉丝id
+	UserID     field.Int64 // 用户ID
+	FollowerID field.Int64 // 粉丝ID
 	CreatedAt  field.Time  // 关注关系创建时间
 	DeletedAt  field.Field // 关注关系删除时间
 

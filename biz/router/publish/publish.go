@@ -21,14 +21,12 @@ func Register(r *server.Hertz) {
 		_blog_server := root.Group("/blog_server", _blog_serverMw()...)
 		{
 			_publish := _blog_server.Group("/publish", _publishMw()...)
+			_publish.DELETE("/action", append(_publishdelactionMw(), publish.PublishDelAction)...)
+			_publish.PATCH("/action", append(_publishmodifyactionMw(), publish.PublishModifyAction)...)
+			_publish.POST("/action", append(_publishactionMw(), publish.PublishAction)...)
 			_publish.GET("/detail", append(_publishdetailMw(), publish.PublishDetail)...)
 			_publish.GET("/list", append(_publishlistMw(), publish.PublishList)...)
-			{
-				_action := _publish.Group("/action", _actionMw()...)
-				_action.POST("/create", append(_publishactionMw(), publish.PublishAction)...)
-				_action.POST("/delete", append(_publishdelactionMw(), publish.PublishDelAction)...)
-				_action.POST("/modify", append(_publishmodifyactionMw(), publish.PublishModifyAction)...)
-			}
+			_publish.POST("/view_add", append(_publishviewcountaddMw(), publish.PublishViewCountAdd)...)
 		}
 	}
 }
