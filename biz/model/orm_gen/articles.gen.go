@@ -22,7 +22,7 @@ type Article struct {
 	Note         string    `gorm:"column:note;not null;comment:文章小记" json:"note"`                     // 文章小记
 	CoverURL     string    `gorm:"column:cover_url;not null;comment:背景图URL" json:"cover_url"`         // 背景图URL
 	PublishTime  time.Time `gorm:"column:publish_time;not null;comment:发布时间戳" json:"publish_time"`    // 发布时间戳
-	HashID       string    `gorm:"column:hash_id;not null;comment:文章的hashID值" json:"hash_id"`         // 文章的hashID值
+	HashID       []byte    `gorm:"column:hash_id;not null;comment:文章的hashID值" json:"hash_id"`         // 文章的hashID值
 	ViewCount    int64     `gorm:"column:view_count;not null;comment:阅览数目" json:"view_count"`         // 阅览数目
 }
 

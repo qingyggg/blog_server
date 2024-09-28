@@ -42,6 +42,7 @@ const (
 
 	ArticleIsNotExistErrCode
 	CommentIsNotExistErrCode
+	RepliedCommentNotExistErrCode
 )
 
 const (
@@ -52,10 +53,11 @@ const (
 	PasswordIsNotVerifiedMsg = "username or password not verified"
 	FavoriteActionErrMsg     = "favorite add failed"
 
-	MessageAddFailedErrMsg    = "message add failed"
-	FriendListNoPermissionMsg = "You can't query his friend list"
-	ArticleIsNotExistErrMsg   = "article is not exist"
-	CommentIsNotExistErrMsg   = "comment is not exist"
+	MessageAddFailedErrMsg       = "message add failed"
+	FriendListNoPermissionMsg    = "You can't query his friend list"
+	ArticleIsNotExistErrMsg      = "article is not exist"
+	CommentIsNotExistErrMsg      = "comment is not exist"
+	RepliedCommentNotExistErrMsg = "replied comment is not exist"
 )
 
 type ErrNo struct {
@@ -94,6 +96,7 @@ var (
 	FriendListNoPermissionErr = NewErrNo(FriendListNoPermissionErrCode, FriendListNoPermissionMsg)
 	ArticleIsNotExistErr      = NewErrNo(ArticleIsNotExistErrCode, ArticleIsNotExistErrMsg)
 	CommentIsNotExistErr      = NewErrNo(CommentIsNotExistErrCode, CommentIsNotExistErrMsg)
+	RepliedCommentNotExistErr = NewErrNo(RepliedCommentNotExistErrCode, RepliedCommentNotExistErrMsg)
 )
 
 // ConvertErr convert error to Errno

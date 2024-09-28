@@ -1,9 +1,9 @@
 version: '3'
 
 services:
-  mysql:
-    image: 'mysql:latest'
-    container_name: mysql
+  mariadb:
+    image: 'mariadb:latest'
+    container_name: mariadb
     volumes:
       - ../pkg/configs/sql:/docker-entrypoint-initdb.d
     ports:
@@ -11,7 +11,7 @@ services:
     environment:
       - MYSQL_DATABASE=storybook
       - MYSQL_USER=storybook
-      - MYSQL_PASSWORD=storybook123
+      - MYSQL_PASSWORD=blog_server123
       - MYSQL_RANDOM_ROOT_PASSWORD="yes"
     restart: always
 

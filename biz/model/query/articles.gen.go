@@ -37,7 +37,7 @@ func newArticle(db *gorm.DB, opts ...gen.DOOption) article {
 	_article.Note = field.NewString(tableName, "note")
 	_article.CoverURL = field.NewString(tableName, "cover_url")
 	_article.PublishTime = field.NewTime(tableName, "publish_time")
-	_article.HashID = field.NewString(tableName, "hash_id")
+	_article.HashID = field.NewBytes(tableName, "hash_id")
 	_article.ViewCount = field.NewInt64(tableName, "view_count")
 
 	_article.fillFieldMap()
@@ -60,7 +60,7 @@ type article struct {
 	Note         field.String // 文章小记
 	CoverURL     field.String // 背景图URL
 	PublishTime  field.Time   // 发布时间戳
-	HashID       field.String // 文章的hashID值
+	HashID       field.Bytes  // 文章的hashID值
 	ViewCount    field.Int64  // 阅览数目
 
 	fieldMap map[string]field.Expr
@@ -88,7 +88,7 @@ func (a *article) updateTableName(table string) *article {
 	a.Note = field.NewString(table, "note")
 	a.CoverURL = field.NewString(table, "cover_url")
 	a.PublishTime = field.NewTime(table, "publish_time")
-	a.HashID = field.NewString(table, "hash_id")
+	a.HashID = field.NewBytes(table, "hash_id")
 	a.ViewCount = field.NewInt64(table, "view_count")
 
 	a.fillFieldMap()

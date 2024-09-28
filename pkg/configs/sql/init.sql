@@ -4,19 +4,21 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 -- Table structure for comments
 -- ----------------------------
-DROP TABLE IF EXISTS `comments`;
-CREATE TABLE `comments` (
-                          `id`                 BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '评论 ID',
-                          `user_id`            BIGINT NOT NULL COMMENT '评论发布用户ID',
-                          `article_id`         BIGINT NOT NULL COMMENT '评论文章ID',
-                          `replied_comment_id` BIGINT DEFAULT 777 COMMENT '被回复的评论的ID',
-                          `floor`              SMALLINT NOT NULL COMMENT '评论等级，分为三级',
-                          `comment_text`       VARCHAR(255) NOT NULL COMMENT '评论内容',
-                          `created_at`         TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '评论创建时间',
-                          `deleted_at`         TIMESTAMP NULL COMMENT '评论删除时间',
-                          INDEX `articleIdIdx` (`article_id`) COMMENT '根据文章ID，评论 ID 索引',
-                          INDEX `repliedIdIdx` (`replied_comment_id`) COMMENT '根据被回复的评论ID，评论 ID 索引'
-) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb4 COMMENT = '评论表';
+# DROP TABLE IF EXISTS `comments`;
+# CREATE TABLE `comments` (
+#     `id`                 BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '评论 ID',
+#     `user_id`            BIGINT NOT NULL COMMENT '评论发布用户ID',
+#     `article_id`         BIGINT NOT NULL COMMENT '评论文章ID',
+#     `replied_comment_id` BIGINT DEFAULT 777 COMMENT '父评论ID',
+#     `floor`              SMALLINT NOT NULL COMMENT '评论等级，分为三级',
+#     `comment_text`       TEXT NOT NULL COMMENT '评论内容',
+#     `created_at`         TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '评论创建时间',
+#     `has_sub`            BOOL DEFAULT false COMMENT '是否具有子评论',
+#     `sub_comment_count`  INT DEFAULT 0 COMMENT '子评论数量',
+#     `root_comment_id`    INT DEFAULT 0 COMMENT '如果该字段为零，则为顶级评论，反之亦然' ,
+#     INDEX `articleIdIdx` (`article_id`) COMMENT '根据文章ID，评论 ID 索引',
+#     INDEX `repliedIdIdx` (`replied_comment_id`) COMMENT '根据被回复的评论ID，评论 ID 索引'
+# ) AUTO_INCREMENT = 1000 DEFAULT CHARSET = utf8mb4 COMMENT = '评论表';
 
 -- ----------------------------
 -- Table structure for comment_favorite
@@ -54,6 +56,7 @@ CREATE TABLE `follows` (
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
                        `id`               BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
+                       `hash_id`          BINARY(8) NOT NULL UNIQUE COMMENT '用户的hash值',
                        `user_name`        VARCHAR(255) NOT NULL UNIQUE COMMENT '用户名',
                        `password`         VARCHAR(255) NOT NULL COMMENT '用户密码',
                        `avatar`           VARCHAR(255) NOT NULL COMMENT '用户头像',
@@ -77,7 +80,7 @@ CREATE TABLE `articles` (
                           `note`          TINYTEXT NOT NULL COMMENT '文章小记',
                           `cover_url`     TEXT NOT NULL COMMENT '背景图URL',
                           `publish_time`  timestamp NOT NULL COMMENT '发布时间戳',
-                          `hash_id`          CHAR(64) NOT NULL UNIQUE COMMENT '文章的hashID值',
+                          `hash_id`          BINARY(32) NOT NULL UNIQUE COMMENT '文章的hashID值',
                           `view_count`    BIGINT NOT NULL COMMENT '阅览数目',
                           INDEX `userIdIdx` (`user_id`),
                           INDEX `userIdToHashIdIdx` (`user_id`, `hash_id`)

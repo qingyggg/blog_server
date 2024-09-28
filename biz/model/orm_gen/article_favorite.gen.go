@@ -14,12 +14,12 @@ const TableNameArticleFavorite = "article_favorite"
 
 // ArticleFavorite 点赞表
 type ArticleFavorite struct {
-	ID        int64          `gorm:"column:id;primaryKey;autoIncrement:true;comment:自增主键" json:"id"`                        // 自增主键
-	UserID    int64          `gorm:"column:user_id;not null;comment:点赞用户ID" json:"user_id"`                                 // 点赞用户ID
-	ArticleID int64          `gorm:"column:article_id;not null;comment:被点赞的文章ID" json:"article_id"`                         // 被点赞的文章ID
-	Status    int32          `gorm:"column:status;not null;comment:-1：踩, 1：点赞" json:"status"`                               // -1：踩, 1：点赞
-	CreatedAt time.Time      `gorm:"column:created_at;not null;default:CURRENT_TIMESTAMP;comment:点赞创建时间" json:"created_at"` // 点赞创建时间
-	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at;comment:点赞删除时间" json:"deleted_at"`                                    // 点赞删除时间
+	ID        int64          `gorm:"column:id;primaryKey;autoIncrement:true;comment:自增主键" json:"id"`                          // 自增主键
+	UserID    int64          `gorm:"column:user_id;not null;comment:点赞用户ID" json:"user_id"`                                   // 点赞用户ID
+	ArticleID int64          `gorm:"column:article_id;not null;comment:被点赞的文章ID" json:"article_id"`                           // 被点赞的文章ID
+	Status    int32          `gorm:"column:status;not null;comment:-1：踩, 1：点赞" json:"status"`                                 // -1：踩, 1：点赞
+	CreatedAt time.Time      `gorm:"column:created_at;not null;default:current_timestamp();comment:点赞创建时间" json:"created_at"` // 点赞创建时间
+	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at;comment:点赞删除时间" json:"deleted_at"`                                      // 点赞删除时间
 }
 
 // TableName ArticleFavorite's table name

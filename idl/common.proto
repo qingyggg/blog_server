@@ -20,7 +20,8 @@ message User {
 message UserBase{
   int64 id = 1; // user id
   string name = 2; // user name
-  UserProfile profile =3;
+  string hashId=3;
+  UserProfile profile =4;
 }
 
 message ArticleBasePreload{

@@ -41,13 +41,31 @@ func VerifyPassword(password, hashedPassword string) bool {
 	return true
 }
 
+func GetSHA256Byte(data string) []byte {
+	// 生成 SHA256 哈希
+	hash := sha256.New()
+	hash.Write([]byte(data))
+	hashedData := hash.Sum(nil)
+
+	return hashedData
+}
+
 func GetSHA256String(data string) string {
 	// 生成 SHA256 哈希
 	hash := sha256.New()
 	hash.Write([]byte(data))
 	hashedData := hash.Sum(nil)
 
-	// 将哈希转换为十六进制字符串
-	hashString := hex.EncodeToString(hashedData)
-	return hashString
+	return hex.EncodeToString(hashedData)
+}
+
+// ConvertByteHashToString 将 byte 类型的哈希转换为字符串哈希
+func ConvertByteHashToString(hash []byte) string {
+	return hex.EncodeToString(hash)
+}
+
+// ConvertStringHashToByte 将字符串哈希转换为 byte 类型的哈希
+func ConvertStringHashToByte(hash string) []byte {
+	data, _ := hex.DecodeString(hash)
+	return data
 }

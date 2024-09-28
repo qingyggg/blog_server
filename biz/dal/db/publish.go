@@ -8,31 +8,18 @@ import (
 	"github.com/qingyggg/blog_server/biz/mw/mongo"
 	"github.com/qingyggg/blog_server/pkg/utils"
 	"go.mongodb.org/mongo-driver/v2/bson"
-	"strconv"
-	"time"
 )
 
-func CreateArticle(aInfo *orm_gen.Article, aContent string) (hashAid string, err error) {
-	// 获取当前时间戳
-	timestamp := time.Now().Unix()
-	aHashID := utils.GetSHA256String(strconv.FormatInt(aInfo.UserID, 10) + strconv.FormatInt(timestamp, 10))
-	aInfo.HashID = aHashID
-	err = QDB.Transaction(func(tx *query.Query) error {
+func CreateArticle(aInfo *orm_gen.Article, aContent string) error {
+	err := QDB.Transaction(func(tx *query.Query) error {
 		if err := tx.Article.Create(aInfo); err != nil {
 			return err
 		}
-		insertResult, err := mongo.ArticleCollection.InsertOne(context.TODO(), &mongo.Article{ArticleID: aHashID, Content: aContent})
+		insertResult, err := mongo.ArticleCollection.InsertOne(context.TODO(), &mongo.Article{ArticleID: utils.ConvertByteHashToString(aInfo.HashID), Content: aContent})
 		fmt.Println(insertResult)
-		if err != nil {
-			return err
-		}
-		return nil
+		return err //nil or err
 	})
-	if err != nil {
-		return "", err
-	}
-
-	return hashAid, err
+	return err
 }
 
 func ModifyArticle(aInfo *orm_gen.Article, aContent string) (hashAid string, err error) {
@@ -60,7 +47,7 @@ func ModifyArticle(aInfo *orm_gen.Article, aContent string) (hashAid string, err
 		return "", err
 	}
 
-	return aInfo.HashID, err
+	return utils.ConvertByteHashToString(aInfo.HashID), err
 }
 func DeleteArticle(aInfo *orm_gen.Article) (err error) {
 	err = QDB.Transaction(func(tx *query.Query) error {
@@ -105,7 +92,7 @@ func GetArticleInfos(uid int64, offset int) (aInfos []*orm_gen.Article, err erro
 // TakeArticle: 获取文章info以及内容
 func TakeArticle(aHashID string, uid int64) (aInfo *orm_gen.Article, content string, err error) {
 	var a = query.Article
-	aInfo, err = a.Where(a.UserID.Eq(uid), a.HashID.Eq(aHashID)).Take()
+	aInfo, err = a.Where(a.UserID.Eq(uid), a.HashID.Eq(utils.ConvertStringHashToByte(aHashID))).Take()
 	if err != nil {
 		return nil, "", err
 	}
@@ -138,7 +125,7 @@ func CheckIsFavoriteByUid(uid int64, ahashId string) (bool, error) {
 
 func AddViewCount(uid int64, ahashId string) error {
 	var a = query.Article
-	_, err := a.Where(a.UserID.Eq(uid), a.HashID.Eq(ahashId)).UpdateSimple(a.ViewCount.Add(1))
+	_, err := a.Where(a.UserID.Eq(uid), a.HashID.Eq(utils.ConvertStringHashToByte(ahashId))).UpdateSimple(a.ViewCount.Add(1))
 	return err
 }
 
@@ -146,6 +133,19 @@ func AddViewCount(uid int64, ahashId string) error {
 func CheckArticleExistById(aid int64) (bool, error) {
 	var a = query.Article
 	count, err := a.Where(a.ID.Eq(aid)).Count()
+	if err != nil {
+		return false, err
+	} else if count != 0 {
+		return true, nil
+	} else {
+		return false, nil
+	}
+}
+
+// CheckArticleExistByHashId 根据文章的hash_id 字段查找文章
+func CheckArticleExistByHashId(ahashId string) (bool, error) {
+	var a = query.Article
+	count, err := a.Where(a.HashID.Eq(utils.ConvertStringHashToByte(ahashId))).Count()
 	if err != nil {
 		return false, err
 	} else if count != 0 {

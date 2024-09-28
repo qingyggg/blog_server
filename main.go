@@ -2,17 +2,16 @@ package main
 
 import (
 	"context"
-	"github.com/hertz-contrib/swagger"
-	"github.com/qingyggg/blog_server/biz/dal"
-	"github.com/qingyggg/blog_server/biz/mw/jwt"
-	"github.com/qingyggg/blog_server/biz/mw/minio"
-	swaggerFiles "github.com/swaggo/files"
-
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/hertz-contrib/reverseproxy"
+	"github.com/hertz-contrib/swagger"
+	"github.com/qingyggg/blog_server/biz/dal"
+	"github.com/qingyggg/blog_server/biz/mw/jwt"
+	"github.com/qingyggg/blog_server/biz/mw/minio"
 	_ "github.com/qingyggg/blog_server/docs"
+	swaggerFiles "github.com/swaggo/files"
 )
 
 // Set up /src/*name route forwarding to access minio from external network

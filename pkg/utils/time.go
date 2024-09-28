@@ -1,22 +1,9 @@
-/*
- * Copyright 2023 CloudWeGo Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package utils
 
-import "time"
+import (
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"time"
+)
 
 // MillTimeStampToTime convert ms timestamp to time.Time
 func MillTimeStampToTime(timestamp int64) time.Time {
@@ -28,4 +15,16 @@ func MillTimeStampToTime(timestamp int64) time.Time {
 // SecondTimeStampToTime convert s timestamp to time.Time
 func SecondTimeStampToTime(timestamp int64) time.Time {
 	return time.Unix(timestamp, 0)
+}
+
+func ConvertBsonTimeToString(dateTime bson.DateTime) string {
+	// 假设你有一个 bson.DateTime 对象
+
+	// 将 bson.DateTime 转换为 Go 的 time.Time
+	t := dateTime.Time()
+
+	// 将 time.Time 转换为字符串，使用你需要的格式
+	timeStr := t.Format("2006-01-02 15:04:05")
+
+	return timeStr
 }

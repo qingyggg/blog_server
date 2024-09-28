@@ -18,7 +18,7 @@ package constants
 
 // connection information
 const (
-	MySQLDefaultDSN = "storybook:storybook123@tcp(127.0.0.1:18000)/storybook?charset=utf8&parseTime=True&loc=Local&timeout=10s"
+	MySQLDefaultDSN = "storybook:blog_server123@tcp(127.0.0.1:18000)/storybook?charset=utf8mb4&parseTime=True&loc=Local&timeout=10s"
 
 	MinioEndPoint        = "localhost:18001"
 	MinioAccessKeyID     = "blog_server"
@@ -26,7 +26,9 @@ const (
 	MiniouseSSL          = false
 
 	RedisAddr     = "localhost:18003"
-	RedisPassword = "storybook123"
+	RedisPassword = "blog_server123"
+
+	MongoDefaultDSN = "mongodb://blog_server:blog_server123@localhost:18006/?connect=direct"
 )
 
 // constants in the project

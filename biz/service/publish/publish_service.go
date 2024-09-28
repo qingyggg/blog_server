@@ -9,7 +9,9 @@ import (
 	"github.com/qingyggg/blog_server/biz/model/hertz/common"
 	"github.com/qingyggg/blog_server/biz/model/orm_gen"
 	service "github.com/qingyggg/blog_server/biz/service/user"
+	"github.com/qingyggg/blog_server/pkg/errno"
 	"github.com/qingyggg/blog_server/pkg/utils"
+	"strconv"
 	"time"
 )
 
@@ -25,21 +27,33 @@ func NewPublishService(ctx context.Context, c *app.RequestContext) *PublishServi
 	return &PublishService{ctx: ctx, c: c}
 }
 
-func (s *PublishService) PublishCreate(req *publish.ArticleCreateActionRequest) (err error) {
-	_, err = db.CreateArticle(&orm_gen.Article{
+func (s *PublishService) PublishCreate(req *publish.ArticleCreateActionRequest) (err error, aHashId string) {
+	exist, err := db.CheckUserExistById(req.Uid)
+	if err != nil {
+		return err, ""
+	}
+	if !exist {
+		return errno.UserIsNotExistErr, ""
+	}
+	aHashId = utils.GetSHA256String(time.Now().String() + strconv.FormatInt(req.Uid, 16))
+	err = db.CreateArticle(&orm_gen.Article{
 		UserID:      req.Uid,
 		Title:       req.Payload.Preload.Title,
 		Note:        req.Payload.Preload.Note,
 		CoverURL:    utils.UrlConvertReverse(s.ctx, req.Payload.Preload.CoverUrl),
 		PublishTime: time.Now(),
+		HashID:      utils.ConvertStringHashToByte(aHashId),
 	}, req.Payload.Content)
-	return err
+	if err != nil {
+		return err, ""
+	}
+	return nil, aHashId
 }
 
 func (s *PublishService) PublishModify(req *publish.ArticleModifyActionRequest) (err error) {
 	_, err = db.ModifyArticle(&orm_gen.Article{
 		UserID: req.Base.Uid,
-		HashID: req.Base.AHashID,
+		HashID: utils.ConvertStringHashToByte(req.Base.AHashID),
 		Title:  req.Payload.Preload.Title,
 		Note:   req.Payload.Preload.Note,
 	}, req.Payload.Content)
@@ -47,7 +61,7 @@ func (s *PublishService) PublishModify(req *publish.ArticleModifyActionRequest) 
 }
 
 func (s *PublishService) PublishDelete(req *publish.ArticleBaseActionRequest) (err error) {
-	err = db.DeleteArticle(&orm_gen.Article{UserID: req.Uid, HashID: req.AHashID})
+	err = db.DeleteArticle(&orm_gen.Article{UserID: req.Uid, HashID: utils.ConvertStringHashToByte(req.AHashID)})
 	if err != nil {
 		return err
 	}
@@ -67,7 +81,7 @@ func (s *PublishService) PublishDetail(req *publish.ArticleBaseActionRequest) (a
 	}
 	aA = new(common.Article)
 	aA.Id = aInfo.ID
-	aA.HashId = aInfo.HashID
+	aA.HashId = utils.ConvertByteHashToString(aInfo.HashID)
 	aA.Author = curUser //作者信息
 	aA.Base = &common.ArticleBase{
 		Preload: &common.ArticleBasePreload{
@@ -104,16 +118,8 @@ func (s *PublishService) PublishList(req *publish.ArticleCardsRequest) (cards []
 		curUser := (*uMaps)[aInfo.UserID]
 		cards = append(cards, &common.ArticleCard{
 			Id:     aInfo.ID,
-			HashId: aInfo.HashID,
-			Author: &common.UserBase{
-				Id:   curUser.ID,
-				Name: curUser.UserName,
-				Profile: &common.UserProfile{
-					Avatar:          utils.URLconvert(s.ctx, s.c, curUser.Avatar),
-					Signature:       curUser.Signature,
-					BackgroundImage: utils.URLconvert(s.ctx, s.c, curUser.BackgroundImage),
-				},
-			},
+			HashId: utils.ConvertByteHashToString(aInfo.HashID),
+			Author: service.UserAssign(curUser),
 			Info: &common.ArticleInfo{
 				LikeCount:    aInfo.LikeCount,
 				CommentCount: aInfo.CommentCount,

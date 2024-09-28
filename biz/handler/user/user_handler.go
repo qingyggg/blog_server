@@ -35,6 +35,10 @@ func User(ctx context.Context, c *app.RequestContext) {
 	}
 
 	payload, err := service.NewUserService(ctx, c).UserInfo(req)
+	if err != nil {
+		utils.ErrResp(c, err)
+		return
+	}
 	c.JSON(consts.StatusOK, user.UserResponse{
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
@@ -66,7 +70,7 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		utils.ErrResp(c, err) //密码格式不对
 		return
 	}
-	_, err = service.NewUserService(ctx, c).UserRegister(req)
+	uHashId, err := service.NewUserService(ctx, c).UserRegister(req)
 	if err != nil {
 		utils.ErrResp(c, err)
 		return
@@ -78,6 +82,7 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
 		UserId:     user_id,
+		UHashId:    uHashId,
 	})
 }
 

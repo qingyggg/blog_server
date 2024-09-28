@@ -9,6 +9,7 @@ const TableNameUser = "users"
 // User 用户表
 type User struct {
 	ID              int64  `gorm:"column:id;primaryKey;autoIncrement:true;comment:用户ID" json:"id"`             // 用户ID
+	HashID          []byte `gorm:"column:hash_id;not null;comment:用户的hash值" json:"hash_id"`                    // 用户的hash值
 	UserName        string `gorm:"column:user_name;not null;comment:用户名" json:"user_name"`                     // 用户名
 	Password        string `gorm:"column:password;not null;comment:用户密码" json:"password"`                      // 用户密码
 	Avatar          string `gorm:"column:avatar;not null;comment:用户头像" json:"avatar"`                          // 用户头像

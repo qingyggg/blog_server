@@ -16,6 +16,7 @@ message UserActionResponse {
   int32 status_code = 1[(api.go_tag)='json:"status_code"'];
   string status_msg = 2;
   int64 user_id = 3; // user id
+  string uHashId = 4;
 }
 
 message UserActionPwdModifyRequest {

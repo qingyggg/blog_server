@@ -20,7 +20,7 @@ import (
 // @Accept  json
 // @Produce  json
 // @Param  data  body  publish.ArticleCreateActionRequest  true  "文章创建请求参数"
-// @Success 200 {object} publish.ArticleActionResponse "成功响应"
+// @Success 200 {object} publish.ArticleCreateActionResponse "成功响应"
 // @Failure 400 {object} publish.ArticleActionResponse "请求参数错误"
 // @Failure 500 {object} publish.ArticleActionResponse "服务器内部错误"
 // @Router /blog_server/publish/action [post]
@@ -32,15 +32,17 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 		utils.ErrResp(c, err)
 		return
 	}
-	err = service.NewPublishService(ctx, c).PublishCreate(req)
+
+	err, aHashId := service.NewPublishService(ctx, c).PublishCreate(req)
 	if err != nil {
 		utils.ErrResp(c, err)
 		return
 	}
 
-	c.JSON(consts.StatusOK, &publish.ArticleActionResponse{
+	c.JSON(consts.StatusOK, &publish.ArticleCreateActionResponse{
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
+		AHashId:    aHashId,
 	})
 }
 

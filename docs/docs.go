@@ -22,6 +22,149 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/blog_server/comment/action/": {
+            "post": {
+                "description": "向博文添加新评论",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "评论"
+                ],
+                "summary": "新增评论",
+                "parameters": [
+                    {
+                        "description": "新增评论请求",
+                        "name": "CommentActionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/comment.CommentActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "评论成功添加",
+                        "schema": {
+                            "$ref": "#/definitions/comment.CommentActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "无效的请求",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除博文中的评论",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "评论"
+                ],
+                "summary": "删除评论",
+                "parameters": [
+                    {
+                        "description": "删除评论请求",
+                        "name": "CommentDelActionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/comment.CommentDelActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "评论成功删除",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "无效的请求",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/comment/list/": {
+            "get": {
+                "description": "获取博文的评论列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "评论"
+                ],
+                "summary": "获取评论列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "aHashId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "cHashId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "1:请求一级评论 2：请求二级评论",
+                        "name": "type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功获取评论列表",
+                        "schema": {
+                            "$ref": "#/definitions/comment.CommentListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "无效的请求",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/blog_server/publish/action": {
             "post": {
                 "description": "用户可以通过此接口发表一篇文章",
@@ -50,7 +193,7 @@ const docTemplate = `{
                     "200": {
                         "description": "成功响应",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/publish.ArticleCreateActionResponse"
                         }
                     },
                     "400": {
@@ -538,6 +681,115 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "comment.Comment": {
+            "type": "object",
+            "properties": {
+                "AHashId": {
+                    "description": "文章的id",
+                    "type": "string"
+                },
+                "RepliedUHashId": {
+                    "description": "如果该评论为某评论的回复，则该字段为被回复的用户的hashID",
+                    "type": "string"
+                },
+                "cHashId": {
+                    "type": "string"
+                },
+                "childNum": {
+                    "description": "该评论被回复的数量，当为一级评论时候，显示数量，二级的时候，显示为0",
+                    "type": "integer"
+                },
+                "content": {
+                    "description": "comment",
+                    "type": "string"
+                },
+                "createDate": {
+                    "description": "comment publication date, format mm-dd",
+                    "type": "string"
+                },
+                "favorite_count": {
+                    "description": "该评论获得的点赞数量",
+                    "type": "integer"
+                },
+                "user": {
+                    "description": "comment user information",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/common.UserBase"
+                        }
+                    ]
+                }
+            }
+        },
+        "comment.CommentActionRequest": {
+            "type": "object",
+            "properties": {
+                "AHashId": {
+                    "description": "文章的id",
+                    "type": "string"
+                },
+                "Content": {
+                    "description": "评论内容",
+                    "type": "string"
+                },
+                "Degree": {
+                    "description": "评论等级，只能为1或者2",
+                    "type": "integer"
+                },
+                "PHashId": {
+                    "description": "父亲评论的id",
+                    "type": "string"
+                },
+                "UHashId": {
+                    "description": "用户ID",
+                    "type": "string"
+                }
+            }
+        },
+        "comment.CommentActionResponse": {
+            "type": "object",
+            "properties": {
+                "cHashId": {
+                    "type": "string"
+                },
+                "status_code": {
+                    "description": "status code, 0-success, other values-failure",
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "description": "status description",
+                    "type": "string"
+                }
+            }
+        },
+        "comment.CommentDelActionRequest": {
+            "type": "object",
+            "properties": {
+                "CHashId": {
+                    "description": "评论id",
+                    "type": "string"
+                }
+            }
+        },
+        "comment.CommentListResponse": {
+            "type": "object",
+            "properties": {
+                "comment_list": {
+                    "description": "return comment list",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/comment.Comment"
+                    }
+                },
+                "status_code": {
+                    "description": "0-success, other values-failure",
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                }
+            }
+        },
         "common.Article": {
             "type": "object",
             "properties": {
@@ -698,6 +950,9 @@ const docTemplate = `{
         "common.UserBase": {
             "type": "object",
             "properties": {
+                "hashId": {
+                    "type": "string"
+                },
                 "id": {
                     "description": "user id",
                     "type": "integer"
@@ -780,6 +1035,20 @@ const docTemplate = `{
                 }
             }
         },
+        "publish.ArticleCreateActionResponse": {
+            "type": "object",
+            "properties": {
+                "aHashId": {
+                    "type": "string"
+                },
+                "status_code": {
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                }
+            }
+        },
         "publish.ArticleModifyActionRequest": {
             "type": "object",
             "properties": {
@@ -850,6 +1119,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "status_msg": {
+                    "type": "string"
+                },
+                "uHashId": {
                     "type": "string"
                 },
                 "user_id": {

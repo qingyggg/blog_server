@@ -27,6 +27,12 @@ message ArticleActionResponse {
   int32 status_code = 1[(api.go_tag)='json:"status_code"'];
   string status_msg = 2;
 }
+message ArticleCreateActionResponse {
+  int32 status_code = 1[(api.go_tag)='json:"status_code"'];
+  string status_msg = 2;
+  string aHashId=3;
+}
+
 //文章卡片列表
 message ArticleCardsRequest {
   int64 user_id = 1;//如果id为0，则根据时间的先后去请求文章列表
@@ -46,7 +52,7 @@ message ArticleCardsResponse {
 }
 
 service PublishHandler {
-  rpc PublishAction(ArticleCreateActionRequest) returns(ArticleActionResponse) {
+  rpc PublishAction(ArticleCreateActionRequest) returns(ArticleCreateActionResponse) {
     option (api.post) = "/blog_server/publish/action";
   }
   rpc PublishModifyAction(ArticleModifyActionRequest) returns(ArticleActionResponse) {
