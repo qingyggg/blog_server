@@ -5,49 +5,46 @@ definitions:
       AHashId:
         description: 文章的id
         type: string
+      CHashId:
+        type: string
+      ChildNum:
+        description: 该评论被回复的数量，当为一级评论时候，显示数量，二级的时候，显示为0
+        type: integer
+      Content:
+        description: comment
+        type: string
+      CreateDate:
+        description: comment publication date, format mm-dd
+        type: string
+      FavoriteCount:
+        description: 该评论获得的点赞数量
+        type: integer
       RepliedUHashId:
         description: 如果该评论为某评论的回复，则该字段为被回复的用户的hashID
         type: string
-      cHashId:
-        type: string
-      childNum:
-        description: 该评论被回复的数量，当为一级评论时候，显示数量，二级的时候，显示为0
-        type: integer
-      content:
-        description: comment
-        type: string
-      createDate:
-        description: comment publication date, format mm-dd
-        type: string
-      favorite_count:
-        description: 该评论获得的点赞数量
-        type: integer
-      user:
+      User:
         allOf:
         - $ref: '#/definitions/common.UserBase'
         description: comment user information
     type: object
   comment.CommentActionRequest:
     properties:
-      AHashId:
+      aHashId:
         description: 文章的id
         type: string
-      Content:
+      content:
         description: 评论内容
         type: string
-      Degree:
+      degree:
         description: 评论等级，只能为1或者2
         type: integer
-      PHashId:
+      pHashId:
         description: 父亲评论的id
-        type: string
-      UHashId:
-        description: 用户ID
         type: string
     type: object
   comment.CommentActionResponse:
     properties:
-      cHashId:
+      CHashId:
         type: string
       status_code:
         description: status code, 0-success, other values-failure
@@ -58,7 +55,7 @@ definitions:
     type: object
   comment.CommentDelActionRequest:
     properties:
-      CHashId:
+      cHashId:
         description: 评论id
         type: string
     type: object
@@ -204,55 +201,17 @@ definitions:
         description: user profile
         type: string
     type: object
-  publish.ArticleActionResponse:
-    properties:
-      status_code:
-        type: integer
-      status_msg:
-        type: string
-    type: object
-  publish.ArticleBaseActionRequest:
+  publish.ActionRequest:
     properties:
       aHashID:
-        description: 文章的hashid
         type: string
-      uid:
-        description: 作者id
-        type: integer
     type: object
-  publish.ArticleCardsResponse:
+  publish.ActionResponse:
     properties:
-      list:
-        items:
-          $ref: '#/definitions/common.ArticleCard'
-        type: array
       status_code:
         type: integer
       status_msg:
         type: string
-    type: object
-  publish.ArticleCreateActionRequest:
-    properties:
-      payload:
-        $ref: '#/definitions/common.ArticleBase'
-      uid:
-        type: integer
-    type: object
-  publish.ArticleCreateActionResponse:
-    properties:
-      aHashId:
-        type: string
-      status_code:
-        type: integer
-      status_msg:
-        type: string
-    type: object
-  publish.ArticleModifyActionRequest:
-    properties:
-      base:
-        $ref: '#/definitions/publish.ArticleBaseActionRequest'
-      payload:
-        $ref: '#/definitions/common.ArticleBase'
     type: object
   publish.ArticleResponse:
     properties:
@@ -263,12 +222,76 @@ definitions:
       status_msg:
         type: string
     type: object
+  publish.CardsResponse:
+    properties:
+      List:
+        items:
+          $ref: '#/definitions/common.ArticleCard'
+        type: array
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  publish.CreateActionRequest:
+    properties:
+      payload:
+        $ref: '#/definitions/common.ArticleBase'
+    type: object
+  publish.CreateActionResponse:
+    properties:
+      AHashId:
+        type: string
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  publish.DelActionRequest:
+    properties:
+      aHashID:
+        description: 文章的hashid
+        type: string
+    type: object
+  publish.ModifyActionRequest:
+    properties:
+      aHashID:
+        description: 文章的hashid
+        type: string
+      payload:
+        $ref: '#/definitions/common.ArticleBase'
+    type: object
+  relation.RelationActionRequest:
+    properties:
+      action_type:
+        description: 1-Follow, 2-Unfollow
+        type: integer
+      to_user_id:
+        type: integer
+    type: object
+  relation.RelationActionResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  relation.RelationFollowListResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+      user_list:
+        description: User information list
+        items:
+          $ref: '#/definitions/common.User'
+        type: array
+    type: object
   user.UserActionProfileModifyRequest:
     properties:
-      user:
+      user_profile:
         $ref: '#/definitions/common.UserProfile'
-      user_id:
-        type: integer
     type: object
   user.UserActionPwdModifyRequest:
     properties:
@@ -277,7 +300,6 @@ definitions:
       old_password:
         type: string
       username:
-        description: registered user name
         type: string
     type: object
   user.UserActionRequest:
@@ -285,20 +307,19 @@ definitions:
       password:
         type: string
       username:
-        description: registered user name
         type: string
     type: object
   user.UserActionResponse:
     properties:
+      UHashId:
+        type: string
+      UserId:
+        description: user id
+        type: integer
       status_code:
         type: integer
       status_msg:
         type: string
-      uHashId:
-        type: string
-      user_id:
-        description: user id
-        type: integer
     type: object
   user.UserResponse:
     properties:
@@ -389,14 +410,14 @@ paths:
       description: 获取博文的评论列表
       parameters:
       - in: query
-        name: aHashId
+        name: AHashId
         type: string
       - in: query
-        name: cHashId
+        name: CHashId
         type: string
       - description: 1:请求一级评论 2：请求二级评论
         in: query
-        name: type
+        name: Type
         type: integer
       produces:
       - application/json
@@ -427,22 +448,22 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/publish.ArticleBaseActionRequest'
+          $ref: '#/definitions/publish.DelActionRequest'
       produces:
       - application/json
       responses:
         "200":
           description: 成功响应
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/publish.ActionResponse'
         "400":
           description: 请求参数错误
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
         "500":
           description: 服务器内部错误
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
       summary: 删除文章
       tags:
       - 文章管理
@@ -456,22 +477,22 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/publish.ArticleModifyActionRequest'
+          $ref: '#/definitions/publish.ModifyActionRequest'
       produces:
       - application/json
       responses:
         "200":
           description: 成功响应
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/publish.ActionResponse'
         "400":
           description: 请求参数错误
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
         "500":
           description: 服务器内部错误
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
       summary: 修改文章
       tags:
       - 文章管理
@@ -485,22 +506,22 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/publish.ArticleCreateActionRequest'
+          $ref: '#/definitions/publish.CreateActionRequest'
       produces:
       - application/json
       responses:
         "200":
           description: 成功响应
           schema:
-            $ref: '#/definitions/publish.ArticleCreateActionResponse'
+            $ref: '#/definitions/publish.CreateActionResponse'
         "400":
           description: 请求参数错误
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
         "500":
           description: 服务器内部错误
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
       summary: 发表文章
       tags:
       - 文章管理
@@ -512,12 +533,11 @@ paths:
       parameters:
       - description: 文章的hashid
         in: query
-        name: aHashID
+        name: AHashID
         type: string
-      - description: 作者id
-        in: query
-        name: uid
-        type: integer
+      - in: query
+        name: UHashID
+        type: string
       produces:
       - application/json
       responses:
@@ -528,11 +548,11 @@ paths:
         "400":
           description: 请求参数错误
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
         "500":
           description: 服务器内部错误
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
       summary: 获取文章详情
       tags:
       - 文章管理
@@ -543,11 +563,11 @@ paths:
       description: 用户可以通过此接口获取文章列表
       parameters:
       - in: query
-        name: offset
+        name: Offset
         type: integer
       - description: 如果id为0，则根据时间的先后去请求文章列表
         in: query
-        name: user_id
+        name: UserId
         type: integer
       produces:
       - application/json
@@ -555,15 +575,15 @@ paths:
         "200":
           description: 成功响应，返回文章列表
           schema:
-            $ref: '#/definitions/publish.ArticleCardsResponse'
+            $ref: '#/definitions/publish.CardsResponse'
         "400":
           description: 请求参数错误
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
         "500":
           description: 服务器内部错误
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
       summary: 获取文章列表
       tags:
       - 文章管理
@@ -578,25 +598,101 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/publish.ArticleBaseActionRequest'
+          $ref: '#/definitions/publish.ActionRequest'
       produces:
       - application/json
       responses:
         "200":
           description: 成功响应
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/publish.ActionResponse'
         "400":
           description: 请求参数错误
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
         "500":
           description: 服务器内部错误
           schema:
-            $ref: '#/definitions/publish.ArticleActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
       summary: 增加文章阅读数
       tags:
       - 文章管理
+  /blog_server/relation/action:
+    post:
+      consumes:
+      - application/json
+      description: 用户对其他用户进行关注或取消关注
+      parameters:
+      - description: RelationAction请求参数
+        in: body
+        name: relation
+        required: true
+        schema:
+          $ref: '#/definitions/relation.RelationActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应，包含状态码和状态信息
+          schema:
+            $ref: '#/definitions/relation.RelationActionResponse'
+        "400":
+          description: 请求失败，返回错误码和错误信息
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 关注/取消关注
+      tags:
+      - 用户关系
+  /blog_server/relation/follow/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定用户的关注列表
+      parameters:
+      - description: 用户ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应，包含状态码、状态信息和用户列表
+          schema:
+            $ref: '#/definitions/relation.RelationFollowListResponse'
+        "400":
+          description: 请求失败，返回错误码和错误信息
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 获取关注列表
+      tags:
+      - 用户关系
+  /blog_server/relation/follower/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定用户的粉丝列表
+      parameters:
+      - description: 用户ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应，包含状态码、状态信息和用户列表
+          schema:
+            $ref: '#/definitions/relation.RelationFollowListResponse'
+        "400":
+          description: 请求失败，返回错误码和错误信息
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 获取粉丝列表
+      tags:
+      - 用户关系
   /blog_server/user/:
     get:
       consumes:

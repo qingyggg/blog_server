@@ -4,6 +4,7 @@ package user
 
 import (
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/qingyggg/blog_server/biz/mw/jwt"
 )
 
 func rootMw() []app.HandlerFunc {
@@ -37,8 +38,9 @@ func _userloginMw() []app.HandlerFunc {
 }
 
 func _profile_modifyMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		jwt.JwtMiddleware.MiddlewareFunc(),
+	}
 }
 
 func _userprofilemodifyMw() []app.HandlerFunc {
@@ -47,8 +49,9 @@ func _userprofilemodifyMw() []app.HandlerFunc {
 }
 
 func _pwd_modifyMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		jwt.JwtMiddleware.MiddlewareFunc(),
+	}
 }
 
 func _userpwdmodifyMw() []app.HandlerFunc {

@@ -69,8 +69,6 @@ func AddNewComment(ctx context.Context, comment *mymongo.Comment) error {
 				return err
 			}
 		}
-	} else {
-		return errno.ServiceErr.WithMessage("degree参数只能为1或者2")
 	}
 	return err
 }
@@ -237,4 +235,18 @@ func GetCommentByCmtID(ctx context.Context, cHashId string) (cmt *mymongo.Commen
 		return nil, err
 	}
 	return cmt, nil
+}
+
+func CheckCmtExistById(ctx context.Context, cHashId string) (exist bool, err error) {
+	count, err := mymongo.CommentCol.CountDocuments(ctx, bson.M{
+		"hash_id": cHashId,
+	})
+	if err != nil {
+		return false, err
+	}
+	if count != 0 {
+		return true, nil
+	} else {
+		return false, nil
+	}
 }

@@ -90,9 +90,9 @@ func GetArticleInfos(uid int64, offset int) (aInfos []*orm_gen.Article, err erro
 }
 
 // TakeArticle: 获取文章info以及内容
-func TakeArticle(aHashID string, uid int64) (aInfo *orm_gen.Article, content string, err error) {
+func TakeArticle(aHashID string) (aInfo *orm_gen.Article, content string, err error) {
 	var a = query.Article
-	aInfo, err = a.Where(a.UserID.Eq(uid), a.HashID.Eq(utils.ConvertStringHashToByte(aHashID))).Take()
+	aInfo, err = a.Where(a.HashID.Eq(utils.ConvertStringHashToByte(aHashID))).Take()
 	if err != nil {
 		return nil, "", err
 	}
@@ -123,9 +123,9 @@ func CheckIsFavoriteByUid(uid int64, ahashId string) (bool, error) {
 	return false, nil
 }
 
-func AddViewCount(uid int64, ahashId string) error {
+func AddViewCount(ahashId string) error {
 	var a = query.Article
-	_, err := a.Where(a.UserID.Eq(uid), a.HashID.Eq(utils.ConvertStringHashToByte(ahashId))).UpdateSimple(a.ViewCount.Add(1))
+	_, err := a.Where(a.HashID.Eq(utils.ConvertStringHashToByte(ahashId))).UpdateSimple(a.ViewCount.Add(1))
 	return err
 }
 

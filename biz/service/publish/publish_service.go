@@ -8,7 +8,9 @@ import (
 	"github.com/qingyggg/blog_server/biz/model/hertz/basic/user"
 	"github.com/qingyggg/blog_server/biz/model/hertz/common"
 	"github.com/qingyggg/blog_server/biz/model/orm_gen"
+	service_utils "github.com/qingyggg/blog_server/biz/service"
 	service "github.com/qingyggg/blog_server/biz/service/user"
+	"github.com/qingyggg/blog_server/pkg/constants"
 	"github.com/qingyggg/blog_server/pkg/errno"
 	"github.com/qingyggg/blog_server/pkg/utils"
 	"strconv"
@@ -27,20 +29,20 @@ func NewPublishService(ctx context.Context, c *app.RequestContext) *PublishServi
 	return &PublishService{ctx: ctx, c: c}
 }
 
-func (s *PublishService) PublishCreate(req *publish.ArticleCreateActionRequest) (err error, aHashId string) {
-	exist, err := db.CheckUserExistById(req.Uid)
-	if err != nil {
-		return err, ""
+func (s *PublishService) PublishCreate(req *publish.CreateActionRequest) (err error, aHashId string) {
+	uid := service_utils.GetUid(s.c)
+	var coverUrl string
+	if req.Payload.Preload.CoverUrl == "" {
+		coverUrl = constants.TestBackground
+	} else {
+		coverUrl = utils.UrlConvertReverse(s.ctx, req.Payload.Preload.CoverUrl)
 	}
-	if !exist {
-		return errno.UserIsNotExistErr, ""
-	}
-	aHashId = utils.GetSHA256String(time.Now().String() + strconv.FormatInt(req.Uid, 16))
+	aHashId = utils.GetSHA256String(time.Now().String() + strconv.FormatInt(uid, 16))
 	err = db.CreateArticle(&orm_gen.Article{
-		UserID:      req.Uid,
+		UserID:      uid,
 		Title:       req.Payload.Preload.Title,
 		Note:        req.Payload.Preload.Note,
-		CoverURL:    utils.UrlConvertReverse(s.ctx, req.Payload.Preload.CoverUrl),
+		CoverURL:    coverUrl,
 		PublishTime: time.Now(),
 		HashID:      utils.ConvertStringHashToByte(aHashId),
 	}, req.Payload.Content)
@@ -50,27 +52,51 @@ func (s *PublishService) PublishCreate(req *publish.ArticleCreateActionRequest) 
 	return nil, aHashId
 }
 
-func (s *PublishService) PublishModify(req *publish.ArticleModifyActionRequest) (err error) {
+func (s *PublishService) PublishModify(req *publish.ModifyActionRequest) (err error) {
+	uid := service_utils.GetUid(s.c)
+	exist, err := db.CheckArticleExistByHashId(req.AHashID)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return errno.ArticleIsNotExistErr
+	}
 	_, err = db.ModifyArticle(&orm_gen.Article{
-		UserID: req.Base.Uid,
-		HashID: utils.ConvertStringHashToByte(req.Base.AHashID),
+		UserID: uid,
+		HashID: utils.ConvertStringHashToByte(req.AHashID),
 		Title:  req.Payload.Preload.Title,
 		Note:   req.Payload.Preload.Note,
 	}, req.Payload.Content)
 	return err
 }
 
-func (s *PublishService) PublishDelete(req *publish.ArticleBaseActionRequest) (err error) {
-	err = db.DeleteArticle(&orm_gen.Article{UserID: req.Uid, HashID: utils.ConvertStringHashToByte(req.AHashID)})
+func (s *PublishService) PublishDelete(req *publish.DelActionRequest) (err error) {
+	exist, err := db.CheckArticleExistByHashId(req.AHashID)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return errno.ArticleIsNotExistErr
+	}
+	uid := service_utils.GetUid(s.c)
+	err = db.DeleteArticle(&orm_gen.Article{UserID: uid, HashID: utils.ConvertStringHashToByte(req.AHashID)})
 	if err != nil {
 		return err
 	}
 	return err
 }
 
-func (s *PublishService) PublishDetail(req *publish.ArticleBaseActionRequest) (aA *common.Article, err error) {
+func (s *PublishService) PublishDetail(req *publish.DetailRequest) (aA *common.Article, err error) {
+	//检查文章是否存在
+	exist, err := db.CheckArticleExistByHashId(req.AHashID)
+	if err != nil {
+		return nil, err
+	}
+	if !exist {
+		return nil, errno.ArticleIsNotExistErr
+	}
 	//获取文章信息
-	aInfo, aContent, err := db.TakeArticle(req.AHashID, req.Uid)
+	aInfo, aContent, err := db.TakeArticle(req.AHashID)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +127,7 @@ func (s *PublishService) PublishDetail(req *publish.ArticleBaseActionRequest) (a
 	return aA, nil
 }
 
-func (s *PublishService) PublishList(req *publish.ArticleCardsRequest) (cards []*common.ArticleCard, err error) {
+func (s *PublishService) PublishList(req *publish.CardsRequest) (cards []*common.ArticleCard, err error) {
 	aInfos, err := db.GetArticleInfos(req.UserId, int(req.Offset))
 	if err != nil {
 		return nil, err
@@ -136,7 +162,7 @@ func (s *PublishService) PublishList(req *publish.ArticleCardsRequest) (cards []
 	return cards, nil
 }
 
-func (s *PublishService) AddViewCount(req *publish.ArticleBaseActionRequest) error {
-	err := db.AddViewCount(req.Uid, req.AHashID)
+func (s *PublishService) AddViewCount(req *publish.ActionRequest) error {
+	err := db.AddViewCount(req.AHashID)
 	return err
 }

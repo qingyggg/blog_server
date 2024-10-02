@@ -128,18 +128,18 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "name": "aHashId",
+                        "name": "AHashId",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "name": "cHashId",
+                        "name": "CHashId",
                         "in": "query"
                     },
                     {
                         "type": "integer",
                         "description": "1:请求一级评论 2：请求二级评论",
-                        "name": "type",
+                        "name": "Type",
                         "in": "query"
                     }
                 ],
@@ -185,7 +185,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleCreateActionRequest"
+                            "$ref": "#/definitions/publish.CreateActionRequest"
                         }
                     }
                 ],
@@ -193,19 +193,19 @@ const docTemplate = `{
                     "200": {
                         "description": "成功响应",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleCreateActionResponse"
+                            "$ref": "#/definitions/publish.CreateActionResponse"
                         }
                     },
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     },
                     "500": {
                         "description": "服务器内部错误",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     }
                 }
@@ -229,7 +229,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleBaseActionRequest"
+                            "$ref": "#/definitions/publish.DelActionRequest"
                         }
                     }
                 ],
@@ -237,19 +237,19 @@ const docTemplate = `{
                     "200": {
                         "description": "成功响应",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/publish.ActionResponse"
                         }
                     },
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     },
                     "500": {
                         "description": "服务器内部错误",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     }
                 }
@@ -273,7 +273,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleModifyActionRequest"
+                            "$ref": "#/definitions/publish.ModifyActionRequest"
                         }
                     }
                 ],
@@ -281,19 +281,19 @@ const docTemplate = `{
                     "200": {
                         "description": "成功响应",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/publish.ActionResponse"
                         }
                     },
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     },
                     "500": {
                         "description": "服务器内部错误",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     }
                 }
@@ -316,13 +316,12 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "文章的hashid",
-                        "name": "aHashID",
+                        "name": "AHashID",
                         "in": "query"
                     },
                     {
-                        "type": "integer",
-                        "description": "作者id",
-                        "name": "uid",
+                        "type": "string",
+                        "name": "UHashID",
                         "in": "query"
                     }
                 ],
@@ -336,13 +335,13 @@ const docTemplate = `{
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     },
                     "500": {
                         "description": "服务器内部错误",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     }
                 }
@@ -364,13 +363,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "name": "offset",
+                        "name": "Offset",
                         "in": "query"
                     },
                     {
                         "type": "integer",
                         "description": "如果id为0，则根据时间的先后去请求文章列表",
-                        "name": "user_id",
+                        "name": "UserId",
                         "in": "query"
                     }
                 ],
@@ -378,19 +377,19 @@ const docTemplate = `{
                     "200": {
                         "description": "成功响应，返回文章列表",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleCardsResponse"
+                            "$ref": "#/definitions/publish.CardsResponse"
                         }
                     },
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     },
                     "500": {
                         "description": "服务器内部错误",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     }
                 }
@@ -416,7 +415,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleBaseActionRequest"
+                            "$ref": "#/definitions/publish.ActionRequest"
                         }
                     }
                 ],
@@ -424,19 +423,135 @@ const docTemplate = `{
                     "200": {
                         "description": "成功响应",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/publish.ActionResponse"
                         }
                     },
                     "400": {
                         "description": "请求参数错误",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     },
                     "500": {
                         "description": "服务器内部错误",
                         "schema": {
-                            "$ref": "#/definitions/publish.ArticleActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/relation/action": {
+            "post": {
+                "description": "用户对其他用户进行关注或取消关注",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户关系"
+                ],
+                "summary": "关注/取消关注",
+                "parameters": [
+                    {
+                        "description": "RelationAction请求参数",
+                        "name": "relation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/relation.RelationActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功响应，包含状态码和状态信息",
+                        "schema": {
+                            "$ref": "#/definitions/relation.RelationActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求失败，返回错误码和错误信息",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/relation/follow/list": {
+            "get": {
+                "description": "获取指定用户的关注列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户关系"
+                ],
+                "summary": "获取关注列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "用户ID",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功响应，包含状态码、状态信息和用户列表",
+                        "schema": {
+                            "$ref": "#/definitions/relation.RelationFollowListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求失败，返回错误码和错误信息",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/relation/follower/list": {
+            "get": {
+                "description": "获取指定用户的粉丝列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户关系"
+                ],
+                "summary": "获取粉丝列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "用户ID",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功响应，包含状态码、状态信息和用户列表",
+                        "schema": {
+                            "$ref": "#/definitions/relation.RelationFollowListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求失败，返回错误码和错误信息",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     }
                 }
@@ -688,30 +803,30 @@ const docTemplate = `{
                     "description": "文章的id",
                     "type": "string"
                 },
+                "CHashId": {
+                    "type": "string"
+                },
+                "ChildNum": {
+                    "description": "该评论被回复的数量，当为一级评论时候，显示数量，二级的时候，显示为0",
+                    "type": "integer"
+                },
+                "Content": {
+                    "description": "comment",
+                    "type": "string"
+                },
+                "CreateDate": {
+                    "description": "comment publication date, format mm-dd",
+                    "type": "string"
+                },
+                "FavoriteCount": {
+                    "description": "该评论获得的点赞数量",
+                    "type": "integer"
+                },
                 "RepliedUHashId": {
                     "description": "如果该评论为某评论的回复，则该字段为被回复的用户的hashID",
                     "type": "string"
                 },
-                "cHashId": {
-                    "type": "string"
-                },
-                "childNum": {
-                    "description": "该评论被回复的数量，当为一级评论时候，显示数量，二级的时候，显示为0",
-                    "type": "integer"
-                },
-                "content": {
-                    "description": "comment",
-                    "type": "string"
-                },
-                "createDate": {
-                    "description": "comment publication date, format mm-dd",
-                    "type": "string"
-                },
-                "favorite_count": {
-                    "description": "该评论获得的点赞数量",
-                    "type": "integer"
-                },
-                "user": {
+                "User": {
                     "description": "comment user information",
                     "allOf": [
                         {
@@ -724,24 +839,20 @@ const docTemplate = `{
         "comment.CommentActionRequest": {
             "type": "object",
             "properties": {
-                "AHashId": {
+                "aHashId": {
                     "description": "文章的id",
                     "type": "string"
                 },
-                "Content": {
+                "content": {
                     "description": "评论内容",
                     "type": "string"
                 },
-                "Degree": {
+                "degree": {
                     "description": "评论等级，只能为1或者2",
                     "type": "integer"
                 },
-                "PHashId": {
+                "pHashId": {
                     "description": "父亲评论的id",
-                    "type": "string"
-                },
-                "UHashId": {
-                    "description": "用户ID",
                     "type": "string"
                 }
             }
@@ -749,7 +860,7 @@ const docTemplate = `{
         "comment.CommentActionResponse": {
             "type": "object",
             "properties": {
-                "cHashId": {
+                "CHashId": {
                     "type": "string"
                 },
                 "status_code": {
@@ -765,7 +876,7 @@ const docTemplate = `{
         "comment.CommentDelActionRequest": {
             "type": "object",
             "properties": {
-                "CHashId": {
+                "cHashId": {
                     "description": "评论id",
                     "type": "string"
                 }
@@ -983,80 +1094,22 @@ const docTemplate = `{
                 }
             }
         },
-        "publish.ArticleActionResponse": {
-            "type": "object",
-            "properties": {
-                "status_code": {
-                    "type": "integer"
-                },
-                "status_msg": {
-                    "type": "string"
-                }
-            }
-        },
-        "publish.ArticleBaseActionRequest": {
+        "publish.ActionRequest": {
             "type": "object",
             "properties": {
                 "aHashID": {
-                    "description": "文章的hashid",
                     "type": "string"
-                },
-                "uid": {
-                    "description": "作者id",
-                    "type": "integer"
                 }
             }
         },
-        "publish.ArticleCardsResponse": {
+        "publish.ActionResponse": {
             "type": "object",
             "properties": {
-                "list": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/common.ArticleCard"
-                    }
-                },
                 "status_code": {
                     "type": "integer"
                 },
                 "status_msg": {
                     "type": "string"
-                }
-            }
-        },
-        "publish.ArticleCreateActionRequest": {
-            "type": "object",
-            "properties": {
-                "payload": {
-                    "$ref": "#/definitions/common.ArticleBase"
-                },
-                "uid": {
-                    "type": "integer"
-                }
-            }
-        },
-        "publish.ArticleCreateActionResponse": {
-            "type": "object",
-            "properties": {
-                "aHashId": {
-                    "type": "string"
-                },
-                "status_code": {
-                    "type": "integer"
-                },
-                "status_msg": {
-                    "type": "string"
-                }
-            }
-        },
-        "publish.ArticleModifyActionRequest": {
-            "type": "object",
-            "properties": {
-                "base": {
-                    "$ref": "#/definitions/publish.ArticleBaseActionRequest"
-                },
-                "payload": {
-                    "$ref": "#/definitions/common.ArticleBase"
                 }
             }
         },
@@ -1074,14 +1127,112 @@ const docTemplate = `{
                 }
             }
         },
+        "publish.CardsResponse": {
+            "type": "object",
+            "properties": {
+                "List": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/common.ArticleCard"
+                    }
+                },
+                "status_code": {
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "publish.CreateActionRequest": {
+            "type": "object",
+            "properties": {
+                "payload": {
+                    "$ref": "#/definitions/common.ArticleBase"
+                }
+            }
+        },
+        "publish.CreateActionResponse": {
+            "type": "object",
+            "properties": {
+                "AHashId": {
+                    "type": "string"
+                },
+                "status_code": {
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "publish.DelActionRequest": {
+            "type": "object",
+            "properties": {
+                "aHashID": {
+                    "description": "文章的hashid",
+                    "type": "string"
+                }
+            }
+        },
+        "publish.ModifyActionRequest": {
+            "type": "object",
+            "properties": {
+                "aHashID": {
+                    "description": "文章的hashid",
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/common.ArticleBase"
+                }
+            }
+        },
+        "relation.RelationActionRequest": {
+            "type": "object",
+            "properties": {
+                "action_type": {
+                    "description": "1-Follow, 2-Unfollow",
+                    "type": "integer"
+                },
+                "to_user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "relation.RelationActionResponse": {
+            "type": "object",
+            "properties": {
+                "status_code": {
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "relation.RelationFollowListResponse": {
+            "type": "object",
+            "properties": {
+                "status_code": {
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                },
+                "user_list": {
+                    "description": "User information list",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/common.User"
+                    }
+                }
+            }
+        },
         "user.UserActionProfileModifyRequest": {
             "type": "object",
             "properties": {
-                "user": {
+                "user_profile": {
                     "$ref": "#/definitions/common.UserProfile"
-                },
-                "user_id": {
-                    "type": "integer"
                 }
             }
         },
@@ -1095,7 +1246,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
-                    "description": "registered user name",
                     "type": "string"
                 }
             }
@@ -1107,7 +1257,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
-                    "description": "registered user name",
                     "type": "string"
                 }
             }
@@ -1115,18 +1264,18 @@ const docTemplate = `{
         "user.UserActionResponse": {
             "type": "object",
             "properties": {
+                "UHashId": {
+                    "type": "string"
+                },
+                "UserId": {
+                    "description": "user id",
+                    "type": "integer"
+                },
                 "status_code": {
                     "type": "integer"
                 },
                 "status_msg": {
                     "type": "string"
-                },
-                "uHashId": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "description": "user id",
-                    "type": "integer"
                 }
             }
         },

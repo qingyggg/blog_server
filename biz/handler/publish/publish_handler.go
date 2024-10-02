@@ -19,14 +19,14 @@ import (
 // @Tags 文章管理
 // @Accept  json
 // @Produce  json
-// @Param  data  body  publish.ArticleCreateActionRequest  true  "文章创建请求参数"
-// @Success 200 {object} publish.ArticleCreateActionResponse "成功响应"
-// @Failure 400 {object} publish.ArticleActionResponse "请求参数错误"
-// @Failure 500 {object} publish.ArticleActionResponse "服务器内部错误"
+// @Param  data  body  publish.CreateActionRequest  true  "文章创建请求参数"
+// @Success 200 {object} publish.CreateActionResponse "成功响应"
+// @Failure 400 {object} common.BaseResponse "请求参数错误"
+// @Failure 500 {object} common.BaseResponse "服务器内部错误"
 // @Router /blog_server/publish/action [post]
 func PublishAction(ctx context.Context, c *app.RequestContext) {
 	var err error
-	req := new(publish.ArticleCreateActionRequest)
+	req := new(publish.CreateActionRequest)
 	err = c.BindAndValidate(req)
 	if err != nil {
 		utils.ErrResp(c, err)
@@ -39,7 +39,7 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	c.JSON(consts.StatusOK, &publish.ArticleCreateActionResponse{
+	c.JSON(consts.StatusOK, &publish.CreateActionResponse{
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
 		AHashId:    aHashId,
@@ -52,14 +52,14 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 // @Tags 文章管理
 // @Accept  json
 // @Produce  json
-// @Param  data  body  publish.ArticleModifyActionRequest  true  "文章修改请求参数"
-// @Success 200 {object} publish.ArticleActionResponse "成功响应"
-// @Failure 400 {object} publish.ArticleActionResponse "请求参数错误"
-// @Failure 500 {object} publish.ArticleActionResponse "服务器内部错误"
+// @Param  data  body  publish.ModifyActionRequest  true  "文章修改请求参数"
+// @Success 200 {object} publish.ActionResponse "成功响应"
+// @Failure 400 {object} common.BaseResponse "请求参数错误"
+// @Failure 500 {object} common.BaseResponse "服务器内部错误"
 // @Router /blog_server/publish/action [patch]
 func PublishModifyAction(ctx context.Context, c *app.RequestContext) {
 	var err error
-	req := new(publish.ArticleModifyActionRequest)
+	req := new(publish.ModifyActionRequest)
 	err = c.BindAndValidate(req)
 	if err != nil {
 		utils.ErrResp(c, err)
@@ -70,7 +70,7 @@ func PublishModifyAction(ctx context.Context, c *app.RequestContext) {
 		utils.ErrResp(c, err)
 		return
 	}
-	c.JSON(consts.StatusOK, &publish.ArticleActionResponse{
+	c.JSON(consts.StatusOK, &publish.ActionResponse{
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
 	})
@@ -82,14 +82,14 @@ func PublishModifyAction(ctx context.Context, c *app.RequestContext) {
 // @Tags 文章管理
 // @Accept  json
 // @Produce  json
-// @Param  data  body  publish.ArticleBaseActionRequest  true  "文章删除请求参数"
-// @Success 200 {object} publish.ArticleActionResponse "成功响应"
-// @Failure 400 {object} publish.ArticleActionResponse "请求参数错误"
-// @Failure 500 {object} publish.ArticleActionResponse "服务器内部错误"
+// @Param  data  body  publish.DelActionRequest  true  "文章删除请求参数"
+// @Success 200 {object} publish.ActionResponse "成功响应"
+// @Failure 400 {object} common.BaseResponse "请求参数错误"
+// @Failure 500 {object} common.BaseResponse "服务器内部错误"
 // @Router /blog_server/publish/action [delete]
 func PublishDelAction(ctx context.Context, c *app.RequestContext) {
 	var err error
-	req := new(publish.ArticleBaseActionRequest)
+	req := new(publish.DelActionRequest)
 	err = c.BindAndValidate(req)
 	if err != nil {
 		utils.ErrResp(c, err)
@@ -100,7 +100,7 @@ func PublishDelAction(ctx context.Context, c *app.RequestContext) {
 		utils.ErrResp(c, err)
 		return
 	}
-	c.JSON(consts.StatusOK, &publish.ArticleActionResponse{
+	c.JSON(consts.StatusOK, &publish.ActionResponse{
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
 	})
@@ -112,14 +112,14 @@ func PublishDelAction(ctx context.Context, c *app.RequestContext) {
 // @Tags 文章管理
 // @Accept  json
 // @Produce  json
-// @Param  data  query  publish.ArticleCardsRequest  true  "文章列表请求参数"
-// @Success 200 {object} publish.ArticleCardsResponse "成功响应，返回文章列表"
-// @Failure 400 {object} publish.ArticleActionResponse "请求参数错误"
-// @Failure 500 {object} publish.ArticleActionResponse "服务器内部错误"
+// @Param  data  query  publish.CardsRequest  true  "文章列表请求参数"
+// @Success 200 {object} publish.CardsResponse "成功响应，返回文章列表"
+// @Failure 400 {object} common.BaseResponse "请求参数错误"
+// @Failure 500 {object} common.BaseResponse "服务器内部错误"
 // @Router /blog_server/publish/list [get]
 func PublishList(ctx context.Context, c *app.RequestContext) {
 	var err error
-	req := new(publish.ArticleCardsRequest)
+	req := new(publish.CardsRequest)
 	err = c.BindAndValidate(req)
 	if err != nil {
 		utils.ErrResp(c, err)
@@ -127,8 +127,10 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 	}
 	cards, err := service.NewPublishService(ctx, c).PublishList(req)
 
-	c.JSON(consts.StatusOK, &publish.ArticleCardsResponse{
-		List: cards,
+	c.JSON(consts.StatusOK, &publish.CardsResponse{
+		StatusCode: errno.SuccessCode,
+		StatusMsg:  errno.SuccessMsg,
+		List:       cards,
 	})
 }
 
@@ -138,14 +140,14 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 // @Tags 文章管理
 // @Accept  json
 // @Produce  json
-// @Param  data  query  publish.ArticleBaseActionRequest  true  "文章详情请求参数"
+// @Param  data  query  publish.DetailRequest  true  "文章详情请求参数"
 // @Success 200 {object} publish.ArticleResponse "成功响应，返回文章详情"
-// @Failure 400 {object} publish.ArticleActionResponse "请求参数错误"
-// @Failure 500 {object} publish.ArticleActionResponse "服务器内部错误"
+// @Failure 400 {object} common.BaseResponse "请求参数错误"
+// @Failure 500 {object} common.BaseResponse "服务器内部错误"
 // @Router /blog_server/publish/detail [get]
 func PublishDetail(ctx context.Context, c *app.RequestContext) {
 	var err error
-	req := new(publish.ArticleBaseActionRequest)
+	req := new(publish.DetailRequest)
 	err = c.BindAndValidate(req)
 	if err != nil {
 		utils.ErrResp(c, err)
@@ -157,7 +159,9 @@ func PublishDetail(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	c.JSON(consts.StatusOK, &publish.ArticleResponse{
-		Article: detail,
+		StatusCode: errno.SuccessCode,
+		StatusMsg:  errno.SuccessMsg,
+		Article:    detail,
 	})
 }
 
@@ -167,14 +171,14 @@ func PublishDetail(ctx context.Context, c *app.RequestContext) {
 // @Tags 文章管理
 // @Accept  json
 // @Produce  json
-// @Param  data  body  publish.ArticleBaseActionRequest  true  "文章阅读数增加请求参数"
-// @Success 200 {object} publish.ArticleActionResponse "成功响应"
-// @Failure 400 {object} publish.ArticleActionResponse "请求参数错误"
-// @Failure 500 {object} publish.ArticleActionResponse "服务器内部错误"
+// @Param  data  body  publish.ActionRequest  true  "文章阅读数增加请求参数"
+// @Success 200 {object} publish.ActionResponse "成功响应"
+// @Failure 400 {object} common.BaseResponse "请求参数错误"
+// @Failure 500 {object} common.BaseResponse "服务器内部错误"
 // @Router /blog_server/publish/view_add [post]
 func PublishViewCountAdd(ctx context.Context, c *app.RequestContext) {
 	var err error
-	req := new(publish.ArticleBaseActionRequest)
+	req := new(publish.ActionRequest)
 	err = c.BindAndValidate(req)
 	if err != nil {
 		utils.ErrResp(c, err)
@@ -185,7 +189,7 @@ func PublishViewCountAdd(ctx context.Context, c *app.RequestContext) {
 		utils.ErrResp(c, err)
 		return
 	}
-	c.JSON(consts.StatusOK, &publish.ArticleActionResponse{
+	c.JSON(consts.StatusOK, &publish.ActionResponse{
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
 	})

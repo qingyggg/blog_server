@@ -8,6 +8,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	user "github.com/qingyggg/blog_server/biz/model/hertz/basic/user"
 	"github.com/qingyggg/blog_server/biz/mw/jwt"
+	service_utils "github.com/qingyggg/blog_server/biz/service"
 	service "github.com/qingyggg/blog_server/biz/service/user"
 	"github.com/qingyggg/blog_server/pkg/errno"
 	"github.com/qingyggg/blog_server/pkg/utils"
@@ -63,11 +64,6 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(req)
 	if err != nil {
 		utils.ErrResp(c, err)
-		return
-	}
-	err = utils.ValidatePassword(req.Password)
-	if err != nil {
-		utils.ErrResp(c, err) //密码格式不对
 		return
 	}
 	uHashId, err := service.NewUserService(ctx, c).UserRegister(req)
@@ -177,6 +173,6 @@ func UserProfileModify(ctx context.Context, c *app.RequestContext) {
 	c.JSON(consts.StatusOK, user.UserActionResponse{
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
-		UserId:     req.UserId,
+		UserId:     service_utils.GetUid(c),
 	})
 }

@@ -8,30 +8,29 @@ import "common.proto";
 option go_package = "hertz/basic/user";
 
 message UserActionRequest {
-  string username = 1; // registered user name
-  string password = 2;
+  string Username = 1[(api.go_tag)='json:"username,required"',(api.vd)='len($)>0'];
+  string Password = 2[(api.go_tag)='json:"password,required"',(api.vd)='password($)'];
 }
 
 message UserActionResponse {
   int32 status_code = 1[(api.go_tag)='json:"status_code"'];
   string status_msg = 2;
-  int64 user_id = 3; // user id
-  string uHashId = 4;
+  int64 UserId = 3; // user id
+  string UHashId = 4;
 }
 
 message UserActionPwdModifyRequest {
-  string username = 1; // registered user name
-  string new_password = 2;
-  string old_password = 3;
+  string Username = 1[(api.go_tag)='json:"username,required"',(api.vd)='len($)>0'];
+  string NewPassword = 2[(api.go_tag)='json:"new_password,required"',(api.vd)='password($)'];
+  string OldPassword = 3[(api.go_tag)='json:"old_password,required"',(api.vd)='password($)'];
 }
 
 message UserActionProfileModifyRequest{
-  int64 user_id=1;
-  UserProfile user=2;
+  UserProfile User=1[(api.go_tag)='json:"user_profile,required"'];
 }
 
 message UserRequest {
-  int64 user_id = 1;
+  int64 UserId = 1[(api.go_tag)='query:"user_id,required"'];
 }
 
 message UserResponse {

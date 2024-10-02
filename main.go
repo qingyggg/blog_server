@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/app/server/binding"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/hertz-contrib/reverseproxy"
 	"github.com/hertz-contrib/swagger"
@@ -11,6 +13,7 @@ import (
 	"github.com/qingyggg/blog_server/biz/mw/jwt"
 	"github.com/qingyggg/blog_server/biz/mw/minio"
 	_ "github.com/qingyggg/blog_server/docs"
+	"github.com/qingyggg/blog_server/pkg/utils"
 	swaggerFiles "github.com/swaggo/files"
 )
 
@@ -43,9 +46,19 @@ func Init() {
 // @schemes	http
 func main() {
 	Init()
+	//自定义参数校验
+	validateConfig := &binding.ValidateConfig{}
+	validateConfig.MustRegValidateFunc("password", func(args ...interface{}) error {
+		err := utils.ValidatePassword(fmt.Sprint(args...))
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 	h := server.Default(
 		server.WithStreamBody(true),
 		server.WithHostPorts("0.0.0.0:18005"),
+		server.WithValidateConfig(validateConfig),
 	)
 	//oss
 	h.GET("/src/*name", minioReverseProxy)

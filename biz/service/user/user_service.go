@@ -8,6 +8,7 @@ import (
 	"github.com/qingyggg/blog_server/biz/model/hertz/common"
 	"github.com/qingyggg/blog_server/biz/model/orm_gen"
 	"github.com/qingyggg/blog_server/biz/mw/minio"
+	service_utils "github.com/qingyggg/blog_server/biz/service"
 	"github.com/qingyggg/blog_server/pkg/constants"
 	"github.com/qingyggg/blog_server/pkg/errno"
 	"github.com/qingyggg/blog_server/pkg/utils"
@@ -29,6 +30,7 @@ func NewUserService(ctx context.Context, c *app.RequestContext) *UserService {
 
 // UserRegister register user return user id.
 func (s *UserService) UserRegister(req *user.UserActionRequest) (uHashId string, err error) {
+	//检测用户是否存在
 	isExist, err := db.CheckUserExistByUname(req.Username)
 	uHashId = utils.GetSHA256String(req.Username + time.Now().String())[:16] //截取哈希值的前16为作为用户的hashId
 	if err != nil {
@@ -49,10 +51,11 @@ func (s *UserService) UserRegister(req *user.UserActionRequest) (uHashId string,
 	if err != nil {
 		return uHashId, err
 	}
-	err = initUserSpace(s.ctx, uHashId)
-	if err != nil {
-		return "", err
-	}
+	//后续开发网盘功能的时候用
+	//err = initUserSpace(s.ctx, uHashId)
+	//if err != nil {
+	//	return "", err
+	//}
 	return uHashId, nil
 }
 
@@ -68,7 +71,7 @@ func initUserSpace(ctx context.Context, uHashId string) error {
 }
 
 func (s *UserService) PwdModify(req *user.UserActionPwdModifyRequest) (userId int64, err error) {
-	uid, err := db.VerifyUser(req.Username, req.OldPassword)
+	uid, err := db.VerifyUser(req.Username, req.OldPassword) //验证用户是否存在，旧密码是否正确
 	if err != nil {
 		return 0, err
 	}
@@ -94,19 +97,17 @@ func (s *UserService) UserInfo(req *user.UserRequest) (*common.User, error) {
 	if !exist {
 		return nil, errno.UserIsNotExistErr
 	}
-	currentUserId, exists := s.c.Get("current_user_id")
-	if !exists {
-		currentUserId = 0
-	}
-	return s.GetUserInfo(queryUserId, currentUserId.(int))
+	curUid := service_utils.GetUid(s.c)
+
+	return s.GetUserInfo(queryUserId, curUid)
 }
 
 func (s *UserService) UserProfileModify(req *user.UserActionProfileModifyRequest) error {
-	uid := req.UserId
+	uid := service_utils.GetUid(s.c)
 	profile := map[string]interface{}{
 		"signature":        req.User.Signature,
-		"avatar":           req.User.Avatar,
-		"background_image": req.User.BackgroundImage,
+		"avatar":           utils.UrlConvertReverse(s.ctx, req.User.Avatar),
+		"background_image": utils.UrlConvertReverse(s.ctx, req.User.BackgroundImage),
 	}
 
 	// 过滤空字符串的字段
@@ -122,7 +123,7 @@ func (s *UserService) UserProfileModify(req *user.UserActionProfileModifyRequest
 	return nil
 }
 
-func (s *UserService) GetUserInfo(queryUserId int64, userId int) (*common.User, error) {
+func (s *UserService) GetUserInfo(queryUserId int64, userId int64) (*common.User, error) {
 	u := new(common.User)
 	errChan := make(chan error, 5)
 	defer close(errChan)
@@ -177,8 +178,8 @@ func (s *UserService) GetUserInfo(queryUserId int64, userId int) (*common.User, 
 	}()
 
 	go func() {
-		if userId != 0 && int64(userId) != queryUserId {
-			IsFollow, err := db.QueryFollowExist(int64(userId), queryUserId)
+		if userId != 0 && userId != queryUserId {
+			IsFollow, err := db.QueryFollowExist(userId, queryUserId)
 			if err != nil {
 				errChan <- err
 			} else {

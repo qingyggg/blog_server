@@ -9,38 +9,37 @@ import "common.proto";
 option go_package = "hertz/interact/comment";
 
 message CommentActionRequest {
-  string PHashId =1;//父亲评论的id
-  string AHashId=2; //文章的id
-  string Content=3;//评论内容
-  string UHashId=4;//用户ID
-  int32 Degree=5; //评论等级，只能为1或者2
+  string PHashId =1[(api.go_tag)='json:"pHashId,required"'];//父亲评论的id
+  string AHashId=2[(api.go_tag)='json:"aHashId,required"']; //文章的id
+  string Content=3[(api.go_tag)='json:"content,required"'];//评论内容
+  int32 Degree=4[(api.go_tag)='json:"degree,required"',(api.vd)='$==1 || $==2']; //评论等级，只能为1或者2
 }
 
 message CommentDelActionRequest{
-  string CHashId=2;//评论id
+  string CHashId=1[(api.go_tag)='json:"cHashId,required"'];//评论id
 }
 
 message CommentActionResponse {
   int32 status_code = 1[(api.go_tag)='json:"status_code"']; // status code, 0-success, other values-failure
   string status_msg = 2; // status description
-  string cHashId=3;
+  string CHashId=3;
 }
 
 message Comment {
-  string cHashId=1;
+  string CHashId=1;
   string AHashId=2; //文章的id
-  UserBase user =3; // comment user information
-  string content = 4; // comment
-  string createDate = 5; // comment publication date, format mm-dd
-  int64 favorite_count =6;//该评论获得的点赞数量
-  int64 childNum=7;//该评论被回复的数量，当为一级评论时候，显示数量，二级的时候，显示为0
-  string RepliedUHashId=9;//如果该评论为某评论的回复，则该字段为被回复的用户的hashID
+  UserBase User =3; // comment user information
+  string Content = 4; // comment
+  string CreateDate = 5; // comment publication date, format mm-dd
+  int64 FavoriteCount =6;//该评论获得的点赞数量
+  int64 ChildNum=7;//该评论被回复的数量，当为一级评论时候，显示数量，二级的时候，显示为0
+  string RepliedUHashId=8;//如果该评论为某评论的回复，则该字段为被回复的用户的hashID
 }
 //二级
 message CommentListRequest {
-  string aHashId=1;
-  string cHashId=2;
-  int32 type=3;//1:请求一级评论 2：请求二级评论
+  string AHashId=1[(api.go_tag)='json:"aHashId,required"'];
+  string CHashId=2[(api.go_tag)='json:"cHashId,required"'];
+  int32 Type=3[(api.go_tag)='json:"type,required"',(api.vd)='$==1 || $==2'];//1:请求一级评论 2：请求二级评论
 }
 
 message CommentListResponse {
