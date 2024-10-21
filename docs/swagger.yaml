@@ -1,5 +1,25 @@
 basePath: /
 definitions:
+  collect.CollectActionRequest:
+    properties:
+      aHashId:
+        description: 文章的id
+        type: string
+      action_type:
+        description: 1-collect, 2-Uncollect
+        type: integer
+      tag:
+        type: string
+    type: object
+  collect.CollectActionResponse:
+    properties:
+      status_code:
+        description: status code, 0-success, other values-failure
+        type: integer
+      status_msg:
+        description: status description
+        type: string
+    type: object
   comment.Comment:
     properties:
       AHashId:
@@ -19,6 +39,8 @@ definitions:
       FavoriteCount:
         description: 该评论获得的点赞数量
         type: integer
+      IsFavorite:
+        type: boolean
       RepliedUHashId:
         description: 如果该评论为某评论的回复，则该字段为被回复的用户的hashID
         type: string
@@ -55,6 +77,8 @@ definitions:
     type: object
   comment.CommentDelActionRequest:
     properties:
+      aHashId:
+        type: string
       cHashId:
         description: 评论id
         type: string
@@ -121,11 +145,13 @@ definitions:
     type: object
   common.ArticleInfo:
     properties:
+      collect_count:
+        type: integer
       comment_count:
         description: total number of comments on the video
         type: integer
-      dislike_count:
-        type: integer
+      is_collect:
+        type: boolean
       is_favorite:
         description: true-Liked，false-did not like
         type: boolean
@@ -201,6 +227,25 @@ definitions:
         description: user profile
         type: string
     type: object
+  favorite.FavoriteActionRequest:
+    properties:
+      aHashID:
+        type: string
+      actionType:
+        description: 1-like, 2-unlike ,3-nor like,nor unlike
+        type: integer
+      cHashID:
+        type: string
+    type: object
+  favorite.FavoriteActionResponse:
+    properties:
+      status_code:
+        description: 0 - success, other values - failure
+        type: integer
+      status_msg:
+        description: status description
+        type: string
+    type: object
   publish.ActionRequest:
     properties:
       aHashID:
@@ -267,7 +312,7 @@ definitions:
         description: 1-Follow, 2-Unfollow
         type: integer
       to_user_id:
-        type: integer
+        type: string
     type: object
   relation.RelationActionResponse:
     properties:
@@ -344,7 +389,37 @@ info:
   title: blog_server tests
   version: "1.0"
 paths:
-  /blog_server/comment/action/:
+  /blog_server/collect/action:
+    post:
+      consumes:
+      - application/json
+      description: Allows a user to collect an item (e.g., an article or post).
+      parameters:
+      - description: Request body for collecting an item
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/collect.CollectActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/collect.CollectActionResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 对文章进行收藏或者取消收藏
+      tags:
+      - 文章收藏
+  /blog_server/comment/action:
     delete:
       consumes:
       - application/json
@@ -403,7 +478,7 @@ paths:
       summary: 新增评论
       tags:
       - 评论
-  /blog_server/comment/list/:
+  /blog_server/comment/list:
     get:
       consumes:
       - application/json
@@ -437,6 +512,66 @@ paths:
       summary: 获取评论列表
       tags:
       - 评论
+  /blog_server/favorite/action/article:
+    post:
+      consumes:
+      - application/json
+      description: Allows a user to favorite an article.
+      parameters:
+      - description: Request body for favoriting an article
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/favorite.FavoriteActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/favorite.FavoriteActionResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 对文章进行点赞或者踩
+      tags:
+      - 点赞或者踩
+  /blog_server/favorite/action/comment:
+    post:
+      consumes:
+      - application/json
+      description: Allows a user to comment on a favorite item.
+      parameters:
+      - description: Request body for commenting on a favorite
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/favorite.FavoriteActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/favorite.FavoriteActionResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 对评论进行点赞或者踩
+      tags:
+      - 点赞或者踩
   /blog_server/publish/action:
     delete:
       consumes:
@@ -567,8 +702,8 @@ paths:
         type: integer
       - description: 如果id为0，则根据时间的先后去请求文章列表
         in: query
-        name: UserId
-        type: integer
+        name: UHashID
+        type: string
       produces:
       - application/json
       responses:
@@ -637,7 +772,11 @@ paths:
           schema:
             $ref: '#/definitions/relation.RelationActionResponse'
         "400":
-          description: 请求失败，返回错误码和错误信息
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
           schema:
             $ref: '#/definitions/common.BaseResponse'
       summary: 关注/取消关注
@@ -651,9 +790,9 @@ paths:
       parameters:
       - description: 用户ID
         in: query
-        name: user_id
+        name: UhashID
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -662,7 +801,11 @@ paths:
           schema:
             $ref: '#/definitions/relation.RelationFollowListResponse'
         "400":
-          description: 请求失败，返回错误码和错误信息
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
           schema:
             $ref: '#/definitions/common.BaseResponse'
       summary: 获取关注列表
@@ -676,9 +819,9 @@ paths:
       parameters:
       - description: 用户ID
         in: query
-        name: user_id
+        name: UhashID
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -687,13 +830,17 @@ paths:
           schema:
             $ref: '#/definitions/relation.RelationFollowListResponse'
         "400":
-          description: 请求失败，返回错误码和错误信息
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
           schema:
             $ref: '#/definitions/common.BaseResponse'
       summary: 获取粉丝列表
       tags:
       - 用户关系
-  /blog_server/user/:
+  /blog_server/user:
     get:
       consumes:
       - application/json
@@ -701,9 +848,9 @@ paths:
       parameters:
       - description: 用户ID
         in: query
-        name: user_id
+        name: UHashID
         required: true
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -712,13 +859,17 @@ paths:
           schema:
             $ref: '#/definitions/user.UserResponse'
         "400":
-          description: 请求参数错误
+          description: Invalid request
           schema:
-            $ref: '#/definitions/user.UserActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
       summary: 获取用户信息
       tags:
       - 用户相关接口
-  /blog_server/user/login/:
+  /blog_server/user/login:
     post:
       consumes:
       - application/json
@@ -738,13 +889,17 @@ paths:
           schema:
             $ref: '#/definitions/user.UserActionResponse'
         "400":
-          description: 请求参数错误或其他错误信息
+          description: Invalid request
           schema:
-            $ref: '#/definitions/user.UserActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
       summary: 用户登录
       tags:
       - 用户相关接口
-  /blog_server/user/profile_modify/:
+  /blog_server/user/profile_modify:
     post:
       consumes:
       - application/json
@@ -763,10 +918,18 @@ paths:
           description: 成功返回用户ID及状态信息
           schema:
             $ref: '#/definitions/user.UserActionResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
       summary: 用户修改资料
       tags:
       - 用户相关接口
-  /blog_server/user/pwd_modify/:
+  /blog_server/user/pwd_modify:
     post:
       consumes:
       - application/json
@@ -786,13 +949,17 @@ paths:
           schema:
             $ref: '#/definitions/user.UserActionResponse'
         "400":
-          description: 请求参数错误或其他错误信息
+          description: Invalid request
           schema:
-            $ref: '#/definitions/user.UserActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
       summary: 用户修改密码
       tags:
       - 用户相关接口
-  /blog_server/user/register/:
+  /blog_server/user/register:
     post:
       consumes:
       - application/json
@@ -812,12 +979,25 @@ paths:
           schema:
             $ref: '#/definitions/user.UserActionResponse'
         "400":
-          description: 请求参数错误或其他错误信息
+          description: Invalid request
           schema:
-            $ref: '#/definitions/user.UserActionResponse'
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
       summary: 用户注册
       tags:
       - 用户相关接口
+  /ping:
+    get:
+      description: 测试服务器连接
+      produces:
+      - application/json
+      responses: {}
+      summary: 测试服务器连接
+      tags:
+      - Ping
   /upload/file:
     post:
       consumes:

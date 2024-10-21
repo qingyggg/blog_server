@@ -13,4 +13,5 @@ func Init() {
 	query.SetDefault(db.DB) //init dal api
 	redis.InitRedis()
 	mongo.Init()
+	go db.StartPeriodicSyncForViewCt() //redis view count data sync to mariadb per 5 minute
 }

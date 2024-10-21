@@ -2,17 +2,16 @@ package jwt
 
 import (
 	"context"
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/protocol"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/hertz-contrib/jwt"
 	"github.com/qingyggg/blog_server/biz/dal/db"
 	"github.com/qingyggg/blog_server/biz/model/hertz/basic/user"
 	"github.com/qingyggg/blog_server/pkg/errno"
 	"github.com/qingyggg/blog_server/pkg/utils"
 	"time"
-
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/hertz-contrib/jwt"
 )
 
 var (
@@ -22,7 +21,7 @@ var (
 
 func Init() {
 	JwtMiddleware, _ = jwt.New(&jwt.HertzJWTMiddleware{
-		Key:         []byte("tiktok secret key"),
+		Key:         []byte("mols secret key"),
 		TokenLookup: "cookie:token",
 		Timeout:     24 * time.Hour,
 		MaxRefresh:  time.Hour * 6,
@@ -35,13 +34,14 @@ func Init() {
 				c.Set("hasErr", true)
 				return nil, err
 			}
-			uid, err := db.VerifyUser(user.Username, user.Password)
+			uid, uHashId, err := db.VerifyUser(user.Username, user.Password)
 			if err != nil {
 				c.Set("hasErr", true)
 				return nil, err
 			}
 			c.Set("hasErr", false)
 			c.Set("user_id", uid)
+			c.Set("uHashId", uHashId)
 			return uid, nil
 		},
 		// Set the payload in the token
@@ -56,7 +56,7 @@ func Init() {
 		// build login response if verify password successfully
 		LoginResponse: func(ctx context.Context, c *app.RequestContext, code int, token string, expire time.Time) {
 			hlog.CtxInfof(ctx, "Login success ，token is issued clientIP: "+c.ClientIP())
-			c.SetCookie("token", token, int(24*time.Hour), "/", "localhost", protocol.CookieSameSiteLaxMode, true, true)
+			c.SetCookie("token", token, int(24*time.Hour), "/", "localhost", protocol.CookieSameSiteNoneMode, true, true)
 		},
 		// Verify token and get the id of logged-in user
 		Authorizator: func(data interface{}, ctx context.Context, c *app.RequestContext) bool {
@@ -70,7 +70,7 @@ func Init() {
 		},
 		// Validation failed, build the message
 		Unauthorized: func(ctx context.Context, c *app.RequestContext, code int, message string) {
-			c.JSON(consts.StatusOK, user.UserActionResponse{
+			c.JSON(consts.StatusUnauthorized, user.UserActionResponse{
 				StatusCode: errno.AuthorizationFailedErrCode,
 				StatusMsg:  message,
 			})

@@ -12,18 +12,13 @@ const TableNameArticle = "articles"
 
 // Article 文章表
 type Article struct {
-	ID           int64     `gorm:"column:id;primaryKey;autoIncrement:true;comment:文章ID" json:"id"`    // 文章ID
-	UserID       int64     `gorm:"column:user_id;not null;comment:作者ID" json:"user_id"`               // 作者ID
-	LikeCount    int64     `gorm:"column:like_count;not null;comment:点赞用户数目" json:"like_count"`       // 点赞用户数目
-	DislikeCount int64     `gorm:"column:dislike_count;not null;comment:踩的用户数目" json:"dislike_count"` // 踩的用户数目
-	CommentCount int64     `gorm:"column:comment_count;not null;comment:评论数目" json:"comment_count"`   // 评论数目
-	CollectCount int64     `gorm:"column:collect_count;not null;comment:收藏数目" json:"collect_count"`   // 收藏数目
-	Title        string    `gorm:"column:title;not null;comment:文章标题" json:"title"`                   // 文章标题
-	Note         string    `gorm:"column:note;not null;comment:文章小记" json:"note"`                     // 文章小记
-	CoverURL     string    `gorm:"column:cover_url;not null;comment:背景图URL" json:"cover_url"`         // 背景图URL
-	PublishTime  time.Time `gorm:"column:publish_time;not null;comment:发布时间戳" json:"publish_time"`    // 发布时间戳
-	HashID       []byte    `gorm:"column:hash_id;not null;comment:文章的hashID值" json:"hash_id"`         // 文章的hashID值
-	ViewCount    int64     `gorm:"column:view_count;not null;comment:阅览数目" json:"view_count"`         // 阅览数目
+	ID          int64     `gorm:"column:id;primaryKey;autoIncrement:true;comment:文章ID" json:"id"` // 文章ID
+	UserID      []byte    `gorm:"column:user_id;not null;comment:作者ID" json:"user_id"`            // 作者ID
+	Title       string    `gorm:"column:title;not null;comment:文章标题" json:"title"`                // 文章标题
+	Note        string    `gorm:"column:note;not null;comment:文章小记" json:"note"`                  // 文章小记
+	CoverURL    string    `gorm:"column:cover_url;not null;comment:背景图URL" json:"cover_url"`      // 背景图URL
+	PublishTime time.Time `gorm:"column:publish_time;not null;comment:发布时间戳" json:"publish_time"` // 发布时间戳
+	HashID      []byte    `gorm:"column:hash_id;not null;comment:文章的hashID值" json:"hash_id"`      // 文章的hashID值
 }
 
 // TableName Article's table name

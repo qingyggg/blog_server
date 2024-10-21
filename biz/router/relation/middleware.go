@@ -18,14 +18,13 @@ func _blog_serverMw() []app.HandlerFunc {
 }
 
 func _relationMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _relationactionMw() []app.HandlerFunc {
 	return []app.HandlerFunc{
 		jwt.JwtMiddleware.MiddlewareFunc(),
 	}
+}
+
+func _relationactionMw() []app.HandlerFunc {
+	return nil
 }
 
 func _followMw() []app.HandlerFunc {
@@ -34,7 +33,6 @@ func _followMw() []app.HandlerFunc {
 }
 
 func _relationfollowlistMw() []app.HandlerFunc {
-	// your code...
 	return nil
 }
 

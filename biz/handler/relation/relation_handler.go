@@ -21,7 +21,8 @@ import (
 // @Produce application/json
 // @Param relation body relation.RelationActionRequest true "RelationAction请求参数"
 // @Success 200 {object} relation.RelationActionResponse "成功响应，包含状态码和状态信息"
-// @Failure 400 {object} common.BaseResponse "请求失败，返回错误码和错误信息"
+// @Failure 400 {object} common.BaseResponse "Invalid request"
+// @Failure 500 {object} common.BaseResponse "Internal server error"
 // @Router /blog_server/relation/action [POST]
 func RelationAction(ctx context.Context, c *app.RequestContext) {
 	var err error
@@ -31,7 +32,7 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 		utils.ErrResp(c, err)
 		return
 	}
-	_, err = service.NewRelationService(ctx, c).FollowAction(req)
+	err = service.NewRelationService(ctx, c).FollowAction(req)
 	if err != nil {
 		utils.ErrResp(c, err)
 		return
@@ -49,9 +50,10 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 // @Tags 用户关系
 // @Accept application/json
 // @Produce application/json
-// @Param user_id query int true "用户ID"
+// @Param  UhashID  query string true "用户ID"
 // @Success 200 {object} relation.RelationFollowListResponse "成功响应，包含状态码、状态信息和用户列表"
-// @Failure 400 {object} common.BaseResponse "请求失败，返回错误码和错误信息"
+// @Failure 400 {object} common.BaseResponse "Invalid request"
+// @Failure 500 {object} common.BaseResponse "Internal server error"
 // @Router /blog_server/relation/follow/list [GET]
 func RelationFollowList(ctx context.Context, c *app.RequestContext) {
 	var err error
@@ -79,9 +81,10 @@ func RelationFollowList(ctx context.Context, c *app.RequestContext) {
 // @Tags 用户关系
 // @Accept application/json
 // @Produce application/json
-// @Param user_id query int true "用户ID"
+// @Param UhashID  query string true "用户ID"
 // @Success 200 {object} relation.RelationFollowListResponse "成功响应，包含状态码、状态信息和用户列表"
-// @Failure 400 {object} common.BaseResponse "请求失败，返回错误码和错误信息"
+// @Failure 400 {object} common.BaseResponse "Invalid request"
+// @Failure 500 {object} common.BaseResponse "Internal server error"
 // @Router /blog_server/relation/follower/list [GET]
 func RelationFollowerList(ctx context.Context, c *app.RequestContext) {
 	var err error

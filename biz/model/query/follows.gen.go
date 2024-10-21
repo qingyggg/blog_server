@@ -28,10 +28,8 @@ func newFollow(db *gorm.DB, opts ...gen.DOOption) follow {
 	tableName := _follow.followDo.TableName()
 	_follow.ALL = field.NewAsterisk(tableName)
 	_follow.ID = field.NewInt64(tableName, "id")
-	_follow.UserID = field.NewInt64(tableName, "user_id")
-	_follow.FollowerID = field.NewInt64(tableName, "follower_id")
-	_follow.CreatedAt = field.NewTime(tableName, "created_at")
-	_follow.DeletedAt = field.NewField(tableName, "deleted_at")
+	_follow.UserID = field.NewBytes(tableName, "user_id")
+	_follow.FollowerID = field.NewBytes(tableName, "follower_id")
 
 	_follow.fillFieldMap()
 
@@ -44,10 +42,8 @@ type follow struct {
 
 	ALL        field.Asterisk
 	ID         field.Int64 // 自增主键
-	UserID     field.Int64 // 用户ID
-	FollowerID field.Int64 // 粉丝ID
-	CreatedAt  field.Time  // 关注关系创建时间
-	DeletedAt  field.Field // 关注关系删除时间
+	UserID     field.Bytes // 用户ID
+	FollowerID field.Bytes // 粉丝ID
 
 	fieldMap map[string]field.Expr
 }
@@ -65,10 +61,8 @@ func (f follow) As(alias string) *follow {
 func (f *follow) updateTableName(table string) *follow {
 	f.ALL = field.NewAsterisk(table)
 	f.ID = field.NewInt64(table, "id")
-	f.UserID = field.NewInt64(table, "user_id")
-	f.FollowerID = field.NewInt64(table, "follower_id")
-	f.CreatedAt = field.NewTime(table, "created_at")
-	f.DeletedAt = field.NewField(table, "deleted_at")
+	f.UserID = field.NewBytes(table, "user_id")
+	f.FollowerID = field.NewBytes(table, "follower_id")
 
 	f.fillFieldMap()
 
@@ -85,12 +79,10 @@ func (f *follow) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (f *follow) fillFieldMap() {
-	f.fieldMap = make(map[string]field.Expr, 5)
+	f.fieldMap = make(map[string]field.Expr, 3)
 	f.fieldMap["id"] = f.ID
 	f.fieldMap["user_id"] = f.UserID
 	f.fieldMap["follower_id"] = f.FollowerID
-	f.fieldMap["created_at"] = f.CreatedAt
-	f.fieldMap["deleted_at"] = f.DeletedAt
 }
 
 func (f follow) clone(db *gorm.DB) follow {

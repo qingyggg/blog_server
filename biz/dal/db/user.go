@@ -59,19 +59,19 @@ func QueryUserByHashId(uHashId string) (*orm_gen.User, error) {
 }
 
 // VerifyUser verify username and password in the db
-func VerifyUser(userName string, password string) (int64, error) {
+func VerifyUser(userName string, password string) (int64, string, error) {
 	user, err := QueryUser(userName)
 	if err != nil {
 		if err.Error() == "record not found" {
-			return 0, errno.UserIsNotExistErr
+			return 0, "", errno.UserIsNotExistErr
 		}
-		return 0, err
+		return 0, "", err
 	}
 	if ok := utils.VerifyPassword(password, user.Password); !ok {
 		err = errno.PasswordIsNotVerified
-		return 0, err
+		return 0, "", err
 	} else {
-		return user.ID, nil
+		return user.ID, utils.ConvertByteHashToString(user.HashID), nil
 	}
 }
 
@@ -134,7 +134,7 @@ func UserProfileModify(user_id int64, payload map[string]interface{}) error {
 }
 
 // map[user id] : user payload
-func QueryUserByIds(uids []int64) (*map[int64]*orm_gen.User, error) {
+func QueryUserByIds(uids []int64) (map[int64]*orm_gen.User, error) {
 	var u = query.User
 	//对uids进行去重操作
 	uMaps := make(map[int64]*orm_gen.User)
@@ -153,7 +153,7 @@ func QueryUserByIds(uids []int64) (*map[int64]*orm_gen.User, error) {
 		uMaps[cu.ID] = cu
 	}
 
-	return &uMaps, nil
+	return uMaps, nil
 }
 
 func QueryUserByHashIds(uids []string) (uMaps map[string]*orm_gen.User, err error) {

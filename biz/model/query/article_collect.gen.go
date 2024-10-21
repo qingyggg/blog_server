@@ -28,11 +28,9 @@ func newArticleCollect(db *gorm.DB, opts ...gen.DOOption) articleCollect {
 	tableName := _articleCollect.articleCollectDo.TableName()
 	_articleCollect.ALL = field.NewAsterisk(tableName)
 	_articleCollect.ID = field.NewInt64(tableName, "id")
-	_articleCollect.UserID = field.NewInt64(tableName, "user_id")
-	_articleCollect.ArticleID = field.NewInt64(tableName, "article_id")
-	_articleCollect.CollectName = field.NewString(tableName, "collect_name")
-	_articleCollect.CreatedAt = field.NewTime(tableName, "created_at")
-	_articleCollect.DeletedAt = field.NewField(tableName, "deleted_at")
+	_articleCollect.ArticleID = field.NewBytes(tableName, "article_id")
+	_articleCollect.UserID = field.NewBytes(tableName, "user_id")
+	_articleCollect.Tag = field.NewString(tableName, "tag")
 
 	_articleCollect.fillFieldMap()
 
@@ -43,13 +41,11 @@ func newArticleCollect(db *gorm.DB, opts ...gen.DOOption) articleCollect {
 type articleCollect struct {
 	articleCollectDo
 
-	ALL         field.Asterisk
-	ID          field.Int64  // 自增主键
-	UserID      field.Int64  // 用户ID
-	ArticleID   field.Int64  // 文章ID
-	CollectName field.String // 收藏的类型
-	CreatedAt   field.Time   // 收藏创建时间
-	DeletedAt   field.Field  // 收藏删除时间
+	ALL       field.Asterisk
+	ID        field.Int64  // 主键
+	ArticleID field.Bytes  // 文章ID
+	UserID    field.Bytes  // 用户ID
+	Tag       field.String // 收藏分类
 
 	fieldMap map[string]field.Expr
 }
@@ -67,11 +63,9 @@ func (a articleCollect) As(alias string) *articleCollect {
 func (a *articleCollect) updateTableName(table string) *articleCollect {
 	a.ALL = field.NewAsterisk(table)
 	a.ID = field.NewInt64(table, "id")
-	a.UserID = field.NewInt64(table, "user_id")
-	a.ArticleID = field.NewInt64(table, "article_id")
-	a.CollectName = field.NewString(table, "collect_name")
-	a.CreatedAt = field.NewTime(table, "created_at")
-	a.DeletedAt = field.NewField(table, "deleted_at")
+	a.ArticleID = field.NewBytes(table, "article_id")
+	a.UserID = field.NewBytes(table, "user_id")
+	a.Tag = field.NewString(table, "tag")
 
 	a.fillFieldMap()
 
@@ -88,13 +82,11 @@ func (a *articleCollect) GetFieldByName(fieldName string) (field.OrderExpr, bool
 }
 
 func (a *articleCollect) fillFieldMap() {
-	a.fieldMap = make(map[string]field.Expr, 6)
+	a.fieldMap = make(map[string]field.Expr, 4)
 	a.fieldMap["id"] = a.ID
-	a.fieldMap["user_id"] = a.UserID
 	a.fieldMap["article_id"] = a.ArticleID
-	a.fieldMap["collect_name"] = a.CollectName
-	a.fieldMap["created_at"] = a.CreatedAt
-	a.fieldMap["deleted_at"] = a.DeletedAt
+	a.fieldMap["user_id"] = a.UserID
+	a.fieldMap["tag"] = a.Tag
 }
 
 func (a articleCollect) clone(db *gorm.DB) articleCollect {

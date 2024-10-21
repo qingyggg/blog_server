@@ -3,23 +3,19 @@ syntax = "proto3";
 package favorite;
 
 import 'api.proto';
-import "common.proto";
 
 option go_package = "hertz/interact/favorite";
 
 message FavoriteActionRequest {
-  int64 comment_id = 1;
-  int64 uid=2;
-  int32 action_type = 3; // 1-like, 2-unlike ,3-nor like,nor unlike
-  int64 article_id =4;
+  string CHashID = 1[(api.go_tag)='json:"cHashID,required"'];
+  int32 ActionType = 2[(api.go_tag)='json:"actionType,required"',(api.vd)='$==1 || $==2 || $==3']; // 1-like, 2-unlike ,3-nor like,nor unlike
+  string AHashID =3[(api.go_tag)='json:"aHashID,required"'];
 }
 
 message FavoriteActionResponse {
   int32 status_code = 1[(api.go_tag)='json:"status_code"']; // 0 - success, other values - failure
   string status_msg = 2; // status description
 }
-
-
 
 service FavoriteHandler {
   rpc CommentFavoriteAction(FavoriteActionRequest) returns(FavoriteActionResponse) {

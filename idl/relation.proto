@@ -8,7 +8,7 @@ import "common.proto";
 option go_package = "hertz/social/relation";
 
 message RelationActionRequest {
-  int64 ToUserId = 1[(api.go_tag)='json:"to_user_id,required"'];
+  string UhashID = 1[(api.go_tag)='json:"to_user_id,required"'];
   int32 ActionType = 2[(api.go_tag)='json:"action_type,required"',(api.vd)='$==1 || $==2']; // 1-Follow, 2-Unfollow
 }
 
@@ -18,7 +18,7 @@ message RelationActionResponse {
 }
 
 message RelationFollowListRequest { //follow list
-  int64 UserId = 1[(api.go_tag)='query:"user_id,required"'];
+  string UhashID = 1[(api.go_tag)='query:"user_id,required"'];
 }
 
 message RelationFollowListResponse {

@@ -7,8 +7,10 @@ import (
 	"github.com/qingyggg/blog_server/biz/model/hertz/common"
 	"github.com/qingyggg/blog_server/biz/model/hertz/social/relation"
 	"github.com/qingyggg/blog_server/biz/model/orm_gen"
+	service_utils "github.com/qingyggg/blog_server/biz/service"
 	service "github.com/qingyggg/blog_server/biz/service/user"
 	"github.com/qingyggg/blog_server/pkg/errno"
+	"github.com/qingyggg/blog_server/pkg/utils"
 )
 
 var (
@@ -28,46 +30,51 @@ func NewRelationService(ctx context.Context, c *app.RequestContext) *RelationSer
 	return &RelationService{ctx: ctx, c: c}
 }
 
-func (s *RelationService) FollowAction(req *relation.RelationActionRequest) (flag bool, err error) {
+func (s *RelationService) FollowAction(req *relation.RelationActionRequest) error {
 	//1.check user
-	exist, err := db.CheckUserExistById(req.ToUserId)
+	exist, err := db.CheckUserExistByHashId(req.UhashID)
 	if err != nil {
-		return false, err
+		return err
 	}
 	if exist != true {
-		return false, errno.UserIsNotExistErr
+		return errno.UserIsNotExistErr
 	}
 	//2.check param user id != to user id,action type==1 or 2
-	curUid, _ := s.c.Get("current_user_id")
-	if curUid.(int64) == req.ToUserId {
-		return false, errno.NewErrNo(errno.ParamErrCode, "用户不可以自己关注自己")
+	//获取用户hashid
+	user, err := db.QueryUserById(service_utils.GetUid(s.c))
+	if err != nil {
+		return err
+	}
+	curUidByte := user.HashID
+	curUid := utils.ConvertByteHashToString(curUidByte)
+	followedId := req.UhashID
+	followedIdByte := utils.ConvertStringHashToByte(req.UhashID)
+
+	if req.UhashID == curUid {
+		return errno.NewErrNo(errno.ParamErrCode, "用户不可以自己关注自己")
 	}
 	//3.follow exist ,db action
-	folRelation := orm_gen.Follow{UserID: req.ToUserId, FollowerID: curUid.(int64)}
-	followExist, _ := db.QueryFollowExist(folRelation.UserID, folRelation.FollowerID)
+	folRelation := orm_gen.Follow{UserID: followedIdByte, FollowerID: curUidByte}
+	followExist, _ := db.QueryFollowExist(followedId, curUid)
 	if req.ActionType == FOLLOW {
 		if followExist {
-			return false, errno.FollowRelationAlreadyExistErr
+			return errno.FollowRelationAlreadyExistErr
 		}
-		flag, err = db.AddNewFollow(&folRelation)
+		err = db.AddNewFollow(&folRelation)
 	} else {
 		if !followExist {
-			return false, errno.FollowRelationNotExistErr
+			return errno.FollowRelationNotExistErr
 		}
-		flag, err = db.DeleteFollow(&folRelation)
+		err = db.DeleteFollow(&folRelation)
 	}
-	return flag, err
+	return err
 }
 
 func (s *RelationService) GetRelationList(req *relation.RelationFollowListRequest, reqType int32) ([]*common.User, error) {
-	uid := req.UserId
+	uid := req.UhashID
 	var list []*common.User
-	var uids []int64
-	curUid, exist := s.c.Get("current_user_id")
-	if !exist {
-		curUid = int64(0)
-	}
-	exist, err := db.CheckUserExistById(uid)
+	var uids []string
+	exist, err := db.CheckUserExistByHashId(uid)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +90,7 @@ func (s *RelationService) GetRelationList(req *relation.RelationFollowListReques
 		return nil, err
 	}
 	for _, uid := range uids {
-		user_info, err := service.NewUserService(s.ctx, s.c).GetUserInfo(uid, curUid.(int64))
+		user_info, err := service.NewUserService(s.ctx, s.c).GetUserInfo(uid)
 		if err != nil {
 			return nil, err
 		}

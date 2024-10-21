@@ -7,6 +7,9 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/binding"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/hertz-contrib/cors"
+	"github.com/hertz-contrib/gzip"
+	"github.com/hertz-contrib/pprof"
 	"github.com/hertz-contrib/reverseproxy"
 	"github.com/hertz-contrib/swagger"
 	"github.com/qingyggg/blog_server/biz/dal"
@@ -15,6 +18,7 @@ import (
 	_ "github.com/qingyggg/blog_server/docs"
 	"github.com/qingyggg/blog_server/pkg/utils"
 	swaggerFiles "github.com/swaggo/files"
+	"time"
 )
 
 // Set up /src/*name route forwarding to access minio from external network
@@ -60,6 +64,20 @@ func main() {
 		server.WithHostPorts("0.0.0.0:18005"),
 		server.WithValidateConfig(validateConfig),
 	)
+	h.Use(gzip.Gzip(gzip.DefaultCompression)) //gzip压缩
+	// default is "debug/pprof"
+	pprof.Register(h, "dev/pprof")
+	//cors config
+	h.Use(cors.New(cors.Config{
+		//AllowWildcard: 	  true,
+		//AllowOrigins:     []string{"*"},
+		AllowAllOrigins:  true,
+		AllowMethods:     []string{"PUT", "PATCH", "GET", "POST", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token, x-token"},
+		ExposeHeaders:    []string{"Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 	//oss
 	h.GET("/src/*name", minioReverseProxy)
 	//swagger

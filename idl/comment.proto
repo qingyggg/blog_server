@@ -17,6 +17,7 @@ message CommentActionRequest {
 
 message CommentDelActionRequest{
   string CHashId=1[(api.go_tag)='json:"cHashId,required"'];//评论id
+  string AHashId=2[(api.go_tag)='json:"aHashId,required"'];
 }
 
 message CommentActionResponse {
@@ -34,6 +35,7 @@ message Comment {
   int64 FavoriteCount =6;//该评论获得的点赞数量
   int64 ChildNum=7;//该评论被回复的数量，当为一级评论时候，显示数量，二级的时候，显示为0
   string RepliedUHashId=8;//如果该评论为某评论的回复，则该字段为被回复的用户的hashID
+  bool IsFavorite=9;
 }
 //二级
 message CommentListRequest {
@@ -50,16 +52,16 @@ message CommentListResponse {
 
 service CommentHandler {
   rpc CommentAction(CommentActionRequest) returns(CommentActionResponse) {
-      option (api.post) = "/blog_server/comment/action/";
+      option (api.post) = "/blog_server/comment/action";
       // Logged in users to comment on videos.
   }
 
   rpc CommentDelAction(CommentDelActionRequest) returns(CommentActionResponse){
-    option (api.delete) = "/blog_server/comment/action/";
+    option (api.delete) = "/blog_server/comment/action";
   }
 
   rpc CommentList(CommentListRequest) returns(CommentListResponse) {
-      option (api.get) = "/blog_server/comment/list/";
+      option (api.get) = "/blog_server/comment/list";
       // Get all comments on a video in reverse chronological order.
   }
 }

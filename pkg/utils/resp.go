@@ -54,7 +54,7 @@ func baseResp(err errno.ErrNo) *BaseResp {
 
 func ErrResp(c *app.RequestContext, err error) {
 	resp := BuildBaseResp(err)
-	c.JSON(consts.StatusOK, user.UserActionResponse{
+	c.JSON(consts.StatusInternalServerError, user.UserActionResponse{
 		StatusCode: resp.StatusCode,
 		StatusMsg:  resp.StatusMsg,
 	})

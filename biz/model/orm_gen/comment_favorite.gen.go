@@ -8,11 +8,11 @@ const TableNameCommentFavorite = "comment_favorite"
 
 // CommentFavorite 用户对评论的点赞或者踩
 type CommentFavorite struct {
-	ID        int64 `gorm:"column:id;primaryKey;autoIncrement:true;comment:主键" json:"id"`     // 主键
-	ArticleID int64 `gorm:"column:article_id;not null;comment:评论文章ID" json:"article_id"`      // 评论文章ID
-	CommentID int64 `gorm:"column:comment_id;not null;comment:被点赞或踩的评论 ID" json:"comment_id"` // 被点赞或踩的评论 ID
-	UserID    int64 `gorm:"column:user_id;not null;comment:用户ID" json:"user_id"`              // 用户ID
-	Status    int32 `gorm:"column:status;not null;comment:-1：踩, 1：点赞" json:"status"`          // -1：踩, 1：点赞
+	ID        int64  `gorm:"column:id;primaryKey;autoIncrement:true;comment:主键" json:"id"`     // 主键
+	ArticleID []byte `gorm:"column:article_id;not null;comment:评论文章ID" json:"article_id"`      // 评论文章ID
+	CommentID []byte `gorm:"column:comment_id;not null;comment:被点赞或踩的评论 ID" json:"comment_id"` // 被点赞或踩的评论 ID
+	UserID    []byte `gorm:"column:user_id;not null;comment:用户ID" json:"user_id"`              // 用户ID
+	Status    int32  `gorm:"column:status;not null;comment:2：踩, 1：点赞" json:"status"`           // 2：踩, 1：点赞
 }
 
 // TableName CommentFavorite's table name

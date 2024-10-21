@@ -20,6 +20,7 @@ var (
 	Article         *article
 	ArticleCollect  *articleCollect
 	ArticleFavorite *articleFavorite
+	ArticleView     *articleView
 	CommentFavorite *commentFavorite
 	Follow          *follow
 	User            *user
@@ -30,6 +31,7 @@ func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	Article = &Q.Article
 	ArticleCollect = &Q.ArticleCollect
 	ArticleFavorite = &Q.ArticleFavorite
+	ArticleView = &Q.ArticleView
 	CommentFavorite = &Q.CommentFavorite
 	Follow = &Q.Follow
 	User = &Q.User
@@ -41,6 +43,7 @@ func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 		Article:         newArticle(db, opts...),
 		ArticleCollect:  newArticleCollect(db, opts...),
 		ArticleFavorite: newArticleFavorite(db, opts...),
+		ArticleView:     newArticleView(db, opts...),
 		CommentFavorite: newCommentFavorite(db, opts...),
 		Follow:          newFollow(db, opts...),
 		User:            newUser(db, opts...),
@@ -53,6 +56,7 @@ type Query struct {
 	Article         article
 	ArticleCollect  articleCollect
 	ArticleFavorite articleFavorite
+	ArticleView     articleView
 	CommentFavorite commentFavorite
 	Follow          follow
 	User            user
@@ -66,6 +70,7 @@ func (q *Query) clone(db *gorm.DB) *Query {
 		Article:         q.Article.clone(db),
 		ArticleCollect:  q.ArticleCollect.clone(db),
 		ArticleFavorite: q.ArticleFavorite.clone(db),
+		ArticleView:     q.ArticleView.clone(db),
 		CommentFavorite: q.CommentFavorite.clone(db),
 		Follow:          q.Follow.clone(db),
 		User:            q.User.clone(db),
@@ -86,6 +91,7 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 		Article:         q.Article.replaceDB(db),
 		ArticleCollect:  q.ArticleCollect.replaceDB(db),
 		ArticleFavorite: q.ArticleFavorite.replaceDB(db),
+		ArticleView:     q.ArticleView.replaceDB(db),
 		CommentFavorite: q.CommentFavorite.replaceDB(db),
 		Follow:          q.Follow.replaceDB(db),
 		User:            q.User.replaceDB(db),
@@ -96,6 +102,7 @@ type queryCtx struct {
 	Article         IArticleDo
 	ArticleCollect  IArticleCollectDo
 	ArticleFavorite IArticleFavoriteDo
+	ArticleView     IArticleViewDo
 	CommentFavorite ICommentFavoriteDo
 	Follow          IFollowDo
 	User            IUserDo
@@ -106,6 +113,7 @@ func (q *Query) WithContext(ctx context.Context) *queryCtx {
 		Article:         q.Article.WithContext(ctx),
 		ArticleCollect:  q.ArticleCollect.WithContext(ctx),
 		ArticleFavorite: q.ArticleFavorite.WithContext(ctx),
+		ArticleView:     q.ArticleView.WithContext(ctx),
 		CommentFavorite: q.CommentFavorite.WithContext(ctx),
 		Follow:          q.Follow.WithContext(ctx),
 		User:            q.User.WithContext(ctx),

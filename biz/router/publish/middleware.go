@@ -18,8 +18,9 @@ func _blog_serverMw() []app.HandlerFunc {
 }
 
 func _publishMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		jwt.JwtMiddleware.MiddlewareFunc(),
+	}
 }
 
 func _publishdetailMw() []app.HandlerFunc {
@@ -38,21 +39,15 @@ func _actionMw() []app.HandlerFunc {
 }
 
 func _publishactionMw() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		jwt.JwtMiddleware.MiddlewareFunc(),
-	}
+	return nil
 }
 
 func _publishdelactionMw() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		jwt.JwtMiddleware.MiddlewareFunc(),
-	}
+	return nil
 }
 
 func _publishmodifyactionMw() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		jwt.JwtMiddleware.MiddlewareFunc(),
-	}
+	return nil
 }
 
 func _publishviewcountaddMw() []app.HandlerFunc {

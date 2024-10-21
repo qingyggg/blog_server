@@ -5,6 +5,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/qingyggg/blog_server/biz/dal/db"
 	"github.com/qingyggg/blog_server/biz/model/hertz/interact/comment"
+	"github.com/qingyggg/blog_server/biz/model/orm_gen"
 	"github.com/qingyggg/blog_server/biz/mw/mongo"
 	service_utils "github.com/qingyggg/blog_server/biz/service"
 	service "github.com/qingyggg/blog_server/biz/service/user"
@@ -12,6 +13,7 @@ import (
 	"github.com/qingyggg/blog_server/pkg/utils"
 	"math/rand"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -69,7 +71,6 @@ func (c *CommentService) AddNewCmt(req *comment.CommentActionRequest) (error, st
 }
 
 func (c *CommentService) DelCmt(req *comment.CommentDelActionRequest) error {
-	//
 	uid := service_utils.GetUid(c.c)
 	user, err := db.QueryUserById(uid)
 	if err != nil {
@@ -89,25 +90,101 @@ func (c *CommentService) DelCmt(req *comment.CommentDelActionRequest) error {
 	if cmt.UserID != utils.ConvertByteHashToString(user.HashID) {
 		return errno.ServiceErr.WithMessage("当前用户没有权利删除该评论")
 	}
-	err = db.DelCommentByHashID(c.ctx, req.CHashId)
+	err = db.DelCommentByHashID(c.ctx, req.CHashId, req.AHashId)
 	return err
 }
 
 func (c *CommentService) GetTopCmtList(req *comment.CommentListRequest) (err error, comments []*comment.Comment) {
 	//1.请求
-	cmtList, err := db.GetCommentListByArticleID(c.ctx, req.AHashId)
+	firstList, err := db.GetCommentListByArticleID(c.ctx, req.AHashId)
 	if err != nil {
 		return err, nil
 	}
-	//2.获取uid
+	err, cmts := c.getCmtList(firstList)
+	if err != nil {
+		return err, nil
+	}
+	return nil, cmts
+}
+
+func (c *CommentService) GetSubCmtList(req *comment.CommentListRequest) (err error, cmts []*comment.Comment) {
+	firstList, err := db.GetCommentListByTopCommentID(c.ctx, req.AHashId, req.CHashId)
+	if err != nil {
+		return err, nil
+	}
+	err, cmts = c.getCmtList(firstList)
+	if err != nil {
+		return err, nil
+	}
+	return nil, cmts
+}
+
+func (c *CommentService) getCmtList(cmtList []*mongo.CommentItem) (err error, cmts []*comment.Comment) {
+	//获取uid,cid
 	var uids []string
+	var cids []string
+	var wg sync.WaitGroup
+	var UInfoMaps map[string]*orm_gen.User
+	var CInfoMaps map[string]int32
+	var CCtMaps map[string]int64
+	var errChan = make(chan error, 3)
+	wg.Add(3)
 	for _, cmt := range cmtList {
 		uids = append(uids, cmt.UserID)
+		cids = append(cids, cmt.HashID)
 	}
-	uInfoMaps, err := db.QueryUserByHashIds(uids)
+	curUid := service_utils.GetUid(c.c)
+	user, err := db.QueryUserById(curUid)
+	if err != nil {
+		return err, nil
+	}
+
+	go func() {
+		defer wg.Done()
+		uInfoMaps, err := db.QueryUserByHashIds(uids) //请求用户信息
+		if err != nil {
+			errChan <- err
+			return
+		}
+		UInfoMaps = uInfoMaps
+	}()
+	go func() {
+		defer wg.Done()
+		err, cInfoMaps := db.GetCmtFavoriteStatusMap(cids, utils.ConvertByteHashToString(user.HashID))
+		if err != nil {
+			errChan <- err
+			return
+		}
+		CInfoMaps = cInfoMaps
+	}()
+	go func() {
+		defer wg.Done()
+		err, cCtMaps := db.GetCmtFavoriteCtMap(cids)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		CCtMaps = cCtMaps
+	}()
+	go func() {
+		wg.Wait()
+		close(errChan)
+	}()
+	for err := range errChan {
+		if err != nil {
+			return err, nil
+		}
+	}
 	//3.用户信息附加,形成完整的评论表
+	var isFavorite bool
+	var curUserPayload *orm_gen.User
 	for _, cmt := range cmtList {
-		curUserPayload := uInfoMaps[cmt.UserID]
+		curUserPayload = UInfoMaps[cmt.UserID]
+		if CInfoMaps[cmt.HashID] == 1 {
+			isFavorite = true
+		} else {
+			isFavorite = false
+		}
 		curPayload := comment.Comment{
 			CHashId:       cmt.HashID,
 			AHashId:       cmt.ArticleID,
@@ -115,38 +192,10 @@ func (c *CommentService) GetTopCmtList(req *comment.CommentListRequest) (err err
 			ChildNum:      cmt.ChildNum,
 			User:          service.UserAssign(curUserPayload),
 			CreateDate:    utils.ConvertBsonTimeToString(cmt.CreateTime),
-			FavoriteCount: 3, //后续完善
+			FavoriteCount: CCtMaps[cmt.HashID], //后续完善
+			IsFavorite:    isFavorite,
 		}
-		comments = append(comments, &curPayload)
-	}
-	return nil, comments
-}
-
-func (c *CommentService) GetSubCmtList(req *comment.CommentListRequest) (err error, cmts []*comment.Comment) {
-	//1.数据库操作，平摊数组，获取uid，对uid进行搜索用户信息
-	var uids []string
-	list, err := db.GetCommentListByTopCommentID(c.ctx, req.AHashId, req.CHashId)
-	if err != nil {
-		return err, nil
-	}
-	for _, v := range list {
-		uids = append(uids, v.UserID)
-	}
-	//请求用户信息
-	uMaps, err := db.QueryUserByHashIds(uids)
-	if err != nil {
-		return err, nil
-	}
-	for _, v := range list {
-		cmts = append(cmts, &comment.Comment{
-			CHashId:        v.HashID,
-			AHashId:        v.ArticleID,
-			User:           service.UserAssign(uMaps[v.UserID]),
-			Content:        v.Content,
-			CreateDate:     utils.ConvertBsonTimeToString(v.CreateTime),
-			RepliedUHashId: v.ParentUID,
-			FavoriteCount:  3, //后续完善
-		})
+		cmts = append(cmts, &curPayload)
 	}
 	return nil, cmts
 }

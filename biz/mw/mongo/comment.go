@@ -20,6 +20,7 @@ func InitComment() {
 
 	CreateIndex(CmtClosureCol, bson.M{"ancestor": 1}, false)
 	CreateIndex(CmtClosureCol, bson.M{"descendant": 1}, false)
+	CreateIndex(CmtClosureCol, bson.M{"article_id": 1}, false)
 }
 
 type Comment struct {
@@ -35,6 +36,7 @@ type Comment struct {
 type CommentClosure struct {
 	AncestorID   string `bson:"ancestor"`
 	DescendantID string `bson:"descendant"`
+	ArticleID    string `bson:"article_id"`
 	Depth        int    `bson:"depth"`
 }
 
@@ -47,14 +49,5 @@ type CommentItem struct {
 	HashID     string        `bson:"hash_id"`
 	CreateTime bson.DateTime `bson:"create_time"`
 	ChildNum   int64         `bson:"child_num"`
-}
-
-type CommentItemForSub struct {
-	ArticleID  string        `bson:"article_id"`
-	Content    string        `bson:"content"`
-	Degree     int8          `bson:"degree"`
-	UserID     string        `bson:"user_id"`
-	HashID     string        `bson:"hash_id"`
 	ParentUID  string        `bson:"parent_uid"` //@xxx reply_to @xxx
-	CreateTime bson.DateTime `bson:"create_time"`
 }

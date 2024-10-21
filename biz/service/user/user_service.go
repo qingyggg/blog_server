@@ -70,36 +70,34 @@ func initUserSpace(ctx context.Context, uHashId string) error {
 	return nil
 }
 
-func (s *UserService) PwdModify(req *user.UserActionPwdModifyRequest) (userId int64, err error) {
-	uid, err := db.VerifyUser(req.Username, req.OldPassword) //验证用户是否存在，旧密码是否正确
+func (s *UserService) PwdModify(req *user.UserActionPwdModifyRequest) (uid int64, uHashId string, err error) {
+	uid, uHashId, err = db.VerifyUser(req.Username, req.OldPassword) //验证用户是否存在，旧密码是否正确
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 	crptedPwd, err := utils.Crypt(req.NewPassword)
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 	err = db.UserPwdModify(uid, crptedPwd)
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
-	return uid, nil
+	return uid, uHashId, nil
 }
 
 // UserInfo the function of user api
 func (s *UserService) UserInfo(req *user.UserRequest) (*common.User, error) {
-	queryUserId := req.UserId
-	//
-	exist, err := db.CheckUserExistById(req.UserId)
+	queryUserId := req.UHashID
+	exist, err := db.CheckUserExistByHashId(queryUserId)
 	if err != nil {
 		return nil, err
 	}
 	if !exist {
 		return nil, errno.UserIsNotExistErr
 	}
-	curUid := service_utils.GetUid(s.c)
 
-	return s.GetUserInfo(queryUserId, curUid)
+	return s.GetUserInfo(queryUserId)
 }
 
 func (s *UserService) UserProfileModify(req *user.UserActionProfileModifyRequest) error {
@@ -123,7 +121,7 @@ func (s *UserService) UserProfileModify(req *user.UserActionProfileModifyRequest
 	return nil
 }
 
-func (s *UserService) GetUserInfo(queryUserId int64, userId int64) (*common.User, error) {
+func (s *UserService) GetUserInfo(queryUHashId string) (*common.User, error) {
 	u := new(common.User)
 	errChan := make(chan error, 5)
 	defer close(errChan)
@@ -131,9 +129,10 @@ func (s *UserService) GetUserInfo(queryUserId int64, userId int64) (*common.User
 	wg.Add(5)
 
 	go func() { //
-		dbUser, err := db.QueryUserById(queryUserId)
+		dbUser, err := db.QueryUserByHashId(queryUHashId)
 		if err != nil {
 			errChan <- err
+			return
 		} else {
 			u.Base = new(common.UserBase)
 			u.Base.Name = dbUser.UserName
@@ -147,9 +146,10 @@ func (s *UserService) GetUserInfo(queryUserId int64, userId int64) (*common.User
 	}()
 
 	go func() {
-		WorkCount, err := db.GetWorkCount(queryUserId)
+		WorkCount, err := db.GetWorkCount(queryUHashId)
 		if err != nil {
 			errChan <- err
+			return
 		} else {
 			u.WorkCount = WorkCount
 		}
@@ -157,9 +157,10 @@ func (s *UserService) GetUserInfo(queryUserId int64, userId int64) (*common.User
 	}()
 
 	go func() {
-		FollowCount, err := db.GetFollowCount(queryUserId)
+		FollowCount, err := db.GetFollowCount(queryUHashId)
 		if err != nil {
 			errChan <- err
+			return
 			return
 		} else {
 			u.FollowCount = FollowCount
@@ -168,9 +169,10 @@ func (s *UserService) GetUserInfo(queryUserId int64, userId int64) (*common.User
 	}()
 
 	go func() {
-		FollowerCount, err := db.GetFollowerCount(queryUserId)
+		FollowerCount, err := db.GetFollowerCount(queryUHashId)
 		if err != nil {
 			errChan <- err
+			return
 		} else {
 			u.FollowerCount = FollowerCount
 		}
@@ -178,15 +180,21 @@ func (s *UserService) GetUserInfo(queryUserId int64, userId int64) (*common.User
 	}()
 
 	go func() {
-		if userId != 0 && userId != queryUserId {
-			IsFollow, err := db.QueryFollowExist(userId, queryUserId)
+		uid := service_utils.GetUid(s.c) //检查用户登录状态
+		user, err := db.QueryUserById(uid)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		uHashId := utils.ConvertByteHashToString(user.HashID)
+		if uHashId != queryUHashId {
+			IsFollow, err := db.QueryFollowExist(queryUHashId, uHashId)
 			if err != nil {
 				errChan <- err
+				return
 			} else {
 				u.IsFollow = IsFollow
 			}
-		} else {
-			u.IsFollow = false
 		}
 		wg.Done()
 	}()
@@ -197,6 +205,5 @@ func (s *UserService) GetUserInfo(queryUserId int64, userId int64) (*common.User
 		return nil, result
 	default:
 	}
-	u.Base.Id = queryUserId
 	return u, nil
 }

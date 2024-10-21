@@ -19,25 +19,11 @@ func Register(r *server.Hertz) {
 	root := r.Group("/", rootMw()...)
 	{
 		_blog_server := root.Group("/blog_server", _blog_serverMw()...)
-		{
-			_user := _blog_server.Group("/user", _userMw()...)
-			_user.GET("/", append(_user0Mw(), user.User)...)
-			{
-				_login := _user.Group("/login", _loginMw()...)
-				_login.POST("/", append(_userloginMw(), user.UserLogin)...)
-			}
-			{
-				_profile_modify := _user.Group("/profile_modify", _profile_modifyMw()...)
-				_profile_modify.POST("/", append(_userprofilemodifyMw(), user.UserProfileModify)...)
-			}
-			{
-				_pwd_modify := _user.Group("/pwd_modify", _pwd_modifyMw()...)
-				_pwd_modify.POST("/", append(_userpwdmodifyMw(), user.UserPwdModify)...)
-			}
-			{
-				_register := _user.Group("/register", _registerMw()...)
-				_register.POST("/", append(_userregisterMw(), user.UserRegister)...)
-			}
-		}
+		_blog_server.GET("/user", append(_user0Mw(), user.User)...)
+		_user := _blog_server.Group("/user", _userMw()...)
+		_user.POST("/login", append(_userloginMw(), user.UserLogin)...)
+		_user.POST("/profile_modify", append(_userprofilemodifyMw(), user.UserProfileModify)...)
+		_user.POST("/pwd_modify", append(_userpwdmodifyMw(), user.UserPwdModify)...)
+		_user.POST("/register", append(_userregisterMw(), user.UserRegister)...)
 	}
 }

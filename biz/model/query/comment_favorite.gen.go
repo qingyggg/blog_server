@@ -28,9 +28,9 @@ func newCommentFavorite(db *gorm.DB, opts ...gen.DOOption) commentFavorite {
 	tableName := _commentFavorite.commentFavoriteDo.TableName()
 	_commentFavorite.ALL = field.NewAsterisk(tableName)
 	_commentFavorite.ID = field.NewInt64(tableName, "id")
-	_commentFavorite.ArticleID = field.NewInt64(tableName, "article_id")
-	_commentFavorite.CommentID = field.NewInt64(tableName, "comment_id")
-	_commentFavorite.UserID = field.NewInt64(tableName, "user_id")
+	_commentFavorite.ArticleID = field.NewBytes(tableName, "article_id")
+	_commentFavorite.CommentID = field.NewBytes(tableName, "comment_id")
+	_commentFavorite.UserID = field.NewBytes(tableName, "user_id")
 	_commentFavorite.Status = field.NewInt32(tableName, "status")
 
 	_commentFavorite.fillFieldMap()
@@ -44,10 +44,10 @@ type commentFavorite struct {
 
 	ALL       field.Asterisk
 	ID        field.Int64 // 主键
-	ArticleID field.Int64 // 评论文章ID
-	CommentID field.Int64 // 被点赞或踩的评论 ID
-	UserID    field.Int64 // 用户ID
-	Status    field.Int32 // -1：踩, 1：点赞
+	ArticleID field.Bytes // 评论文章ID
+	CommentID field.Bytes // 被点赞或踩的评论 ID
+	UserID    field.Bytes // 用户ID
+	Status    field.Int32 // 2：踩, 1：点赞
 
 	fieldMap map[string]field.Expr
 }
@@ -65,9 +65,9 @@ func (c commentFavorite) As(alias string) *commentFavorite {
 func (c *commentFavorite) updateTableName(table string) *commentFavorite {
 	c.ALL = field.NewAsterisk(table)
 	c.ID = field.NewInt64(table, "id")
-	c.ArticleID = field.NewInt64(table, "article_id")
-	c.CommentID = field.NewInt64(table, "comment_id")
-	c.UserID = field.NewInt64(table, "user_id")
+	c.ArticleID = field.NewBytes(table, "article_id")
+	c.CommentID = field.NewBytes(table, "comment_id")
+	c.UserID = field.NewBytes(table, "user_id")
 	c.Status = field.NewInt32(table, "status")
 
 	c.fillFieldMap()

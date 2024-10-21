@@ -18,14 +18,14 @@ func _blog_serverMw() []app.HandlerFunc {
 }
 
 func _commentMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func _actionMw() []app.HandlerFunc {
 	return []app.HandlerFunc{
 		jwt.JwtMiddleware.MiddlewareFunc(),
 	}
+
+}
+
+func _actionMw() []app.HandlerFunc {
+	return nil
 }
 
 func _commentdelactionMw() []app.HandlerFunc {

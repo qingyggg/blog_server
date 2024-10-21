@@ -28,28 +28,24 @@ func newArticleFavorite(db *gorm.DB, opts ...gen.DOOption) articleFavorite {
 	tableName := _articleFavorite.articleFavoriteDo.TableName()
 	_articleFavorite.ALL = field.NewAsterisk(tableName)
 	_articleFavorite.ID = field.NewInt64(tableName, "id")
-	_articleFavorite.UserID = field.NewInt64(tableName, "user_id")
-	_articleFavorite.ArticleID = field.NewInt64(tableName, "article_id")
+	_articleFavorite.ArticleID = field.NewBytes(tableName, "article_id")
+	_articleFavorite.UserID = field.NewBytes(tableName, "user_id")
 	_articleFavorite.Status = field.NewInt32(tableName, "status")
-	_articleFavorite.CreatedAt = field.NewTime(tableName, "created_at")
-	_articleFavorite.DeletedAt = field.NewField(tableName, "deleted_at")
 
 	_articleFavorite.fillFieldMap()
 
 	return _articleFavorite
 }
 
-// articleFavorite 点赞表
+// articleFavorite 文章点赞表
 type articleFavorite struct {
 	articleFavoriteDo
 
 	ALL       field.Asterisk
-	ID        field.Int64 // 自增主键
-	UserID    field.Int64 // 点赞用户ID
-	ArticleID field.Int64 // 被点赞的文章ID
-	Status    field.Int32 // -1：踩, 1：点赞
-	CreatedAt field.Time  // 点赞创建时间
-	DeletedAt field.Field // 点赞删除时间
+	ID        field.Int64 // 主键
+	ArticleID field.Bytes // 评论文章ID
+	UserID    field.Bytes // 用户ID
+	Status    field.Int32 // 2：踩, 1：点赞
 
 	fieldMap map[string]field.Expr
 }
@@ -67,11 +63,9 @@ func (a articleFavorite) As(alias string) *articleFavorite {
 func (a *articleFavorite) updateTableName(table string) *articleFavorite {
 	a.ALL = field.NewAsterisk(table)
 	a.ID = field.NewInt64(table, "id")
-	a.UserID = field.NewInt64(table, "user_id")
-	a.ArticleID = field.NewInt64(table, "article_id")
+	a.ArticleID = field.NewBytes(table, "article_id")
+	a.UserID = field.NewBytes(table, "user_id")
 	a.Status = field.NewInt32(table, "status")
-	a.CreatedAt = field.NewTime(table, "created_at")
-	a.DeletedAt = field.NewField(table, "deleted_at")
 
 	a.fillFieldMap()
 
@@ -88,13 +82,11 @@ func (a *articleFavorite) GetFieldByName(fieldName string) (field.OrderExpr, boo
 }
 
 func (a *articleFavorite) fillFieldMap() {
-	a.fieldMap = make(map[string]field.Expr, 6)
+	a.fieldMap = make(map[string]field.Expr, 4)
 	a.fieldMap["id"] = a.ID
-	a.fieldMap["user_id"] = a.UserID
 	a.fieldMap["article_id"] = a.ArticleID
+	a.fieldMap["user_id"] = a.UserID
 	a.fieldMap["status"] = a.Status
-	a.fieldMap["created_at"] = a.CreatedAt
-	a.fieldMap["deleted_at"] = a.DeletedAt
 }
 
 func (a articleFavorite) clone(db *gorm.DB) articleFavorite {

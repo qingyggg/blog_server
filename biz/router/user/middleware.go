@@ -18,13 +18,14 @@ func _blog_serverMw() []app.HandlerFunc {
 }
 
 func _userMw() []app.HandlerFunc {
-	// your code...
 	return nil
 }
 
 func _user0Mw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		jwt.JwtMiddleware.MiddlewareFunc(),
+	}
+
 }
 
 func _loginMw() []app.HandlerFunc {

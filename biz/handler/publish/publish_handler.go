@@ -126,6 +126,10 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	cards, err := service.NewPublishService(ctx, c).PublishList(req)
+	if err != nil {
+		utils.ErrResp(c, err)
+		return
+	}
 
 	c.JSON(consts.StatusOK, &publish.CardsResponse{
 		StatusCode: errno.SuccessCode,

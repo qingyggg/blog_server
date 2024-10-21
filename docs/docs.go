@@ -22,7 +22,53 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/blog_server/comment/action/": {
+        "/blog_server/collect/action": {
+            "post": {
+                "description": "Allows a user to collect an item (e.g., an article or post).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章收藏"
+                ],
+                "summary": "对文章进行收藏或者取消收藏",
+                "parameters": [
+                    {
+                        "description": "Request body for collecting an item",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/collect.CollectActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/collect.CollectActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/comment/action": {
             "post": {
                 "description": "向博文添加新评论",
                 "consumes": [
@@ -112,7 +158,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/blog_server/comment/list/": {
+        "/blog_server/comment/list": {
             "get": {
                 "description": "获取博文的评论列表",
                 "consumes": [
@@ -158,6 +204,98 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/favorite/action/article": {
+            "post": {
+                "description": "Allows a user to favorite an article.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "点赞或者踩"
+                ],
+                "summary": "对文章进行点赞或者踩",
+                "parameters": [
+                    {
+                        "description": "Request body for favoriting an article",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/favorite.FavoriteActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/favorite.FavoriteActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/favorite/action/comment": {
+            "post": {
+                "description": "Allows a user to comment on a favorite item.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "点赞或者踩"
+                ],
+                "summary": "对评论进行点赞或者踩",
+                "parameters": [
+                    {
+                        "description": "Request body for commenting on a favorite",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/favorite.FavoriteActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/favorite.FavoriteActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/common.BaseResponse"
                         }
@@ -367,9 +505,9 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "如果id为0，则根据时间的先后去请求文章列表",
-                        "name": "UserId",
+                        "name": "UHashID",
                         "in": "query"
                     }
                 ],
@@ -473,7 +611,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "请求失败，返回错误码和错误信息",
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/common.BaseResponse"
                         }
@@ -496,9 +640,9 @@ const docTemplate = `{
                 "summary": "获取关注列表",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "用户ID",
-                        "name": "user_id",
+                        "name": "UhashID",
                         "in": "query",
                         "required": true
                     }
@@ -511,7 +655,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "请求失败，返回错误码和错误信息",
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/common.BaseResponse"
                         }
@@ -534,9 +684,9 @@ const docTemplate = `{
                 "summary": "获取粉丝列表",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "用户ID",
-                        "name": "user_id",
+                        "name": "UhashID",
                         "in": "query",
                         "required": true
                     }
@@ -549,7 +699,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "请求失败，返回错误码和错误信息",
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/common.BaseResponse"
                         }
@@ -557,7 +713,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/blog_server/user/": {
+        "/blog_server/user": {
             "get": {
                 "description": "根据用户请求获取对应的用户信息",
                 "consumes": [
@@ -572,9 +728,9 @@ const docTemplate = `{
                 "summary": "获取用户信息",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "用户ID",
-                        "name": "user_id",
+                        "name": "UHashID",
                         "in": "query",
                         "required": true
                     }
@@ -587,15 +743,21 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "请求参数错误",
+                        "description": "Invalid request",
                         "schema": {
-                            "$ref": "#/definitions/user.UserActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     }
                 }
             }
         },
-        "/blog_server/user/login/": {
+        "/blog_server/user/login": {
             "post": {
                 "description": "用户通过提供用户名和密码登录账户",
                 "consumes": [
@@ -627,15 +789,21 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "请求参数错误或其他错误信息",
+                        "description": "Invalid request",
                         "schema": {
-                            "$ref": "#/definitions/user.UserActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     }
                 }
             }
         },
-        "/blog_server/user/profile_modify/": {
+        "/blog_server/user/profile_modify": {
             "post": {
                 "description": "用户通过上传新的头像，背景图片，或者更改用户签名来进行修改资料",
                 "consumes": [
@@ -665,11 +833,23 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/user.UserActionResponse"
                         }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
                     }
                 }
             }
         },
-        "/blog_server/user/pwd_modify/": {
+        "/blog_server/user/pwd_modify": {
             "post": {
                 "description": "用户通过提供用户名，旧密码，新密码进行修改账户密码",
                 "consumes": [
@@ -701,15 +881,21 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "请求参数错误或其他错误信息",
+                        "description": "Invalid request",
                         "schema": {
-                            "$ref": "#/definitions/user.UserActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     }
                 }
             }
         },
-        "/blog_server/user/register/": {
+        "/blog_server/user/register": {
             "post": {
                 "description": "用户通过提供用户名和密码注册账户",
                 "consumes": [
@@ -741,12 +927,31 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "请求参数错误或其他错误信息",
+                        "description": "Invalid request",
                         "schema": {
-                            "$ref": "#/definitions/user.UserActionResponse"
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
                         }
                     }
                 }
+            }
+        },
+        "/ping": {
+            "get": {
+                "description": "测试服务器连接",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ping"
+                ],
+                "summary": "测试服务器连接",
+                "responses": {}
             }
         },
         "/upload/file": {
@@ -796,6 +1001,35 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "collect.CollectActionRequest": {
+            "type": "object",
+            "properties": {
+                "aHashId": {
+                    "description": "文章的id",
+                    "type": "string"
+                },
+                "action_type": {
+                    "description": "1-collect, 2-Uncollect",
+                    "type": "integer"
+                },
+                "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "collect.CollectActionResponse": {
+            "type": "object",
+            "properties": {
+                "status_code": {
+                    "description": "status code, 0-success, other values-failure",
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "description": "status description",
+                    "type": "string"
+                }
+            }
+        },
         "comment.Comment": {
             "type": "object",
             "properties": {
@@ -821,6 +1055,9 @@ const docTemplate = `{
                 "FavoriteCount": {
                     "description": "该评论获得的点赞数量",
                     "type": "integer"
+                },
+                "IsFavorite": {
+                    "type": "boolean"
                 },
                 "RepliedUHashId": {
                     "description": "如果该评论为某评论的回复，则该字段为被回复的用户的hashID",
@@ -876,6 +1113,9 @@ const docTemplate = `{
         "comment.CommentDelActionRequest": {
             "type": "object",
             "properties": {
+                "aHashId": {
+                    "type": "string"
+                },
                 "cHashId": {
                     "description": "评论id",
                     "type": "string"
@@ -980,12 +1220,15 @@ const docTemplate = `{
         "common.ArticleInfo": {
             "type": "object",
             "properties": {
+                "collect_count": {
+                    "type": "integer"
+                },
                 "comment_count": {
                     "description": "total number of comments on the video",
                     "type": "integer"
                 },
-                "dislike_count": {
-                    "type": "integer"
+                "is_collect": {
+                    "type": "boolean"
                 },
                 "is_favorite": {
                     "description": "true-Liked，false-did not like",
@@ -1094,6 +1337,34 @@ const docTemplate = `{
                 }
             }
         },
+        "favorite.FavoriteActionRequest": {
+            "type": "object",
+            "properties": {
+                "aHashID": {
+                    "type": "string"
+                },
+                "actionType": {
+                    "description": "1-like, 2-unlike ,3-nor like,nor unlike",
+                    "type": "integer"
+                },
+                "cHashID": {
+                    "type": "string"
+                }
+            }
+        },
+        "favorite.FavoriteActionResponse": {
+            "type": "object",
+            "properties": {
+                "status_code": {
+                    "description": "0 - success, other values - failure",
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "description": "status description",
+                    "type": "string"
+                }
+            }
+        },
         "publish.ActionRequest": {
             "type": "object",
             "properties": {
@@ -1195,7 +1466,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "to_user_id": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },

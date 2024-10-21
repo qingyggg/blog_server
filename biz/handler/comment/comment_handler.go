@@ -23,7 +23,7 @@ import (
 // @Success 200 {object} comment.CommentActionResponse "评论成功添加"
 // @Failure 400 {object} common.BaseResponse "无效的请求"
 // @Failure 500 {object} common.BaseResponse "服务器内部错误"
-// @Router /blog_server/comment/action/ [post]
+// @Router /blog_server/comment/action [post]
 func CommentAction(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req comment.CommentActionRequest
@@ -55,7 +55,7 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 // @Success 200 {object} common.BaseResponse "评论成功删除"
 // @Failure 400 {object} common.BaseResponse "无效的请求"
 // @Failure 500 {object} common.BaseResponse "服务器内部错误"
-// @Router /blog_server/comment/action/ [delete]
+// @Router /blog_server/comment/action [delete]
 func CommentDelAction(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req comment.CommentDelActionRequest
@@ -85,7 +85,7 @@ func CommentDelAction(ctx context.Context, c *app.RequestContext) {
 // @Success 200 {object} comment.CommentListResponse "成功获取评论列表"
 // @Failure 400 {object} common.BaseResponse "无效的请求"
 // @Failure 500 {object} common.BaseResponse "服务器内部错误"
-// @Router /blog_server/comment/list/ [get]
+// @Router /blog_server/comment/list [get]
 func CommentList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var list []*comment.Comment
@@ -99,8 +99,6 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 		err, list = service.NewCommentService(ctx, c).GetTopCmtList(&req)
 	} else if req.Type == 2 {
 		err, list = service.NewCommentService(ctx, c).GetSubCmtList(&req)
-	} else {
-		err = errno.ServiceErr.WithMessage("type参数只能为1或者2")
 	}
 	if err != nil {
 		utils.ErrResp(c, err)

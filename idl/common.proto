@@ -39,8 +39,9 @@ message ArticleInfo{
   int64 like_count = 1; // total number of likes for the video
   int64 comment_count = 2; // total number of comments on the video
   bool is_favorite = 3; // true-Liked，false-did not like
-  int64 dislike_count = 4;
+  int64 collect_count = 4;
   int64 viewed_count=5;
+  bool is_collect=6;
 }
 
 message ArticleCard{

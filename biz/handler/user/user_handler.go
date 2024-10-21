@@ -21,11 +21,12 @@ import (
 // @Tags 用户相关接口
 // @Accept json
 // @Produce json
-// @Param user_id query int true "用户ID"
+// @Param  UHashID   query string  true "用户ID"
 // @Success 200 {object} user.UserResponse "成功获取用户信息"
-// @Failure 400 {object} user.UserActionResponse "请求参数错误"
+// @Failure 400 {object} common.BaseResponse "Invalid request"
+// @Failure 500 {object} common.BaseResponse "Internal server error"
 //
-//	@router	/blog_server/user/ [GET]
+//	@router	/blog_server/user [GET]
 func User(ctx context.Context, c *app.RequestContext) {
 	var err error
 	req := new(user.UserRequest)
@@ -56,8 +57,11 @@ func User(ctx context.Context, c *app.RequestContext) {
 //	@Produce		json
 //	@Param			user	body		user.UserActionRequest	true	"用户注册请求参数"
 //	@Success		200		{object}	user.UserActionResponse	"成功返回用户ID及状态信息"
-//	@Failure		400		{object}	user.UserActionResponse	"请求参数错误或其他错误信息"
-//	@Router			/blog_server/user/register/ [post]
+//
+// @Failure 400 {object} common.BaseResponse "Invalid request"
+// @Failure 500 {object} common.BaseResponse "Internal server error"
+//
+//	@Router			/blog_server/user/register [post]
 func UserRegister(ctx context.Context, c *app.RequestContext) {
 	var err error
 	req := new(user.UserActionRequest) //req:username,password
@@ -91,8 +95,11 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 //	@Produce		json
 //	@Param			user	body		user.UserActionRequest	true	"用户登录请求参数"
 //	@Success		200		{object}	user.UserActionResponse	"成功返回用户ID及状态信息"
-//	@Failure		400		{object}	user.UserActionResponse	"请求参数错误或其他错误信息"
-//	@router	/blog_server/user/login/ [POST]
+//
+// @Failure 400 {object} common.BaseResponse "Invalid request"
+// @Failure 500 {object} common.BaseResponse "Internal server error"
+//
+//	@router	/blog_server/user/login [POST]
 func UserLogin(ctx context.Context, c *app.RequestContext) {
 	var err error
 	req := new(user.UserActionRequest)
@@ -107,12 +114,15 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 	if hasErr.(bool) {
 		return
 	}
-	v, _ := c.Get("user_id")
-	user_id := v.(int64)
+	v1, _ := c.Get("user_id")
+	user_id := v1.(int64)
+	v2, _ := c.Get("uHashId")
+	uHashId := v2.(string)
 	c.JSON(consts.StatusOK, user.UserActionResponse{
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
 		UserId:     user_id,
+		UHashId:    uHashId,
 	})
 }
 
@@ -125,8 +135,11 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 //	@Produce		json
 //	@Param			user	body		user.UserActionPwdModifyRequest	true	"用户修改密码请求参数"
 //	@Success		200		{object}	user.UserActionResponse	"成功返回用户ID及状态信息"
-//	@Failure		400		{object}	user.UserActionResponse	"请求参数错误或其他错误信息"
-//	@router	/blog_server/user/pwd_modify/ [POST]
+//
+// @Failure 400 {object} common.BaseResponse "Invalid request"
+// @Failure 500 {object} common.BaseResponse "Internal server error"
+//
+//	@router	/blog_server/user/pwd_modify [POST]
 func UserPwdModify(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req = new(user.UserActionPwdModifyRequest)
@@ -135,7 +148,7 @@ func UserPwdModify(ctx context.Context, c *app.RequestContext) {
 		utils.ErrResp(c, err)
 		return
 	}
-	uid, err := service.NewUserService(ctx, c).PwdModify(req)
+	uid, uHashId, err := service.NewUserService(ctx, c).PwdModify(req)
 	if err != nil {
 		utils.ErrResp(c, err)
 		return
@@ -143,6 +156,7 @@ func UserPwdModify(ctx context.Context, c *app.RequestContext) {
 	c.JSON(consts.StatusOK, user.UserActionResponse{
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
+		UHashId:    uHashId,
 		UserId:     uid,
 	})
 }
@@ -156,7 +170,11 @@ func UserPwdModify(ctx context.Context, c *app.RequestContext) {
 //	@Produce		json
 //	@Param			user	body		user.UserActionProfileModifyRequest	true	"用户修改资料请求参数"
 //	@Success		200		{object}	user.UserActionResponse	"成功返回用户ID及状态信息"
-//	@router	/blog_server/user/profile_modify/ [POST]
+//
+// @Failure 400 {object} common.BaseResponse "Invalid request"
+// @Failure 500 {object} common.BaseResponse "Internal server error"
+//
+//	@router	/blog_server/user/profile_modify [POST]
 func UserProfileModify(ctx context.Context, c *app.RequestContext) {
 	var err error
 	req := new(user.UserActionProfileModifyRequest)

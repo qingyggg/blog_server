@@ -40,7 +40,7 @@ message CreateActionResponse {
 
 //文章卡片列表
 message CardsRequest {
-  int64 UserId = 1[(api.go_tag)='query:"user_id,required"'];//如果id为0，则根据时间的先后去请求文章列表
+  string UHashID = 1[(api.go_tag)='query:"uHashId,required"'];//如果id为0，则根据时间的先后去请求文章列表
   int32 Offset=2[(api.go_tag)='query:"offset,required"'];
 }
 

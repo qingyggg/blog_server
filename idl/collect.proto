@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package comment;
+
+import "api.proto";
+
+option go_package = "hertz/interact/collect";
+
+message CollectActionRequest {
+  string AHashId=1[(api.go_tag)='json:"aHashId,required"']; //文章的id
+  string Tag=2[(api.go_tag)='json:"tag,required"'];
+  int32 ActionType = 3[(api.go_tag)='json:"action_type,required"',(api.vd)='$==1 || $==2']; // 1-collect, 2-Uncollect
+}
+message CollectActionResponse{
+  int32 status_code = 1[(api.go_tag)='json:"status_code"']; // status code, 0-success, other values-failure
+  string status_msg = 2; // status description
+}
+
+service CollectHandler {
+  rpc CollectAction(CollectActionRequest) returns(CollectActionResponse) {
+    option (api.post) = "/blog_server/collect/action";
+  }
+}

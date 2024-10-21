@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"github.com/qingyggg/blog_server/biz/model/orm_gen"
 	"github.com/qingyggg/blog_server/biz/model/query"
 	"github.com/qingyggg/blog_server/biz/mw/mongo"
@@ -15,8 +14,7 @@ func CreateArticle(aInfo *orm_gen.Article, aContent string) error {
 		if err := tx.Article.Create(aInfo); err != nil {
 			return err
 		}
-		insertResult, err := mongo.ArticleCollection.InsertOne(context.TODO(), &mongo.Article{ArticleID: utils.ConvertByteHashToString(aInfo.HashID), Content: aContent})
-		fmt.Println(insertResult)
+		_, err := mongo.ArticleCollection.InsertOne(context.TODO(), &mongo.Article{ArticleID: utils.ConvertByteHashToString(aInfo.HashID), Content: aContent})
 		return err //nil or err
 	})
 	return err
@@ -36,11 +34,10 @@ func ModifyArticle(aInfo *orm_gen.Article, aContent string) (hashAid string, err
 			},
 		}
 		// 更新单个文档
-		updateResult, err := mongo.ArticleCollection.UpdateOne(context.TODO(), filter, update)
+		_, err := mongo.ArticleCollection.UpdateOne(context.TODO(), filter, update)
 		if err != nil {
 			return err
 		}
-		fmt.Println(updateResult)
 		return nil
 	})
 	if err != nil {
@@ -59,13 +56,10 @@ func DeleteArticle(aInfo *orm_gen.Article) (err error) {
 
 		// 在 MongoDB 中删除对应的 article
 		filter := bson.M{"article_id": aInfo.HashID} // MongoDB 过滤条件，使用 HashID 匹配
-		deleteResult, err := mongo.ArticleCollection.DeleteOne(context.TODO(), filter)
+		_, err := mongo.ArticleCollection.DeleteOne(context.TODO(), filter)
 		if err != nil {
 			return err
 		}
-
-		// 输出删除结果，供调试使用
-		fmt.Println("MongoDB delete result:", deleteResult)
 
 		return nil
 	})
@@ -74,11 +68,11 @@ func DeleteArticle(aInfo *orm_gen.Article) (err error) {
 }
 
 // GetArticleInfos: 获取一系列的文章卡片
-func GetArticleInfos(uid int64, offset int) (aInfos []*orm_gen.Article, err error) {
+func GetArticleInfos(uid string, offset int) (aInfos []*orm_gen.Article, err error) {
 	var a = query.Article
 	var expr query.IArticleDo
-	if uid != 0 {
-		expr = a.Where(a.UserID.Eq(uid))
+	if uid != "" {
+		expr = a.Where(a.UserID.Eq(utils.ConvertStringHashToByte(uid)))
 	} else {
 		expr = a.Where()
 	}
@@ -109,24 +103,13 @@ func TakeArticle(aHashID string) (aInfo *orm_gen.Article, content string, err er
 }
 
 // GetWorkCount get the num of video published by the user
-func GetWorkCount(uid int64) (count int64, err error) {
+func GetWorkCount(uHashId string) (count int64, err error) {
 	var a = query.Article
-	count, err = a.Where(a.ID.Eq(uid)).Count()
+	count, err = a.Where(a.UserID.Eq(utils.ConvertStringHashToByte(uHashId))).Count()
 	if err != nil {
 		return 0, err
 	}
 	return count, nil
-}
-
-func CheckIsFavoriteByUid(uid int64, ahashId string) (bool, error) {
-	//var a = query.Article
-	return false, nil
-}
-
-func AddViewCount(ahashId string) error {
-	var a = query.Article
-	_, err := a.Where(a.HashID.Eq(utils.ConvertStringHashToByte(ahashId))).UpdateSimple(a.ViewCount.Add(1))
-	return err
 }
 
 // CheckArticleExistById  query if video exist

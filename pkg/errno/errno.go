@@ -43,6 +43,9 @@ const (
 	ArticleIsNotExistErrCode
 	CommentIsNotExistErrCode
 	RepliedCommentNotExistErrCode
+
+	CollectAlreadyExistErrCode
+	CollectIsNotExistErrCode
 )
 
 const (
@@ -58,6 +61,8 @@ const (
 	ArticleIsNotExistErrMsg      = "article is not exist"
 	CommentIsNotExistErrMsg      = "comment is not exist"
 	RepliedCommentNotExistErrMsg = "replied comment is not exist"
+	CollectAlreadyExistErrMsg    = "collect is already exist"
+	CollectIsNotExistErrMsg      = "collect is not exist"
 )
 
 type ErrNo struct {
@@ -97,6 +102,8 @@ var (
 	ArticleIsNotExistErr      = NewErrNo(ArticleIsNotExistErrCode, ArticleIsNotExistErrMsg)
 	CommentIsNotExistErr      = NewErrNo(CommentIsNotExistErrCode, CommentIsNotExistErrMsg)
 	RepliedCommentNotExistErr = NewErrNo(RepliedCommentNotExistErrCode, RepliedCommentNotExistErrMsg)
+	CollectAlreadyExistErr    = NewErrNo(CollectAlreadyExistErrCode, CollectAlreadyExistErrMsg)
+	CollectIsNotExistErr      = NewErrNo(CollectIsNotExistErrCode, CollectIsNotExistErrMsg)
 )
 
 // ConvertErr convert error to Errno
