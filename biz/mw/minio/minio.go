@@ -73,7 +73,7 @@ func Init() {
 	ctx := context.Background()
 	Client, err = minio.New(constants.MinioEndPoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(constants.MinioAccessKeyID, constants.MinioSecretAccessKey, ""),
-		Secure: constants.MiniouseSSL,
+		Secure: constants.MinioSSL,
 	})
 	if err != nil {
 		hlog.Fatal("minio连接错误: ", err)

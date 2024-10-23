@@ -124,6 +124,7 @@ func (c *CommentService) getCmtList(cmtList []*mongo.CommentItem) (err error, cm
 	var uids []string
 	var cids []string
 	var wg sync.WaitGroup
+	cmts = []*comment.Comment{}
 	var UInfoMaps map[string]*orm_gen.User
 	var CInfoMaps map[string]int32
 	var CCtMaps map[string]int64

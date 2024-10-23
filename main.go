@@ -14,26 +14,14 @@ import (
 	"github.com/hertz-contrib/swagger"
 	"github.com/qingyggg/blog_server/biz/dal"
 	"github.com/qingyggg/blog_server/biz/mw/jwt"
+	"github.com/qingyggg/blog_server/biz/mw/logger"
 	"github.com/qingyggg/blog_server/biz/mw/minio"
 	_ "github.com/qingyggg/blog_server/docs"
+	"github.com/qingyggg/blog_server/pkg/constants"
 	"github.com/qingyggg/blog_server/pkg/utils"
 	swaggerFiles "github.com/swaggo/files"
 	"time"
 )
-
-// Set up /src/*name route forwarding to access minio from external network
-func minioReverseProxy(c context.Context, ctx *app.RequestContext) {
-	proxy, _ := reverseproxy.NewSingleHostReverseProxy("http://localhost:18001")
-	ctx.URI().SetPath(ctx.Param("name"))
-	hlog.CtxInfof(c, string(ctx.Request.URI().Path()))
-	proxy.ServeHTTP(c, ctx)
-}
-
-func Init() {
-	dal.Init()
-	jwt.Init()
-	minio.Init()
-}
 
 //	@title			blog_server tests
 //	@version		1.0
@@ -49,16 +37,7 @@ func Init() {
 // @BasePath	/
 // @schemes	http
 func main() {
-	Init()
-	//自定义参数校验
-	validateConfig := &binding.ValidateConfig{}
-	validateConfig.MustRegValidateFunc("password", func(args ...interface{}) error {
-		err := utils.ValidatePassword(fmt.Sprint(args...))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	validateConfig := GetCustomValidateConfig()
 	h := server.Default(
 		server.WithStreamBody(true),
 		server.WithHostPorts("0.0.0.0:18005"),
@@ -86,4 +65,33 @@ func main() {
 
 	register(h)
 	h.Spin()
+}
+
+// Set up /src/*name route forwarding to access minio from external network
+func minioReverseProxy(c context.Context, ctx *app.RequestContext) {
+	proxy, _ := reverseproxy.NewSingleHostReverseProxy("http://localhost:18001")
+	ctx.URI().SetPath(ctx.Param("name"))
+	hlog.CtxInfof(c, string(ctx.Request.URI().Path()))
+	proxy.ServeHTTP(c, ctx)
+}
+
+func init() {
+	utils.EnvInit()
+	constants.UrlInit()
+	logger.InitLogger()
+	dal.Init()
+	jwt.Init()
+	minio.Init()
+}
+func GetCustomValidateConfig() *binding.ValidateConfig {
+	//自定义参数校验
+	validateConfig := &binding.ValidateConfig{}
+	validateConfig.MustRegValidateFunc("password", func(args ...interface{}) error {
+		err := utils.ValidatePassword(fmt.Sprint(args...))
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	return validateConfig
 }
