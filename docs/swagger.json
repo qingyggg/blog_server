@@ -1,0 +1,1570 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a demo using Hertz.",
+        "title": "blog_server tests",
+        "contact": {
+            "name": "hertz-contrib",
+            "url": "https://github.com/hertz-contrib"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:18005",
+    "basePath": "/",
+    "paths": {
+        "/blog_server/collect/action": {
+            "post": {
+                "description": "Allows a user to collect an item (e.g., an article or post).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章收藏"
+                ],
+                "summary": "对文章进行收藏或者取消收藏",
+                "parameters": [
+                    {
+                        "description": "Request body for collecting an item",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/collect.CollectActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/collect.CollectActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/comment/action": {
+            "post": {
+                "description": "向博文添加新评论",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "评论"
+                ],
+                "summary": "新增评论",
+                "parameters": [
+                    {
+                        "description": "新增评论请求",
+                        "name": "CommentActionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/comment.CommentActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "评论成功添加",
+                        "schema": {
+                            "$ref": "#/definitions/comment.CommentActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "无效的请求",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除博文中的评论",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "评论"
+                ],
+                "summary": "删除评论",
+                "parameters": [
+                    {
+                        "description": "删除评论请求",
+                        "name": "CommentDelActionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/comment.CommentDelActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "评论成功删除",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "无效的请求",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/comment/list": {
+            "get": {
+                "description": "获取博文的评论列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "评论"
+                ],
+                "summary": "获取评论列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "AHashId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "CHashId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "1:请求一级评论 2：请求二级评论",
+                        "name": "Type",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功获取评论列表",
+                        "schema": {
+                            "$ref": "#/definitions/comment.CommentListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "无效的请求",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/favorite/action/article": {
+            "post": {
+                "description": "Allows a user to favorite an article.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "点赞或者踩"
+                ],
+                "summary": "对文章进行点赞或者踩",
+                "parameters": [
+                    {
+                        "description": "Request body for favoriting an article",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/favorite.FavoriteActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/favorite.FavoriteActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/favorite/action/comment": {
+            "post": {
+                "description": "Allows a user to comment on a favorite item.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "点赞或者踩"
+                ],
+                "summary": "对评论进行点赞或者踩",
+                "parameters": [
+                    {
+                        "description": "Request body for commenting on a favorite",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/favorite.FavoriteActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success response",
+                        "schema": {
+                            "$ref": "#/definitions/favorite.FavoriteActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/publish/action": {
+            "post": {
+                "description": "用户可以通过此接口发表一篇文章",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章管理"
+                ],
+                "summary": "发表文章",
+                "parameters": [
+                    {
+                        "description": "文章创建请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/publish.CreateActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功响应",
+                        "schema": {
+                            "$ref": "#/definitions/publish.CreateActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "用户可以通过此接口删除一篇文章",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章管理"
+                ],
+                "summary": "删除文章",
+                "parameters": [
+                    {
+                        "description": "文章删除请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/publish.DelActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功响应",
+                        "schema": {
+                            "$ref": "#/definitions/publish.ActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "用户可以通过此接口修改一篇文章",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章管理"
+                ],
+                "summary": "修改文章",
+                "parameters": [
+                    {
+                        "description": "文章修改请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/publish.ModifyActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功响应",
+                        "schema": {
+                            "$ref": "#/definitions/publish.ActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/publish/detail": {
+            "get": {
+                "description": "用户可以通过此接口获取某篇文章的详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章管理"
+                ],
+                "summary": "获取文章详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "文章的hashid",
+                        "name": "AHashID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "UHashID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功响应，返回文章详情",
+                        "schema": {
+                            "$ref": "#/definitions/publish.ArticleResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/publish/list": {
+            "get": {
+                "description": "用户可以通过此接口获取文章列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章管理"
+                ],
+                "summary": "获取文章列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "Offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "如果id为0，则根据时间的先后去请求文章列表",
+                        "name": "UHashID",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功响应，返回文章列表",
+                        "schema": {
+                            "$ref": "#/definitions/publish.CardsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/publish/view_add": {
+            "post": {
+                "description": "用户可以通过此接口增加某篇文章的阅读数",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章管理"
+                ],
+                "summary": "增加文章阅读数",
+                "parameters": [
+                    {
+                        "description": "文章阅读数增加请求参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/publish.ActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功响应",
+                        "schema": {
+                            "$ref": "#/definitions/publish.ActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "服务器内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/relation/action": {
+            "post": {
+                "description": "用户对其他用户进行关注或取消关注",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户关系"
+                ],
+                "summary": "关注/取消关注",
+                "parameters": [
+                    {
+                        "description": "RelationAction请求参数",
+                        "name": "relation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/relation.RelationActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功响应，包含状态码和状态信息",
+                        "schema": {
+                            "$ref": "#/definitions/relation.RelationActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/relation/follow/list": {
+            "get": {
+                "description": "获取指定用户的关注列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户关系"
+                ],
+                "summary": "获取关注列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户ID",
+                        "name": "UhashID",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功响应，包含状态码、状态信息和用户列表",
+                        "schema": {
+                            "$ref": "#/definitions/relation.RelationFollowListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/relation/follower/list": {
+            "get": {
+                "description": "获取指定用户的粉丝列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户关系"
+                ],
+                "summary": "获取粉丝列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户ID",
+                        "name": "UhashID",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功响应，包含状态码、状态信息和用户列表",
+                        "schema": {
+                            "$ref": "#/definitions/relation.RelationFollowListResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/user": {
+            "get": {
+                "description": "根据用户请求获取对应的用户信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关接口"
+                ],
+                "summary": "获取用户信息",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "用户ID",
+                        "name": "UHashID",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功获取用户信息",
+                        "schema": {
+                            "$ref": "#/definitions/user.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/user/login": {
+            "post": {
+                "description": "用户通过提供用户名和密码登录账户",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关接口"
+                ],
+                "summary": "用户登录",
+                "parameters": [
+                    {
+                        "description": "用户登录请求参数",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功返回用户ID及状态信息",
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/user/profile_modify": {
+            "post": {
+                "description": "用户通过上传新的头像，背景图片，或者更改用户签名来进行修改资料",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关接口"
+                ],
+                "summary": "用户修改资料",
+                "parameters": [
+                    {
+                        "description": "用户修改资料请求参数",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionProfileModifyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功返回用户ID及状态信息",
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/user/pwd_modify": {
+            "post": {
+                "description": "用户通过提供用户名，旧密码，新密码进行修改账户密码",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关接口"
+                ],
+                "summary": "用户修改密码",
+                "parameters": [
+                    {
+                        "description": "用户修改密码请求参数",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionPwdModifyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功返回用户ID及状态信息",
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/blog_server/user/register": {
+            "post": {
+                "description": "用户通过提供用户名和密码注册账户",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户相关接口"
+                ],
+                "summary": "用户注册",
+                "parameters": [
+                    {
+                        "description": "用户注册请求参数",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功返回用户ID及状态信息",
+                        "schema": {
+                            "$ref": "#/definitions/user.UserActionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/ping": {
+            "get": {
+                "description": "测试服务器连接",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ping"
+                ],
+                "summary": "测试服务器连接",
+                "responses": {}
+            }
+        },
+        "/upload/file": {
+            "post": {
+                "description": "用户可以通过该接口上传文件",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文件上传接口"
+                ],
+                "summary": "上传文件",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "上传的文件",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "上传的类型，是头像还是背景图片",
+                        "name": "file_type",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功返回文件信息",
+                        "schema": {
+                            "$ref": "#/definitions/common.UploadResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "请求错误",
+                        "schema": {
+                            "$ref": "#/definitions/common.BaseResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "collect.CollectActionRequest": {
+            "type": "object",
+            "properties": {
+                "aHashId": {
+                    "description": "文章的id",
+                    "type": "string"
+                },
+                "action_type": {
+                    "description": "1-collect, 2-Uncollect",
+                    "type": "integer"
+                },
+                "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "collect.CollectActionResponse": {
+            "type": "object",
+            "properties": {
+                "status_code": {
+                    "description": "status code, 0-success, other values-failure",
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "description": "status description",
+                    "type": "string"
+                }
+            }
+        },
+        "comment.Comment": {
+            "type": "object",
+            "properties": {
+                "AHashId": {
+                    "description": "文章的id",
+                    "type": "string"
+                },
+                "CHashId": {
+                    "type": "string"
+                },
+                "ChildNum": {
+                    "description": "该评论被回复的数量，当为一级评论时候，显示数量，二级的时候，显示为0",
+                    "type": "integer"
+                },
+                "Content": {
+                    "description": "comment",
+                    "type": "string"
+                },
+                "CreateDate": {
+                    "description": "comment publication date, format mm-dd",
+                    "type": "string"
+                },
+                "FavoriteCount": {
+                    "description": "该评论获得的点赞数量",
+                    "type": "integer"
+                },
+                "IsFavorite": {
+                    "type": "boolean"
+                },
+                "RepliedUHashId": {
+                    "description": "如果该评论为某评论的回复，则该字段为被回复的用户的hashID",
+                    "type": "string"
+                },
+                "User": {
+                    "description": "comment user information",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/common.UserBase"
+                        }
+                    ]
+                }
+            }
+        },
+        "comment.CommentActionRequest": {
+            "type": "object",
+            "properties": {
+                "aHashId": {
+                    "description": "文章的id",
+                    "type": "string"
+                },
+                "content": {
+                    "description": "评论内容",
+                    "type": "string"
+                },
+                "degree": {
+                    "description": "评论等级，只能为1或者2",
+                    "type": "integer"
+                },
+                "pHashId": {
+                    "description": "父亲评论的id",
+                    "type": "string"
+                }
+            }
+        },
+        "comment.CommentActionResponse": {
+            "type": "object",
+            "properties": {
+                "CHashId": {
+                    "type": "string"
+                },
+                "status_code": {
+                    "description": "status code, 0-success, other values-failure",
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "description": "status description",
+                    "type": "string"
+                }
+            }
+        },
+        "comment.CommentDelActionRequest": {
+            "type": "object",
+            "properties": {
+                "aHashId": {
+                    "type": "string"
+                },
+                "cHashId": {
+                    "description": "评论id",
+                    "type": "string"
+                }
+            }
+        },
+        "comment.CommentListResponse": {
+            "type": "object",
+            "properties": {
+                "comment_list": {
+                    "description": "return comment list",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/comment.Comment"
+                    }
+                },
+                "status_code": {
+                    "description": "0-success, other values-failure",
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "common.Article": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "description": "author information",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/common.User"
+                        }
+                    ]
+                },
+                "base": {
+                    "$ref": "#/definitions/common.ArticleBase"
+                },
+                "hashId": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "video id",
+                    "type": "integer"
+                },
+                "info": {
+                    "$ref": "#/definitions/common.ArticleInfo"
+                }
+            }
+        },
+        "common.ArticleBase": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "preload": {
+                    "$ref": "#/definitions/common.ArticleBasePreload"
+                }
+            }
+        },
+        "common.ArticleBasePreload": {
+            "type": "object",
+            "properties": {
+                "cover_url": {
+                    "type": "string"
+                },
+                "note": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "common.ArticleCard": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "description": "author information",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/common.UserBase"
+                        }
+                    ]
+                },
+                "hashId": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "info": {
+                    "$ref": "#/definitions/common.ArticleInfo"
+                },
+                "pre": {
+                    "$ref": "#/definitions/common.ArticleBasePreload"
+                }
+            }
+        },
+        "common.ArticleInfo": {
+            "type": "object",
+            "properties": {
+                "collect_count": {
+                    "type": "integer"
+                },
+                "comment_count": {
+                    "description": "total number of comments on the video",
+                    "type": "integer"
+                },
+                "is_collect": {
+                    "type": "boolean"
+                },
+                "is_favorite": {
+                    "description": "true-Liked，false-did not like",
+                    "type": "boolean"
+                },
+                "like_count": {
+                    "description": "total number of likes for the video",
+                    "type": "integer"
+                },
+                "viewed_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "common.BaseResponse": {
+            "type": "object",
+            "properties": {
+                "status_code": {
+                    "description": "status code, 0-success, other values-failure",
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "description": "status description",
+                    "type": "string"
+                }
+            }
+        },
+        "common.UploadResponse": {
+            "type": "object",
+            "properties": {
+                "fileUrl": {
+                    "description": "文件存储的URL",
+                    "type": "string"
+                },
+                "status_code": {
+                    "description": "status code, 0-success, other values-failure",
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "description": "status description",
+                    "type": "string"
+                }
+            }
+        },
+        "common.User": {
+            "type": "object",
+            "properties": {
+                "base": {
+                    "$ref": "#/definitions/common.UserBase"
+                },
+                "follow_count": {
+                    "description": "total number of people the user follows",
+                    "type": "integer"
+                },
+                "follower_count": {
+                    "description": "total number of fans",
+                    "type": "integer"
+                },
+                "is_follow": {
+                    "description": "whether the currently logged-in user follows this user",
+                    "type": "boolean"
+                },
+                "total_favorited": {
+                    "description": "number of articles for articles published by user",
+                    "type": "integer"
+                },
+                "work_count": {
+                    "description": "number of articles published by user",
+                    "type": "integer"
+                }
+            }
+        },
+        "common.UserBase": {
+            "type": "object",
+            "properties": {
+                "hashId": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "user id",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "user name",
+                    "type": "string"
+                },
+                "profile": {
+                    "$ref": "#/definitions/common.UserProfile"
+                }
+            }
+        },
+        "common.UserProfile": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "description": "user avatar URL",
+                    "type": "string"
+                },
+                "background_image": {
+                    "description": "image at the top of the user's personal page",
+                    "type": "string"
+                },
+                "signature": {
+                    "description": "user profile",
+                    "type": "string"
+                }
+            }
+        },
+        "favorite.FavoriteActionRequest": {
+            "type": "object",
+            "properties": {
+                "aHashID": {
+                    "type": "string"
+                },
+                "actionType": {
+                    "description": "1-like, 2-unlike ,3-nor like,nor unlike",
+                    "type": "integer"
+                },
+                "cHashID": {
+                    "type": "string"
+                }
+            }
+        },
+        "favorite.FavoriteActionResponse": {
+            "type": "object",
+            "properties": {
+                "status_code": {
+                    "description": "0 - success, other values - failure",
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "description": "status description",
+                    "type": "string"
+                }
+            }
+        },
+        "publish.ActionRequest": {
+            "type": "object",
+            "properties": {
+                "aHashID": {
+                    "type": "string"
+                }
+            }
+        },
+        "publish.ActionResponse": {
+            "type": "object",
+            "properties": {
+                "status_code": {
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "publish.ArticleResponse": {
+            "type": "object",
+            "properties": {
+                "article": {
+                    "$ref": "#/definitions/common.Article"
+                },
+                "status_code": {
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "publish.CardsResponse": {
+            "type": "object",
+            "properties": {
+                "List": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/common.ArticleCard"
+                    }
+                },
+                "status_code": {
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "publish.CreateActionRequest": {
+            "type": "object",
+            "properties": {
+                "payload": {
+                    "$ref": "#/definitions/common.ArticleBase"
+                }
+            }
+        },
+        "publish.CreateActionResponse": {
+            "type": "object",
+            "properties": {
+                "AHashId": {
+                    "type": "string"
+                },
+                "status_code": {
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "publish.DelActionRequest": {
+            "type": "object",
+            "properties": {
+                "aHashID": {
+                    "description": "文章的hashid",
+                    "type": "string"
+                }
+            }
+        },
+        "publish.ModifyActionRequest": {
+            "type": "object",
+            "properties": {
+                "aHashID": {
+                    "description": "文章的hashid",
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/common.ArticleBase"
+                }
+            }
+        },
+        "relation.RelationActionRequest": {
+            "type": "object",
+            "properties": {
+                "action_type": {
+                    "description": "1-Follow, 2-Unfollow",
+                    "type": "integer"
+                },
+                "to_user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "relation.RelationActionResponse": {
+            "type": "object",
+            "properties": {
+                "status_code": {
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "relation.RelationFollowListResponse": {
+            "type": "object",
+            "properties": {
+                "status_code": {
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                },
+                "user_list": {
+                    "description": "User information list",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/common.User"
+                    }
+                }
+            }
+        },
+        "user.UserActionProfileModifyRequest": {
+            "type": "object",
+            "properties": {
+                "user_profile": {
+                    "$ref": "#/definitions/common.UserProfile"
+                }
+            }
+        },
+        "user.UserActionPwdModifyRequest": {
+            "type": "object",
+            "properties": {
+                "new_password": {
+                    "type": "string"
+                },
+                "old_password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.UserActionRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.UserActionResponse": {
+            "type": "object",
+            "properties": {
+                "UHashId": {
+                    "type": "string"
+                },
+                "UserId": {
+                    "description": "user id",
+                    "type": "integer"
+                },
+                "status_code": {
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.UserResponse": {
+            "type": "object",
+            "properties": {
+                "status_code": {
+                    "type": "integer"
+                },
+                "status_msg": {
+                    "type": "string"
+                },
+                "user": {
+                    "description": "User Info",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/common.User"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

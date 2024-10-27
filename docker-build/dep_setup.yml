@@ -1,0 +1,127 @@
+networks:
+  blog_server:
+    driver: bridge
+
+services:
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb
+    volumes:
+      - mariadb-data:/var/lib/mysql  # 使用命名卷持久化 MySQL 数据
+      - ../pkg/configs/sql:/docker-entrypoint-initdb.d  # 初始化 SQL 脚本
+    ports:
+      - "18000:3306"
+    environment:
+      - MYSQL_DATABASE=storybook
+      - MYSQL_USER=storybook
+      - MYSQL_PASSWORD=blog_server123
+      - MYSQL_RANDOM_ROOT_PASSWORD="yes"
+    networks:
+      - blog_server
+    restart: always
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      start_period: 1m
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - "18001:9000"
+      - "18002:9001"
+    environment:
+      MINIO_ACCESS_KEY: blog_server
+      MINIO_SECRET_KEY: blog_server123
+    volumes:
+      - minio-data:/data  # 使用命名卷持久化 MinIO 数据
+      - ../pkg/configs/minio/:/root/.minio
+    networks:
+      - blog_server
+    command: server --console-address ':9001' /data
+    privileged: true
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7
+    container_name: redis
+    ports:
+      - "18003:6379"
+    volumes:
+      - redis-data:/data  # 使用命名卷持久化 Redis 数据
+      - ../pkg/configs/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - blog_server
+    command: redis-server /usr/local/etc/redis/redis.conf
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  mongo:
+    image: mongo:8.0
+    container_name: mongo
+    ports:
+      - "18006:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=blog_server
+      - MONGO_INITDB_ROOT_PASSWORD=blog_server123
+    volumes:
+      - mongo-data:/data/db  # 使用命名卷持久化 MongoDB 数据
+    networks:
+      - blog_server
+    restart: always
+    healthcheck:
+      test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "18007:443"  # HTTP 端口
+    networks:
+      - blog_server
+    volumes:
+      - ../pkg/configs/nginx/nginx.conf:/etc/nginx/nginx.conf  # 挂载 Nginx 配置文件
+      - ../pkg/configs/nginx/certs/:/etc/nginx/certs            # 挂载 SSL 证书
+    restart: always
+
+  server:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    container_name: blog_server
+    depends_on:
+      mariadb:
+        condition: service_healthy  # 等待 mariadb 健康检查通过后启动
+      redis:
+        condition: service_healthy  # 等待 redis 健康检查通过后启动
+      mongo:
+        condition: service_healthy  # 等待 mongo 健康检查通过后启动
+      minio:
+        condition: service_healthy  # 等待 minio 健康检查通过后启动
+    networks:
+      - blog_server
+    ports:
+      - "18005:18005"
+
+volumes:
+  mariadb-data:  # MariaDB 数据持久化卷
+  minio-data:    # MinIO 数据持久化卷
+  redis-data:    # Redis 数据持久化卷
+  mongo-data:    # MongoDB 数据持久化卷

@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package publish;
+
+import "api.proto";
+import "common.proto";
+
+option go_package = "hertz/basic/publish";
+
+message DetailRequest{
+  string AHashID=1[(api.go_tag)='query:"aHashID,required"'];//文章的hashid
+  string UHashID=2[(api.go_tag)='query:"uHashID,required"'];
+}
+message ActionRequest{
+  string AHashID=1[(api.go_tag)='json:"aHashID,required"'];
+}
+message DelActionRequest{
+  string AHashID=1[(api.go_tag)='json:"aHashID,required"'];//文章的hashid
+}
+//文章的创建
+message CreateActionRequest {
+  ArticleBase Payload=1[(api.go_tag)='json:"payload,required"'];
+}
+
+//文章的修改
+message ModifyActionRequest {
+  string AHashID=1[(api.go_tag)='json:"aHashID,required"'];//文章的hashid
+  ArticleBase Payload=2[(api.go_tag)='json:"payload,required"'];
+}
+
+message ActionResponse {
+  int32 status_code = 1[(api.go_tag)='json:"status_code"'];
+  string status_msg = 2;
+}
+message CreateActionResponse {
+  int32 status_code = 1[(api.go_tag)='json:"status_code"'];
+  string status_msg = 2;
+  string AHashId=3;
+}
+
+//文章卡片列表
+message CardsRequest {
+  string UHashID = 1[(api.go_tag)='query:"uHashId,required"'];//如果id为0，则根据时间的先后去请求文章列表
+  int32 Offset=2[(api.go_tag)='query:"offset,required"'];
+}
+
+message ArticleResponse{
+  int32 status_code = 1[(api.go_tag)='json:"status_code"'];
+  string status_msg = 2;
+  Article article=3;
+}
+
+message CardsResponse {
+  int32 status_code = 1[(api.go_tag)='json:"status_code"'];
+  string status_msg = 2;
+  repeated ArticleCard List=3;
+}
+
+service PublishHandler {
+  rpc PublishAction(CreateActionRequest) returns(CreateActionResponse) {
+    option (api.post) = "/blog_server/publish/action";
+  }
+  rpc PublishModifyAction(ModifyActionRequest) returns(ActionResponse) {
+    option (api.patch) = "/blog_server/publish/action";
+  }
+  rpc PublishDelAction(DelActionRequest) returns(ActionResponse) {
+    option (api.delete) = "/blog_server/publish/action";
+    // Logged in user selects video to upload.
+  }
+  rpc PublishList(CardsRequest) returns(CardsResponse) {
+    option (api.get) = "/blog_server/publish/list";
+    // Get logged-in to the user's video publishing list, and directly list all the videos that the user has contributed.
+  }
+  rpc PublishDetail(DetailRequest) returns(ArticleResponse) {
+    option (api.get) = "/blog_server/publish/detail";
+    // Get logged-in to the user's video publishing list, and directly list all the videos that the user has contributed.
+  }
+  rpc PublishViewCountAdd(ActionRequest) returns(ActionResponse){
+    option (api.post) ="/blog_server/publish/view_add";
+  }
+}
+

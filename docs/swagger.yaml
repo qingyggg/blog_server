@@ -1,0 +1,1033 @@
+basePath: /
+definitions:
+  collect.CollectActionRequest:
+    properties:
+      aHashId:
+        description: 文章的id
+        type: string
+      action_type:
+        description: 1-collect, 2-Uncollect
+        type: integer
+      tag:
+        type: string
+    type: object
+  collect.CollectActionResponse:
+    properties:
+      status_code:
+        description: status code, 0-success, other values-failure
+        type: integer
+      status_msg:
+        description: status description
+        type: string
+    type: object
+  comment.Comment:
+    properties:
+      AHashId:
+        description: 文章的id
+        type: string
+      CHashId:
+        type: string
+      ChildNum:
+        description: 该评论被回复的数量，当为一级评论时候，显示数量，二级的时候，显示为0
+        type: integer
+      Content:
+        description: comment
+        type: string
+      CreateDate:
+        description: comment publication date, format mm-dd
+        type: string
+      FavoriteCount:
+        description: 该评论获得的点赞数量
+        type: integer
+      IsFavorite:
+        type: boolean
+      RepliedUHashId:
+        description: 如果该评论为某评论的回复，则该字段为被回复的用户的hashID
+        type: string
+      User:
+        allOf:
+        - $ref: '#/definitions/common.UserBase'
+        description: comment user information
+    type: object
+  comment.CommentActionRequest:
+    properties:
+      aHashId:
+        description: 文章的id
+        type: string
+      content:
+        description: 评论内容
+        type: string
+      degree:
+        description: 评论等级，只能为1或者2
+        type: integer
+      pHashId:
+        description: 父亲评论的id
+        type: string
+    type: object
+  comment.CommentActionResponse:
+    properties:
+      CHashId:
+        type: string
+      status_code:
+        description: status code, 0-success, other values-failure
+        type: integer
+      status_msg:
+        description: status description
+        type: string
+    type: object
+  comment.CommentDelActionRequest:
+    properties:
+      aHashId:
+        type: string
+      cHashId:
+        description: 评论id
+        type: string
+    type: object
+  comment.CommentListResponse:
+    properties:
+      comment_list:
+        description: return comment list
+        items:
+          $ref: '#/definitions/comment.Comment'
+        type: array
+      status_code:
+        description: 0-success, other values-failure
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  common.Article:
+    properties:
+      author:
+        allOf:
+        - $ref: '#/definitions/common.User'
+        description: author information
+      base:
+        $ref: '#/definitions/common.ArticleBase'
+      hashId:
+        type: string
+      id:
+        description: video id
+        type: integer
+      info:
+        $ref: '#/definitions/common.ArticleInfo'
+    type: object
+  common.ArticleBase:
+    properties:
+      content:
+        type: string
+      preload:
+        $ref: '#/definitions/common.ArticleBasePreload'
+    type: object
+  common.ArticleBasePreload:
+    properties:
+      cover_url:
+        type: string
+      note:
+        type: string
+      title:
+        type: string
+    type: object
+  common.ArticleCard:
+    properties:
+      author:
+        allOf:
+        - $ref: '#/definitions/common.UserBase'
+        description: author information
+      hashId:
+        type: string
+      id:
+        type: integer
+      info:
+        $ref: '#/definitions/common.ArticleInfo'
+      pre:
+        $ref: '#/definitions/common.ArticleBasePreload'
+    type: object
+  common.ArticleInfo:
+    properties:
+      collect_count:
+        type: integer
+      comment_count:
+        description: total number of comments on the video
+        type: integer
+      is_collect:
+        type: boolean
+      is_favorite:
+        description: true-Liked，false-did not like
+        type: boolean
+      like_count:
+        description: total number of likes for the video
+        type: integer
+      viewed_count:
+        type: integer
+    type: object
+  common.BaseResponse:
+    properties:
+      status_code:
+        description: status code, 0-success, other values-failure
+        type: integer
+      status_msg:
+        description: status description
+        type: string
+    type: object
+  common.UploadResponse:
+    properties:
+      fileUrl:
+        description: 文件存储的URL
+        type: string
+      status_code:
+        description: status code, 0-success, other values-failure
+        type: integer
+      status_msg:
+        description: status description
+        type: string
+    type: object
+  common.User:
+    properties:
+      base:
+        $ref: '#/definitions/common.UserBase'
+      follow_count:
+        description: total number of people the user follows
+        type: integer
+      follower_count:
+        description: total number of fans
+        type: integer
+      is_follow:
+        description: whether the currently logged-in user follows this user
+        type: boolean
+      total_favorited:
+        description: number of articles for articles published by user
+        type: integer
+      work_count:
+        description: number of articles published by user
+        type: integer
+    type: object
+  common.UserBase:
+    properties:
+      hashId:
+        type: string
+      id:
+        description: user id
+        type: integer
+      name:
+        description: user name
+        type: string
+      profile:
+        $ref: '#/definitions/common.UserProfile'
+    type: object
+  common.UserProfile:
+    properties:
+      avatar:
+        description: user avatar URL
+        type: string
+      background_image:
+        description: image at the top of the user's personal page
+        type: string
+      signature:
+        description: user profile
+        type: string
+    type: object
+  favorite.FavoriteActionRequest:
+    properties:
+      aHashID:
+        type: string
+      actionType:
+        description: 1-like, 2-unlike ,3-nor like,nor unlike
+        type: integer
+      cHashID:
+        type: string
+    type: object
+  favorite.FavoriteActionResponse:
+    properties:
+      status_code:
+        description: 0 - success, other values - failure
+        type: integer
+      status_msg:
+        description: status description
+        type: string
+    type: object
+  publish.ActionRequest:
+    properties:
+      aHashID:
+        type: string
+    type: object
+  publish.ActionResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  publish.ArticleResponse:
+    properties:
+      article:
+        $ref: '#/definitions/common.Article'
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  publish.CardsResponse:
+    properties:
+      List:
+        items:
+          $ref: '#/definitions/common.ArticleCard'
+        type: array
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  publish.CreateActionRequest:
+    properties:
+      payload:
+        $ref: '#/definitions/common.ArticleBase'
+    type: object
+  publish.CreateActionResponse:
+    properties:
+      AHashId:
+        type: string
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  publish.DelActionRequest:
+    properties:
+      aHashID:
+        description: 文章的hashid
+        type: string
+    type: object
+  publish.ModifyActionRequest:
+    properties:
+      aHashID:
+        description: 文章的hashid
+        type: string
+      payload:
+        $ref: '#/definitions/common.ArticleBase'
+    type: object
+  relation.RelationActionRequest:
+    properties:
+      action_type:
+        description: 1-Follow, 2-Unfollow
+        type: integer
+      to_user_id:
+        type: string
+    type: object
+  relation.RelationActionResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  relation.RelationFollowListResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+      user_list:
+        description: User information list
+        items:
+          $ref: '#/definitions/common.User'
+        type: array
+    type: object
+  user.UserActionProfileModifyRequest:
+    properties:
+      user_profile:
+        $ref: '#/definitions/common.UserProfile'
+    type: object
+  user.UserActionPwdModifyRequest:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+      username:
+        type: string
+    type: object
+  user.UserActionRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  user.UserActionResponse:
+    properties:
+      UHashId:
+        type: string
+      UserId:
+        description: user id
+        type: integer
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+    type: object
+  user.UserResponse:
+    properties:
+      status_code:
+        type: integer
+      status_msg:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/common.User'
+        description: User Info
+    type: object
+host: localhost:18005
+info:
+  contact:
+    name: hertz-contrib
+    url: https://github.com/hertz-contrib
+  description: This is a demo using Hertz.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: blog_server tests
+  version: "1.0"
+paths:
+  /blog_server/collect/action:
+    post:
+      consumes:
+      - application/json
+      description: Allows a user to collect an item (e.g., an article or post).
+      parameters:
+      - description: Request body for collecting an item
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/collect.CollectActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/collect.CollectActionResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 对文章进行收藏或者取消收藏
+      tags:
+      - 文章收藏
+  /blog_server/comment/action:
+    delete:
+      consumes:
+      - application/json
+      description: 删除博文中的评论
+      parameters:
+      - description: 删除评论请求
+        in: body
+        name: CommentDelActionRequest
+        required: true
+        schema:
+          $ref: '#/definitions/comment.CommentDelActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 评论成功删除
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "400":
+          description: 无效的请求
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 删除评论
+      tags:
+      - 评论
+    post:
+      consumes:
+      - application/json
+      description: 向博文添加新评论
+      parameters:
+      - description: 新增评论请求
+        in: body
+        name: CommentActionRequest
+        required: true
+        schema:
+          $ref: '#/definitions/comment.CommentActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 评论成功添加
+          schema:
+            $ref: '#/definitions/comment.CommentActionResponse'
+        "400":
+          description: 无效的请求
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 新增评论
+      tags:
+      - 评论
+  /blog_server/comment/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取博文的评论列表
+      parameters:
+      - in: query
+        name: AHashId
+        type: string
+      - in: query
+        name: CHashId
+        type: string
+      - description: 1:请求一级评论 2：请求二级评论
+        in: query
+        name: Type
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功获取评论列表
+          schema:
+            $ref: '#/definitions/comment.CommentListResponse'
+        "400":
+          description: 无效的请求
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 获取评论列表
+      tags:
+      - 评论
+  /blog_server/favorite/action/article:
+    post:
+      consumes:
+      - application/json
+      description: Allows a user to favorite an article.
+      parameters:
+      - description: Request body for favoriting an article
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/favorite.FavoriteActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/favorite.FavoriteActionResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 对文章进行点赞或者踩
+      tags:
+      - 点赞或者踩
+  /blog_server/favorite/action/comment:
+    post:
+      consumes:
+      - application/json
+      description: Allows a user to comment on a favorite item.
+      parameters:
+      - description: Request body for commenting on a favorite
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/favorite.FavoriteActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success response
+          schema:
+            $ref: '#/definitions/favorite.FavoriteActionResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 对评论进行点赞或者踩
+      tags:
+      - 点赞或者踩
+  /blog_server/publish/action:
+    delete:
+      consumes:
+      - application/json
+      description: 用户可以通过此接口删除一篇文章
+      parameters:
+      - description: 文章删除请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/publish.DelActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应
+          schema:
+            $ref: '#/definitions/publish.ActionResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 删除文章
+      tags:
+      - 文章管理
+    patch:
+      consumes:
+      - application/json
+      description: 用户可以通过此接口修改一篇文章
+      parameters:
+      - description: 文章修改请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/publish.ModifyActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应
+          schema:
+            $ref: '#/definitions/publish.ActionResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 修改文章
+      tags:
+      - 文章管理
+    post:
+      consumes:
+      - application/json
+      description: 用户可以通过此接口发表一篇文章
+      parameters:
+      - description: 文章创建请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/publish.CreateActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应
+          schema:
+            $ref: '#/definitions/publish.CreateActionResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 发表文章
+      tags:
+      - 文章管理
+  /blog_server/publish/detail:
+    get:
+      consumes:
+      - application/json
+      description: 用户可以通过此接口获取某篇文章的详细信息
+      parameters:
+      - description: 文章的hashid
+        in: query
+        name: AHashID
+        type: string
+      - in: query
+        name: UHashID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应，返回文章详情
+          schema:
+            $ref: '#/definitions/publish.ArticleResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 获取文章详情
+      tags:
+      - 文章管理
+  /blog_server/publish/list:
+    get:
+      consumes:
+      - application/json
+      description: 用户可以通过此接口获取文章列表
+      parameters:
+      - in: query
+        name: Offset
+        type: integer
+      - description: 如果id为0，则根据时间的先后去请求文章列表
+        in: query
+        name: UHashID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应，返回文章列表
+          schema:
+            $ref: '#/definitions/publish.CardsResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 获取文章列表
+      tags:
+      - 文章管理
+  /blog_server/publish/view_add:
+    post:
+      consumes:
+      - application/json
+      description: 用户可以通过此接口增加某篇文章的阅读数
+      parameters:
+      - description: 文章阅读数增加请求参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/publish.ActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应
+          schema:
+            $ref: '#/definitions/publish.ActionResponse'
+        "400":
+          description: 请求参数错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: 服务器内部错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 增加文章阅读数
+      tags:
+      - 文章管理
+  /blog_server/relation/action:
+    post:
+      consumes:
+      - application/json
+      description: 用户对其他用户进行关注或取消关注
+      parameters:
+      - description: RelationAction请求参数
+        in: body
+        name: relation
+        required: true
+        schema:
+          $ref: '#/definitions/relation.RelationActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应，包含状态码和状态信息
+          schema:
+            $ref: '#/definitions/relation.RelationActionResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 关注/取消关注
+      tags:
+      - 用户关系
+  /blog_server/relation/follow/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定用户的关注列表
+      parameters:
+      - description: 用户ID
+        in: query
+        name: UhashID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应，包含状态码、状态信息和用户列表
+          schema:
+            $ref: '#/definitions/relation.RelationFollowListResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 获取关注列表
+      tags:
+      - 用户关系
+  /blog_server/relation/follower/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定用户的粉丝列表
+      parameters:
+      - description: 用户ID
+        in: query
+        name: UhashID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功响应，包含状态码、状态信息和用户列表
+          schema:
+            $ref: '#/definitions/relation.RelationFollowListResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 获取粉丝列表
+      tags:
+      - 用户关系
+  /blog_server/user:
+    get:
+      consumes:
+      - application/json
+      description: 根据用户请求获取对应的用户信息
+      parameters:
+      - description: 用户ID
+        in: query
+        name: UHashID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功获取用户信息
+          schema:
+            $ref: '#/definitions/user.UserResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 获取用户信息
+      tags:
+      - 用户相关接口
+  /blog_server/user/login:
+    post:
+      consumes:
+      - application/json
+      description: 用户通过提供用户名和密码登录账户
+      parameters:
+      - description: 用户登录请求参数
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功返回用户ID及状态信息
+          schema:
+            $ref: '#/definitions/user.UserActionResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 用户登录
+      tags:
+      - 用户相关接口
+  /blog_server/user/profile_modify:
+    post:
+      consumes:
+      - application/json
+      description: 用户通过上传新的头像，背景图片，或者更改用户签名来进行修改资料
+      parameters:
+      - description: 用户修改资料请求参数
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserActionProfileModifyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功返回用户ID及状态信息
+          schema:
+            $ref: '#/definitions/user.UserActionResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 用户修改资料
+      tags:
+      - 用户相关接口
+  /blog_server/user/pwd_modify:
+    post:
+      consumes:
+      - application/json
+      description: 用户通过提供用户名，旧密码，新密码进行修改账户密码
+      parameters:
+      - description: 用户修改密码请求参数
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserActionPwdModifyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功返回用户ID及状态信息
+          schema:
+            $ref: '#/definitions/user.UserActionResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 用户修改密码
+      tags:
+      - 用户相关接口
+  /blog_server/user/register:
+    post:
+      consumes:
+      - application/json
+      description: 用户通过提供用户名和密码注册账户
+      parameters:
+      - description: 用户注册请求参数
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserActionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功返回用户ID及状态信息
+          schema:
+            $ref: '#/definitions/user.UserActionResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 用户注册
+      tags:
+      - 用户相关接口
+  /ping:
+    get:
+      description: 测试服务器连接
+      produces:
+      - application/json
+      responses: {}
+      summary: 测试服务器连接
+      tags:
+      - Ping
+  /upload/file:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 用户可以通过该接口上传文件
+      parameters:
+      - description: 上传的文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: 上传的类型，是头像还是背景图片
+        in: formData
+        name: file_type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功返回文件信息
+          schema:
+            $ref: '#/definitions/common.UploadResponse'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/common.BaseResponse'
+      summary: 上传文件
+      tags:
+      - 文件上传接口
+schemes:
+- http
+swagger: "2.0"

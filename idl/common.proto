@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+option go_package = "hertz/common";
+import "api.proto";
+message UserProfile{
+  string avatar = 1; // user avatar URL
+  string background_image =2; // image at the top of the user's personal page
+  string signature = 3; // user profile
+}
+
+message User {
+  int64 follow_count = 1; // total number of people the user follows
+  int64 follower_count = 2; // total number of fans
+  bool is_follow = 3; // whether the currently logged-in user follows this user
+  int64 total_favorited = 4; // number of articles for articles published by user
+  int64 work_count = 5; // number of articles published by user
+  UserBase base=6;
+}
+
+message UserBase{
+  int64 id = 1; // user id
+  string name = 2; // user name
+  string hashId=3;
+  UserProfile profile =4;
+}
+
+message ArticleBasePreload{
+  string note=1;
+  string title=2;
+  string cover_url=3;
+}
+
+message ArticleBase{
+  ArticleBasePreload preload=1;
+  string content=3;
+}
+
+message ArticleInfo{
+  int64 like_count = 1; // total number of likes for the video
+  int64 comment_count = 2; // total number of comments on the video
+  bool is_favorite = 3; // true-Liked，false-did not like
+  int64 collect_count = 4;
+  int64 viewed_count=5;
+  bool is_collect=6;
+}
+
+message ArticleCard{
+  int64 id=1;
+  ArticleInfo info=2;
+  ArticleBasePreload pre=3;
+  UserBase author = 4; // author information
+  string hashId=5;
+}
+
+message Article {
+  int64 id = 1; // video id
+  User author = 2; // author information
+  ArticleInfo info=3;
+  ArticleBase base=4;
+  string hashId=5;
+}
+
+message BaseResponse{
+  int32 status_code = 1[(api.go_tag)='json:"status_code"']; // status code, 0-success, other values-failure
+  string status_msg = 2; // status description
+}
+
+// 文件上传响应消息
+message UploadResponse {
+  int32 status_code = 1[(api.go_tag)='json:"status_code"']; // status code, 0-success, other values-failure
+  string status_msg = 2; // status description
+  string fileUrl = 3;  // 文件存储的URL
+}

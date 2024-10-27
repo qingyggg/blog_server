@@ -1,0 +1,4 @@
+pkg/data
+hlog
+cmd
+pkg/configs/minio/certs
