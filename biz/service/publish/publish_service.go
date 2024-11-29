@@ -164,15 +164,15 @@ func (s *PublishService) PublishDelete(req *publish.DelActionRequest) (err error
 	return nil
 }
 
-func (s *PublishService) PublishDetail(req *publish.DetailRequest) (aA *common.Article, err error) {
-	aA = new(common.Article)
-	aA.Info = new(common.ArticleInfo)
+func (s *PublishService) PublishDetail(req *publish.DetailRequest) (*common.Article, error) {
+	aA := new(common.Article)
+	aInfo := new(common.ArticleInfo)
 	//1.get article data from db
-	if err = s.publishDetail(req.AHashID, aA); err != nil {
+	if err := s.publishDetail(req.AHashID, aA); err != nil {
 		return nil, err
 	}
 	var wg sync.WaitGroup
-	var mu sync.RWMutex
+	var mu sync.Mutex
 	var errChan = make(chan error, 6)
 	wg.Add(6)
 	//defer close(errChan)
@@ -198,7 +198,7 @@ func (s *PublishService) PublishDetail(req *publish.DetailRequest) (aA *common.A
 			return
 		}
 		mu.Lock()
-		aA.Info.LikeCount = ct
+		aInfo.LikeCount = ct
 		mu.Unlock()
 	}()
 	//3.comment count
@@ -210,7 +210,7 @@ func (s *PublishService) PublishDetail(req *publish.DetailRequest) (aA *common.A
 			return
 		}
 		mu.Lock()
-		aA.Info.CommentCount = ct
+		aInfo.CommentCount = ct
 		mu.Unlock()
 	}()
 	//collect count
@@ -222,7 +222,7 @@ func (s *PublishService) PublishDetail(req *publish.DetailRequest) (aA *common.A
 			return
 		}
 		mu.Lock()
-		aA.Info.CollectCount = count
+		aInfo.CollectCount = count
 		mu.Unlock()
 	}()
 	//view count
@@ -234,7 +234,7 @@ func (s *PublishService) PublishDetail(req *publish.DetailRequest) (aA *common.A
 			return
 		}
 		mu.Lock()
-		aA.Info.ViewedCount = count
+		aInfo.ViewedCount = count
 		mu.Unlock()
 	}()
 	//if token exists:
@@ -268,11 +268,11 @@ func (s *PublishService) PublishDetail(req *publish.DetailRequest) (aA *common.A
 			} else {
 				faEx = false
 			}
-			aA.Info.IsFavorite = faEx
-			aA.Info.IsCollect = colEx
+			aInfo.IsFavorite = faEx
+			aInfo.IsCollect = colEx
 		} else {
-			aA.Info.IsFavorite = false
-			aA.Info.IsCollect = false
+			aInfo.IsFavorite = false
+			aInfo.IsCollect = false
 		}
 	}()
 
@@ -286,6 +286,7 @@ func (s *PublishService) PublishDetail(req *publish.DetailRequest) (aA *common.A
 			return nil, err
 		}
 	}
+	aA.Info = aInfo
 	return aA, nil
 }
 
@@ -327,7 +328,6 @@ func (s *PublishService) PublishList(req *publish.CardsRequest) (cards []*common
 	var CoMap map[string]int64        //收藏数量
 	var errChan = make(chan error, 5)
 	defer close(errChan)
-	wg.Add(5)
 	//1.请求文章信息
 	aInfos, err := db.GetArticleInfos(req.UHashID, int(req.Offset))
 	if err != nil {
@@ -337,6 +337,7 @@ func (s *PublishService) PublishList(req *publish.CardsRequest) (cards []*common
 		aHashIds = append(aHashIds, utils.ConvertByteHashToString(v.HashID))
 		uids = append(uids, utils.ConvertByteHashToString(v.UserID))
 	}
+	wg.Add(5)
 	//2.请求作者信息
 	go func() {
 		defer wg.Done()
@@ -387,6 +388,7 @@ func (s *PublishService) PublishList(req *publish.CardsRequest) (cards []*common
 		}
 		CoMap = coMap
 	}()
+
 	wg.Wait()
 	select {
 	case err := <-errChan:
@@ -401,11 +403,11 @@ func (s *PublishService) PublishList(req *publish.CardsRequest) (cards []*common
 		cur = &common.ArticleCard{
 			Id:     info.ID,
 			HashId: aHashIds[idx],
-			Author: service.UserAssign(UMap[utils.ConvertByteHashToString(info.UserID)]),
+			Author: service.NewUserService(s.ctx, s.c).UserAssign(UMap[utils.ConvertByteHashToString(info.UserID)]),
 			Pre: &common.ArticleBasePreload{
 				Title:    info.Title,
 				Note:     info.Note,
-				CoverUrl: info.CoverURL,
+				CoverUrl: utils.URLconvert(s.ctx, s.c, info.CoverURL),
 			},
 			Info: &common.ArticleInfo{
 				LikeCount:    AfMap[aHashIds[idx]],

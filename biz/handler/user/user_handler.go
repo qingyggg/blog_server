@@ -8,7 +8,6 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	user "github.com/qingyggg/blog_server/biz/model/hertz/basic/user"
 	"github.com/qingyggg/blog_server/biz/mw/jwt"
-	service_utils "github.com/qingyggg/blog_server/biz/service"
 	service "github.com/qingyggg/blog_server/biz/service/user"
 	"github.com/qingyggg/blog_server/pkg/errno"
 	"github.com/qingyggg/blog_server/pkg/utils"
@@ -183,7 +182,7 @@ func UserProfileModify(ctx context.Context, c *app.RequestContext) {
 		utils.ErrResp(c, err)
 		return
 	}
-	err = service.NewUserService(ctx, c).UserProfileModify(req)
+	err, uHashId, uid := service.NewUserService(ctx, c).UserProfileModify(req)
 	if err != nil {
 		utils.ErrResp(c, err)
 		return
@@ -191,6 +190,7 @@ func UserProfileModify(ctx context.Context, c *app.RequestContext) {
 	c.JSON(consts.StatusOK, user.UserActionResponse{
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
-		UserId:     service_utils.GetUid(c),
+		UHashId:    uHashId,
+		UserId:     uid,
 	})
 }

@@ -120,7 +120,7 @@ func ViewCountDel(ahashId string) error {
 	return err
 }
 
-// StartPeriodicSyncForViewCt 定期任务，每 5 分钟将 Redis 中的view count数据同步到 MySQL
+// StartPeriodicSyncForViewCt 定期任务，每 10 分钟将 Redis 中的view count数据同步到 MySQL
 func StartPeriodicSyncForViewCt() {
 	var vrdb redis.View
 	var va = query.ArticleView

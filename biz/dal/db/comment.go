@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	mymongo "github.com/qingyggg/blog_server/biz/mw/mongo"
 	"github.com/qingyggg/blog_server/biz/mw/redis"
 	"github.com/qingyggg/blog_server/pkg/errno"
@@ -245,10 +246,7 @@ func GetCommentListByTopCommentID(ctx context.Context, aHashId string, cHashId s
 		if err := cursor.Decode(item); err != nil {
 			return nil, err
 		}
-		if item.DescendantID != cHashId {
-			cids = append(cids, item.DescendantID)
-		}
-
+		cids = append(cids, item.DescendantID)
 	}
 	//根据cids去请求评论列表
 	var firstList []*mymongo.Comment
@@ -264,7 +262,9 @@ func GetCommentListByTopCommentID(ctx context.Context, aHashId string, cHashId s
 			return nil, err
 		}
 		uMaps[item.HashID] = item.UserID
-		firstList = append(firstList, item)
+		if item.HashID != cHashId {
+			firstList = append(firstList, item)
+		}
 	}
 	for _, v := range firstList {
 		cmtList = append(cmtList, &mymongo.CommentItem{
@@ -280,7 +280,7 @@ func GetCommentListByTopCommentID(ctx context.Context, aHashId string, cHashId s
 	return cmtList, nil
 }
 
-// GetCommentByTopCmtID 根据comment hashid 获取评论
+// GetCommentByCmtID GetCommentByTopCmtID 根据comment hashid 获取评论
 func GetCommentByCmtID(ctx context.Context, cHashId string) (cmt *mymongo.Comment, err error) {
 	cmt = new(mymongo.Comment)
 	//挑选某一个顶级评论
@@ -313,10 +313,6 @@ func GetCmtCtByAids(ctx context.Context, aHashIds []string) (error, map[string]i
 	var aidInCache []string // 存在于缓存里的aHashId:count
 	var aidInNoCache []string
 	var resMap = make(map[string]int64) // 初始化结果map
-	var wg sync.WaitGroup
-	var mu sync.Mutex              // 用于保护resMap的并发写入
-	errChan := make(chan error, 2) // 处理错误的channel
-	defer close(errChan)
 	// 遍历输入的aHashIds，检查每个ID是否存在于缓存中
 	for _, v := range aHashIds {
 		err, exist := rdComment.CheckCommentCt(v)
@@ -330,87 +326,57 @@ func GetCmtCtByAids(ctx context.Context, aHashIds []string) (error, map[string]i
 		}
 	}
 
-	wg.Add(2) // 启动两个goroutine
-
 	// 从缓存中获取点赞数的goroutine
-	go func() {
-		defer wg.Done()
-		for _, v := range aidInCache {
-			err, count := rdComment.CountComment(v)
-			if err != nil {
-				errChan <- err
-				return
-			}
-			mu.Lock()
-			resMap[v] = count
-			mu.Unlock()
-		}
-	}()
-	// 查询MongoDB数据库并将结果同步到Redis的goroutine
-	go func() {
-		defer wg.Done()
-		if len(aidInNoCache) > 0 {
-			pipeline := []bson.M{
-				{
-					"$match": bson.M{"article_id": bson.M{"$in": aidInNoCache}}, // 匹配祖先ID在给定列表中的记录
-				},
-				{
-					"$group": bson.M{
-						"_id":   "$article_id",     // 按祖先ID分组
-						"count": bson.M{"$sum": 1}, // 统计每组的数量
-					},
-				},
-				{
-					"$addFields": bson.M{
-						//添加两个新字段,它的值分别为分组字段的值
-						"article_id": "$article_id",
-					},
-				},
-			}
-
-			// 执行聚合查询
-			cursor, err := mymongo.CommentCol.Aggregate(ctx, pipeline)
-			if err != nil {
-				errChan <- err
-				return
-			}
-			defer cursor.Close(ctx)
-
-			// 解析聚合结果,缓存进redis
-			fpipe := rdComment.GetCommentClient().TxPipeline()
-			for cursor.Next(ctx) {
-				// 查询Mongo
-				var item struct {
-					_id       string
-					Count     int64
-					ArticleId string
-				}
-				if err := cursor.Decode(&item); err != nil {
-					errChan <- err
-					return
-				}
-				mu.Lock()
-				resMap[item._id] = item.Count
-				mu.Unlock()
-				fpipe.Set(item._id+redis.CommentCountSuffix, item.Count, redis.ExpireTime)
-			}
-			// 执行事务
-			_, err = fpipe.Exec()
-			if err != nil {
-				errChan <- err
-				return
-			}
-		}
-	}()
-	wg.Wait()
-	// 检查是否有错误发生
-	select {
-	case err := <-errChan:
+	for _, v := range aidInCache {
+		err, count := rdComment.CountComment(v)
 		if err != nil {
 			return err, nil
 		}
-	default:
+		resMap[v] = count
 	}
+
+	// 查询MongoDB数据库并将结果同步到Redis的goroutine
+	if len(aidInNoCache) > 0 {
+		pipeline := []bson.M{
+			{
+				"$match": bson.M{
+					"article_id": bson.M{"$in": aidInNoCache}, // 匹配 article_id 在给定列表中的记录
+				},
+			},
+			{
+				"$group": bson.M{
+					"_id":   "$article_id",     // 按 article_id 分组
+					"count": bson.M{"$sum": 1}, // 统计每组的记录数
+				},
+			},
+		}
+
+		// 执行聚合查询
+		cursor, err := mymongo.CommentCol.Aggregate(ctx, pipeline)
+		if err != nil {
+			return err, nil
+		}
+		defer cursor.Close(ctx)
+
+		// 解析聚合结果,缓存进redis
+		fpipe := rdComment.GetCommentClient().TxPipeline()
+		for cursor.Next(ctx) {
+			// 查询Mongo
+			item := make(map[string]interface{})
+			if err := cursor.Decode(&item); err != nil {
+				return err, nil
+			}
+			fmt.Println(item)
+			resMap[item["_id"].(string)] = int64(item["count"].(int32))
+			fpipe.Set(item["_id"].(string)+redis.CommentCountSuffix, int64(item["count"].(int32)), redis.ExpireTime)
+		}
+		// 执行事务
+		_, err = fpipe.Exec()
+		if err != nil {
+			return err, nil
+		}
+	}
+
 	//这里如果缓存和MongoDB都没有查找到comment count，
 	//说明这篇文章并没有被评论过，所以默认赋值为0
 	for _, v := range aHashIds {

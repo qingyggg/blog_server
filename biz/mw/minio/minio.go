@@ -45,6 +45,7 @@ func PutToBucket(ctx context.Context, bucketName string, file *multipart.FileHea
 func GetObjURL(ctx context.Context, bucketName, filename string) (u *url.URL, err error) {
 	exp := time.Hour * 24
 	reqParams := make(url.Values)
+	reqParams.Set("Host", "api.marisa.site")
 	u, err = Client.PresignedGetObject(ctx, bucketName, filename, exp, reqParams)
 	return u, err
 }

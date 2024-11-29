@@ -7,14 +7,14 @@ import (
 )
 
 // UserAssign: convert orm_gen.User to common.UserBase
-func UserAssign(payload *orm_gen.User) *common.UserBase {
+func (s *UserService) UserAssign(payload *orm_gen.User) *common.UserBase {
 	base := &common.UserBase{
 		Id:     payload.ID,
 		Name:   payload.UserName,
 		HashId: utils.ConvertByteHashToString(payload.HashID),
 		Profile: &common.UserProfile{
-			Avatar:          payload.Avatar,
-			BackgroundImage: payload.BackgroundImage,
+			Avatar:          utils.URLconvert(s.ctx, s.c, payload.Avatar),
+			BackgroundImage: utils.URLconvert(s.ctx, s.c, payload.BackgroundImage),
 			Signature:       payload.Signature,
 		},
 	}
