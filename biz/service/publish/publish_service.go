@@ -228,10 +228,20 @@ func (s *PublishService) PublishDetail(req *publish.DetailRequest) (*common.Arti
 	//view count
 	go func() {
 		defer wg.Done()
-		err, count := db.ViewCountGet(req.AHashID)
+		var count int64
+		err, exist := db.ViewCountExist(req.AHashID)
 		if err != nil {
 			errChan <- err
 			return
+		}
+		if exist {
+			err, count = db.ViewCountGet(req.AHashID)
+			if err != nil {
+				errChan <- err
+				return
+			}
+		} else {
+			count = 0
 		}
 		mu.Lock()
 		aInfo.ViewedCount = count

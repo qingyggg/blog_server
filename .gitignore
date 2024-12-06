@@ -36,3 +36,5 @@ _testmain.go
 /pkg/data
 *.local.yml
 dumped_hertz_remote_config.json
+*.pem
+blog_server
