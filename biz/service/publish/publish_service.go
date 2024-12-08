@@ -82,10 +82,11 @@ func (s *PublishService) PublishModify(req *publish.ModifyActionRequest) (err er
 		return err
 	}
 	_, err = db.ModifyArticle(&orm_gen.Article{
-		UserID: user.HashID,
-		HashID: utils.ConvertStringHashToByte(req.AHashID),
-		Title:  req.Payload.Preload.Title,
-		Note:   req.Payload.Preload.Note,
+		UserID:   user.HashID,
+		HashID:   utils.ConvertStringHashToByte(req.AHashID),
+		Title:    req.Payload.Preload.Title,
+		Note:     req.Payload.Preload.Note,
+		CoverURL: req.Payload.Preload.CoverUrl,
 	}, req.Payload.Content)
 	return err
 }
