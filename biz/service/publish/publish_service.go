@@ -86,7 +86,7 @@ func (s *PublishService) PublishModify(req *publish.ModifyActionRequest) (err er
 		HashID:   utils.ConvertStringHashToByte(req.AHashID),
 		Title:    req.Payload.Preload.Title,
 		Note:     req.Payload.Preload.Note,
-		CoverURL: req.Payload.Preload.CoverUrl,
+		CoverURL: utils.UrlConvertReverse(s.ctx, req.Payload.Preload.CoverUrl),
 	}, req.Payload.Content)
 	return err
 }
