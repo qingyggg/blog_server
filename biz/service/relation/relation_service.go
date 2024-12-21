@@ -13,7 +13,7 @@ import (
 	"github.com/qingyggg/blog_server/pkg/utils"
 )
 
-var (
+const (
 	FOLLOW    int32 = 1
 	UNFOLLOW  int32 = 2
 	FOLLOWING int32 = 1
@@ -41,12 +41,9 @@ func (s *RelationService) FollowAction(req *relation.RelationActionRequest) erro
 	}
 	//2.check param user id != to user id,action type==1 or 2
 	//获取用户hashid
-	user, err := db.QueryUserById(service_utils.GetUid(s.c))
-	if err != nil {
-		return err
-	}
-	curUidByte := user.HashID
-	curUid := utils.ConvertByteHashToString(curUidByte)
+
+	curUid := service_utils.GetUHashId(s.c)
+	curUidByte := utils.ConvertStringHashToByte(curUid)
 	followedId := req.UhashID
 	followedIdByte := utils.ConvertStringHashToByte(req.UhashID)
 

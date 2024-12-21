@@ -13,6 +13,7 @@ var (
 	rdbFavorite *redis.Client
 	rdbComment  *redis.Client
 	rdbView     *redis.Client
+	rdbUser     *redis.Client
 )
 
 func InitRedis() {
@@ -35,5 +36,10 @@ func InitRedis() {
 		Addr:     constants.RedisAddr,
 		Password: constants.RedisPassword,
 		DB:       3,
+	})
+	rdbUser = redis.NewClient(&redis.Options{
+		Addr:     constants.RedisAddr,
+		Password: constants.RedisPassword,
+		DB:       4,
 	})
 }

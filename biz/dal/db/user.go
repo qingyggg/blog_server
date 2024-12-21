@@ -127,9 +127,9 @@ func UserPwdModify(uid int64, new_pwd string) error {
 	return nil
 }
 
-func UserProfileModify(user_id int64, payload map[string]interface{}) error {
+func UserProfileModify(uHashId string, payload map[string]interface{}) error {
 	var u = query.User
-	_, err := u.Where(u.ID.Eq(user_id)).Updates(payload)
+	_, err := u.Where(u.HashID.Eq(utils.ConvertStringHashToByte(uHashId))).Updates(payload)
 	return err //err =err or err=nil
 }
 

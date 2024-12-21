@@ -7,7 +7,6 @@ import (
 	"github.com/qingyggg/blog_server/biz/model/hertz/interact/collect"
 	service_utils "github.com/qingyggg/blog_server/biz/service"
 	"github.com/qingyggg/blog_server/pkg/errno"
-	"github.com/qingyggg/blog_server/pkg/utils"
 )
 
 type CollectService struct {
@@ -28,12 +27,7 @@ func (c *CollectService) ACollectAction(req *collect.CollectActionRequest) error
 	if !exist {
 		return errno.ArticleIsNotExistErr
 	}
-	uid := service_utils.GetUid(c.c)
-	user, err := db.QueryUserById(uid)
-	if err != nil {
-		return err
-	}
-	uHashId := utils.ConvertByteHashToString(user.HashID)
+	uHashId := service_utils.GetUHashId(c.c)
 	err, exist = db.ACollectExist(req.AHashId, uHashId)
 	if err != nil {
 		return err

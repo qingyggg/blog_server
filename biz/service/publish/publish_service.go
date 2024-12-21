@@ -13,7 +13,6 @@ import (
 	"github.com/qingyggg/blog_server/pkg/constants"
 	"github.com/qingyggg/blog_server/pkg/errno"
 	"github.com/qingyggg/blog_server/pkg/utils"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -29,26 +28,24 @@ func NewPublishService(ctx context.Context, c *app.RequestContext) *PublishServi
 }
 
 func (s *PublishService) PublishCreate(req *publish.CreateActionRequest) (err error, aHashId string) {
-	uid := service_utils.GetUid(s.c)
-	user, err := db.QueryUserById(uid)
-	if err != nil {
-		return err, ""
-	}
+	uHashId := service_utils.GetUHashId(s.c)
+
 	var coverUrl string
 	if req.Payload.Preload.CoverUrl == "" {
 		coverUrl = constants.TestBackground
 	} else {
 		coverUrl = utils.UrlConvertReverse(s.ctx, req.Payload.Preload.CoverUrl)
 	}
-	aHashId = utils.GetSHA256String(time.Now().String() + strconv.FormatInt(uid, 16))
+	aHashId = utils.GetSHA256String(time.Now().String() + uHashId)
 	//1.数据库创建记录
 	err = db.CreateArticle(&orm_gen.Article{
-		UserID:      user.HashID,
-		Title:       req.Payload.Preload.Title,
-		Note:        req.Payload.Preload.Note,
-		CoverURL:    coverUrl,
-		PublishTime: time.Now(),
-		HashID:      utils.ConvertStringHashToByte(aHashId),
+		UserID:       utils.ConvertStringHashToByte(uHashId),
+		Title:        req.Payload.Preload.Title,
+		Note:         req.Payload.Preload.Note,
+		CoverURL:     coverUrl,
+		PublishTime:  time.Now(),
+		LastModified: time.Now(),
+		HashID:       utils.ConvertStringHashToByte(aHashId),
 	}, req.Payload.Content)
 	if err != nil {
 		return err, ""
@@ -69,7 +66,7 @@ func (s *PublishService) PublishCreate(req *publish.CreateActionRequest) (err er
 }
 
 func (s *PublishService) PublishModify(req *publish.ModifyActionRequest) (err error) {
-	uid := service_utils.GetUid(s.c)
+	uHashId := service_utils.GetUHashId(s.c)
 	exist, err := db.CheckArticleExistByHashId(req.AHashID)
 	if err != nil {
 		return err
@@ -77,16 +74,14 @@ func (s *PublishService) PublishModify(req *publish.ModifyActionRequest) (err er
 	if !exist {
 		return errno.ArticleIsNotExistErr
 	}
-	user, err := db.QueryUserById(uid)
-	if err != nil {
-		return err
-	}
+
 	_, err = db.ModifyArticle(&orm_gen.Article{
-		UserID:   user.HashID,
-		HashID:   utils.ConvertStringHashToByte(req.AHashID),
-		Title:    req.Payload.Preload.Title,
-		Note:     req.Payload.Preload.Note,
-		CoverURL: utils.UrlConvertReverse(s.ctx, req.Payload.Preload.CoverUrl),
+		UserID:       utils.ConvertStringHashToByte(uHashId),
+		HashID:       utils.ConvertStringHashToByte(req.AHashID),
+		Title:        req.Payload.Preload.Title,
+		Note:         req.Payload.Preload.Note,
+		CoverURL:     utils.UrlConvertReverse(s.ctx, req.Payload.Preload.CoverUrl),
+		LastModified: time.Now(),
 	}, req.Payload.Content)
 	return err
 }
@@ -105,13 +100,8 @@ func (s *PublishService) PublishDelete(req *publish.DelActionRequest) (err error
 	go func() {
 		defer wg.Done()
 		//1.删除文章
-		uid := service_utils.GetUid(s.c)
-		user, err := db.QueryUserById(uid)
-		if err != nil {
-			errChan <- err
-			return
-		}
-		err = db.DeleteArticle(&orm_gen.Article{UserID: user.HashID, HashID: utils.ConvertStringHashToByte(req.AHashID)})
+		uHashId := service_utils.GetUHashId(s.c)
+		err = db.DeleteArticle(&orm_gen.Article{UserID: utils.ConvertStringHashToByte(uHashId), HashID: utils.ConvertStringHashToByte(req.AHashID)})
 		if err != nil {
 			errChan <- err
 			return
@@ -252,18 +242,12 @@ func (s *PublishService) PublishDetail(req *publish.DetailRequest) (*common.Arti
 	//is favorite,is collect
 	go func() {
 		defer wg.Done()
-		if uid := service_utils.GetUid(s.c); uid != 0 {
+		if uHashId := service_utils.GetUHashId(s.c); uHashId != "" {
 
 			var err error
 			var colEx bool
 			var faSig int32
 			var faEx bool
-			user, err := db.QueryUserById(uid)
-			if err != nil {
-				errChan <- err
-				return
-			}
-			uHashId := utils.ConvertByteHashToString(user.HashID)
 			err, colEx = db.ACollectExist(req.AHashID, uHashId)
 			if err != nil {
 				errChan <- err
@@ -321,7 +305,9 @@ func (s *PublishService) publishDetail(aHashId string, aA *common.Article) error
 			Note:     aInfo.Note,
 			CoverUrl: utils.URLconvert(s.ctx, s.c, aInfo.CoverURL),
 		},
-		Content: aContent,
+		Content:      aContent,
+		CreatedDate:  aInfo.PublishTime.Format("2006-01-02"),
+		LastModified: aInfo.LastModified.Format("2006-01-02"),
 	}
 	aA.Id = aInfo.ID
 	aA.HashId = utils.ConvertByteHashToString(aInfo.HashID)
@@ -426,6 +412,8 @@ func (s *PublishService) PublishList(req *publish.CardsRequest) (cards []*common
 				ViewedCount:  VMap[aHashIds[idx]],
 				CommentCount: CMap[aHashIds[idx]],
 			},
+			CreatedDate:  info.PublishTime.Format("2006-01-02"),
+			LastModified: info.LastModified.Format("2006-01-02"),
 		}
 		cards = append(cards, cur)
 	}

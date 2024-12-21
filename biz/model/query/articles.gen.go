@@ -33,6 +33,7 @@ func newArticle(db *gorm.DB, opts ...gen.DOOption) article {
 	_article.Note = field.NewString(tableName, "note")
 	_article.CoverURL = field.NewString(tableName, "cover_url")
 	_article.PublishTime = field.NewTime(tableName, "publish_time")
+	_article.LastModified = field.NewTime(tableName, "last_modified")
 	_article.HashID = field.NewBytes(tableName, "hash_id")
 
 	_article.fillFieldMap()
@@ -44,14 +45,15 @@ func newArticle(db *gorm.DB, opts ...gen.DOOption) article {
 type article struct {
 	articleDo
 
-	ALL         field.Asterisk
-	ID          field.Int64  // 文章ID
-	UserID      field.Bytes  // 作者ID
-	Title       field.String // 文章标题
-	Note        field.String // 文章小记
-	CoverURL    field.String // 背景图URL
-	PublishTime field.Time   // 发布时间戳
-	HashID      field.Bytes  // 文章的hashID值
+	ALL          field.Asterisk
+	ID           field.Int64  // 文章ID
+	UserID       field.Bytes  // 作者ID
+	Title        field.String // 文章标题
+	Note         field.String // 文章小记
+	CoverURL     field.String // 背景图URL
+	PublishTime  field.Time   // 发布时间戳
+	LastModified field.Time   // 最后一次修改的时间
+	HashID       field.Bytes  // 文章的hashID值
 
 	fieldMap map[string]field.Expr
 }
@@ -74,6 +76,7 @@ func (a *article) updateTableName(table string) *article {
 	a.Note = field.NewString(table, "note")
 	a.CoverURL = field.NewString(table, "cover_url")
 	a.PublishTime = field.NewTime(table, "publish_time")
+	a.LastModified = field.NewTime(table, "last_modified")
 	a.HashID = field.NewBytes(table, "hash_id")
 
 	a.fillFieldMap()
@@ -91,13 +94,14 @@ func (a *article) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (a *article) fillFieldMap() {
-	a.fieldMap = make(map[string]field.Expr, 7)
+	a.fieldMap = make(map[string]field.Expr, 8)
 	a.fieldMap["id"] = a.ID
 	a.fieldMap["user_id"] = a.UserID
 	a.fieldMap["title"] = a.Title
 	a.fieldMap["note"] = a.Note
 	a.fieldMap["cover_url"] = a.CoverURL
 	a.fieldMap["publish_time"] = a.PublishTime
+	a.fieldMap["last_modified"] = a.LastModified
 	a.fieldMap["hash_id"] = a.HashID
 }
 

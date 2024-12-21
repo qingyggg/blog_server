@@ -102,12 +102,9 @@ func (s *UserService) UserInfo(req *user.UserRequest) (*common.User, error) {
 	return s.GetUserInfo(queryUserId)
 }
 
-func (s *UserService) UserProfileModify(req *user.UserActionProfileModifyRequest) (error, string, int64) {
-	uid := service_utils.GetUid(s.c)
-	user, err := db.QueryUserById(uid)
-	if err != nil {
-		return err, "", 0
-	}
+func (s *UserService) UserProfileModify(req *user.UserActionProfileModifyRequest) (error, string) {
+	uHashId := service_utils.GetUHashId(s.c)
+
 	profile := map[string]interface{}{
 		"signature":        req.User.Signature,
 		"avatar":           utils.UrlConvertReverse(s.ctx, req.User.Avatar),
@@ -119,11 +116,11 @@ func (s *UserService) UserProfileModify(req *user.UserActionProfileModifyRequest
 			delete(profile, key)
 		}
 	}
-	err = db.UserProfileModify(uid, profile)
+	err := db.UserProfileModify(uHashId, profile)
 	if err != nil {
-		return err, "", 0
+		return err, ""
 	}
-	return nil, utils.ConvertByteHashToString(user.HashID), uid
+	return nil, uHashId
 }
 
 func (s *UserService) GetUserInfo(queryUHashId string) (*common.User, error) {
@@ -133,22 +130,15 @@ func (s *UserService) GetUserInfo(queryUHashId string) (*common.User, error) {
 	var wg sync.WaitGroup
 	wg.Add(4)
 
-	uid := service_utils.GetUid(s.c)
-	var isLoginedUser bool
+	uHashId := service_utils.GetUHashId(s.c)
 	if queryUHashId == "current" {
-		isLoginedUser = true
-	} else {
-		isLoginedUser = false
+		queryUHashId = uHashId
 	}
-
 	//判断请求的用户信息是否为登录的用户-->queryUHashId=='current'
 	var dbUser *orm_gen.User
 	var err error
-	if isLoginedUser {
-		dbUser, err = db.QueryUserById(uid)
-	} else {
-		dbUser, err = db.QueryUserByHashId(queryUHashId)
-	}
+
+	dbUser, err = db.QueryUserByHashId(queryUHashId)
 	if err != nil {
 		return nil, err
 	} else {
@@ -196,15 +186,6 @@ func (s *UserService) GetUserInfo(queryUHashId string) (*common.User, error) {
 
 	go func() {
 		defer wg.Done()
-		if isLoginedUser {
-			return
-		}
-		user, err := db.QueryUserById(uid)
-		if err != nil {
-			errChan <- err
-			return
-		}
-		uHashId := utils.ConvertByteHashToString(user.HashID)
 		if uHashId != queryUHashId {
 			IsFollow, err := db.QueryFollowExist(queryUHashId, uHashId)
 			if err != nil {

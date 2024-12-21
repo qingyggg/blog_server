@@ -7,7 +7,6 @@ import (
 	"github.com/qingyggg/blog_server/biz/model/hertz/interact/favorite"
 	service_utils "github.com/qingyggg/blog_server/biz/service"
 	"github.com/qingyggg/blog_server/pkg/errno"
-	"github.com/qingyggg/blog_server/pkg/utils"
 )
 
 type FavoriteService struct {
@@ -28,12 +27,7 @@ func (c *FavoriteService) CmtFavoriteAction(req *favorite.FavoriteActionRequest)
 	if !exist {
 		return errno.CommentIsNotExistErr
 	}
-	uid := service_utils.GetUid(c.c)
-	user, err := db.QueryUserById(uid)
-	if err != nil {
-		return err
-	}
-	uHashId := utils.ConvertByteHashToString(user.HashID)
+	uHashId := service_utils.GetUHashId(c.c)
 	err, exist = db.CmtFavorieExist(uHashId, req.CHashID)
 	if err != nil {
 		return err
@@ -69,12 +63,7 @@ func (c *FavoriteService) ArticleFavoriteAction(req *favorite.FavoriteActionRequ
 	if !exist {
 		return errno.ArticleIsNotExistErr
 	}
-	uid := service_utils.GetUid(c.c)
-	user, err := db.QueryUserById(uid)
-	if err != nil {
-		return err
-	}
-	uHashId := utils.ConvertByteHashToString(user.HashID)
+	uHashId := service_utils.GetUHashId(c.c)
 	err, exSignal := db.AFavoriteExist(req.AHashID, uHashId)
 	if err != nil {
 		return err

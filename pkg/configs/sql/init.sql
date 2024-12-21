@@ -55,6 +55,7 @@ CREATE TABLE `articles` (
                           `note`          TINYTEXT NOT NULL COMMENT '文章小记',
                           `cover_url`     TEXT NOT NULL COMMENT '背景图URL',
                           `publish_time`  timestamp NOT NULL COMMENT '发布时间戳',
+                          `last_modified` timestamp NOT NULL COMMENT '最后一次修改的时间',
                           `hash_id`          BINARY(32) NOT NULL UNIQUE COMMENT '文章的hashID值',
                           INDEX `userIdIdx` (`user_id`),
                           INDEX `userIdToHashIdIdx` (`user_id`, `hash_id`)

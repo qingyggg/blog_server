@@ -32,7 +32,9 @@ message ArticleBasePreload{
 
 message ArticleBase{
   ArticleBasePreload preload=1;
-  string content=3;
+  string created_date=2;
+  string last_modified=3;
+  string content=4;
 }
 
 message ArticleInfo{
@@ -50,6 +52,8 @@ message ArticleCard{
   ArticleBasePreload pre=3;
   UserBase author = 4; // author information
   string hashId=5;
+  string created_date=6;
+  string last_modified=7;
 }
 
 message Article {

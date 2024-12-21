@@ -49,12 +49,8 @@ func (c *CommentService) AddNewCmt(req *comment.CommentActionRequest) (error, st
 			return errno.CommentIsNotExistErr.WithMessage("您回复的评论不存在"), ""
 		}
 	}
-	uid := service_utils.GetUid(c.c)
-	user, err := db.QueryUserById(uid)
-	if err != nil {
-		return err, ""
-	}
-	UHashId := utils.ConvertByteHashToString(user.HashID)
+	UHashId := service_utils.GetUHashId(c.c)
+
 	cHashId := utils.GetSHA256String(req.AHashId + UHashId + strconv.FormatInt(int64(rand.Int()), 10) + time.Now().String())
 	err = db.AddNewComment(c.ctx, &mongo.Comment{
 		ArticleID: req.AHashId,
@@ -71,11 +67,8 @@ func (c *CommentService) AddNewCmt(req *comment.CommentActionRequest) (error, st
 }
 
 func (c *CommentService) DelCmt(req *comment.CommentDelActionRequest) error {
-	uid := service_utils.GetUid(c.c)
-	user, err := db.QueryUserById(uid)
-	if err != nil {
-		return err
-	}
+	uHashID := service_utils.GetUHashId(c.c)
+
 	exist, err := db.CheckCmtExistById(c.ctx, req.CHashId)
 	if err != nil {
 		return err
@@ -87,7 +80,7 @@ func (c *CommentService) DelCmt(req *comment.CommentDelActionRequest) error {
 	if err != nil {
 		return err
 	}
-	if cmt.UserID != utils.ConvertByteHashToString(user.HashID) {
+	if cmt.UserID != uHashID {
 		return errno.ServiceErr.WithMessage("当前用户没有权利删除该评论")
 	}
 	err = db.DelCommentByHashID(c.ctx, req.CHashId, req.AHashId)
@@ -134,11 +127,7 @@ func (c *CommentService) getCmtList(cmtList []*mongo.CommentItem, degree int32) 
 		uids = append(uids, cmt.UserID)
 		cids = append(cids, cmt.HashID)
 	}
-	curUid := service_utils.GetUid(c.c)
-	user, err := db.QueryUserById(curUid)
-	if err != nil {
-		return err, nil
-	}
+	uHashId := service_utils.GetUHashId(c.c)
 
 	go func() {
 		defer wg.Done()
@@ -151,7 +140,7 @@ func (c *CommentService) getCmtList(cmtList []*mongo.CommentItem, degree int32) 
 	}()
 	go func() {
 		defer wg.Done()
-		err, cInfoMaps := db.GetCmtFavoriteStatusMap(cids, utils.ConvertByteHashToString(user.HashID))
+		err, cInfoMaps := db.GetCmtFavoriteStatusMap(cids, uHashId)
 		if err != nil {
 			errChan <- err
 			return

@@ -182,7 +182,7 @@ func UserProfileModify(ctx context.Context, c *app.RequestContext) {
 		utils.ErrResp(c, err)
 		return
 	}
-	err, uHashId, uid := service.NewUserService(ctx, c).UserProfileModify(req)
+	err, uHashId := service.NewUserService(ctx, c).UserProfileModify(req)
 	if err != nil {
 		utils.ErrResp(c, err)
 		return
@@ -191,6 +191,5 @@ func UserProfileModify(ctx context.Context, c *app.RequestContext) {
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
 		UHashId:    uHashId,
-		UserId:     uid,
 	})
 }
