@@ -137,3 +137,11 @@ func CheckArticleExistByHashId(ahashId string) (bool, error) {
 		return false, nil
 	}
 }
+func TakeTitle(aHashId string) (string, error) {
+	var a = query.Article
+	article, err := a.Where(a.HashID.Eq(utils.ConvertStringHashToByte(aHashId))).Take()
+	if err != nil {
+		return "", err
+	}
+	return article.Title, nil
+}

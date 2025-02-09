@@ -5,8 +5,6 @@ import (
 	"strconv"
 )
 
-type User struct{}
-
 const (
 	uidSuffix = ":uid"
 )

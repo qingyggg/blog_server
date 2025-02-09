@@ -3,13 +3,94 @@
 package main
 
 import (
+	"context"
+	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
-	handler "github.com/qingyggg/blog_server/biz/handler"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/hertz-contrib/cors"
+	"github.com/hertz-contrib/swagger"
+	"github.com/qingyggg/blog_server/biz/handler"
+	"github.com/qingyggg/blog_server/biz/model/hertz/common"
+	"github.com/qingyggg/blog_server/biz/mw/jwt"
+	"github.com/qingyggg/blog_server/pkg/errno"
+	swaggerFiles "github.com/swaggo/files"
+	"time"
 )
+
+func JwtAuth() []app.HandlerFunc {
+	return []app.HandlerFunc{
+		jwt.JwtMiddleware.MiddlewareFunc(),
+	}
+}
+
+func Cors() []app.HandlerFunc {
+	return []app.HandlerFunc{
+		cors.New(cors.Config{
+			AllowOrigins:     []string{"https://127.0.0.1:5173"},
+			AllowMethods:     []string{"GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"},
+			AllowHeaders:     []string{"Origin"},
+			ExposeHeaders:    []string{"Content-Length"},
+			AllowCredentials: true,
+			AllowWebSockets:  true,
+			AllowOriginFunc: func(origin string) bool {
+				return origin == "https://127.0.0.1:5173"
+			},
+			MaxAge: 12 * time.Hour,
+		}),
+	}
+}
 
 // customizeRegister registers customize routers.
 func customizedRegister(r *server.Hertz) {
+	// ping
 	r.GET("/ping", handler.Ping)
+	//文件上传
 	r.POST("/upload/file", handler.FileUpload)
-	// your code ...
+	//oss
+	r.GET("/src/*name", minioReverseProxy)
+
+	//swagger
+	url := swagger.URL("http://localhost:18005/swagger/doc.json") // The url pointing to API definition
+	r.GET("/swagger/*any", swagger.WrapHandler(swaggerFiles.Handler, url))
+
+	//验证token
+	r.GET("/verifyToken", append(JwtAuth(), func(ctx context.Context, c *app.RequestContext) {
+		c.JSON(consts.StatusOK, &common.BaseResponse{
+			StatusCode: errno.SuccessCode,
+			StatusMsg:  errno.SuccessMsg,
+		})
+	})...)
+
+	//// Socket.IO 处理器（兼容 HTTP 和 WebSocket）
+	//r.POST("/socket.io/", func(c context.Context, ctx *app.RequestContext) {
+	//	if !socket.HertzCtxIsAssigned {
+	//		socket.HertzCtx = ctx
+	//		socket.HertzCtxIsAssigned = true
+	//	}
+	//	// 将 Hertz 的请求转换为标准库的 http.Request
+	//	req, err := adaptor.GetCompatRequest(&ctx.Request)
+	//	if err != nil {
+	//		utils.ErrResp(ctx, err)
+	//		return
+	//	}
+	//	// 将 Hertz 的响应转换为标准库的 http.ResponseWriter
+	//	rw := adaptor.GetCompatResponseWriter(&ctx.Response)
+	//
+	//	socket.Server.ServeHTTP(rw, req)
+	//})
+	//r.GET("/socket.io/", func(c context.Context, ctx *app.RequestContext) {
+	//	if !socket.HertzCtxIsAssigned {
+	//		socket.HertzCtx = ctx
+	//		socket.HertzCtxIsAssigned = true
+	//	}
+	//	// 将 Hertz 的请求转换为标准库的 http.Request
+	//	req, err := adaptor.GetCompatRequest(&ctx.Request)
+	//	if err != nil {
+	//		utils.ErrResp(ctx, err)
+	//		return
+	//	}
+	//	// 将 Hertz 的响应转换为标准库的 http.ResponseWriter
+	//	rw := adaptor.GetCompatResponseWriter(&ctx.Response)
+	//	socket.Server.ServeHTTP(rw, req)
+	//})
 }

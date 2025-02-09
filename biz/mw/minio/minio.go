@@ -45,7 +45,6 @@ func PutToBucket(ctx context.Context, bucketName string, file *multipart.FileHea
 func GetObjURL(ctx context.Context, bucketName, filename string) (u *url.URL, err error) {
 	exp := time.Hour * 24
 	reqParams := make(url.Values)
-	reqParams.Set("Host", "api.marisa.site")
 	u, err = Client.PresignedGetObject(ctx, bucketName, filename, exp, reqParams)
 	return u, err
 }
@@ -72,18 +71,31 @@ func DelObject(ctx context.Context, bucketName, fileName string) error {
 
 func Init() {
 	ctx := context.Background()
+
+	// 初始化 MinIO 客户端
+	var err error
 	Client, err = minio.New(constants.MinioEndPoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(constants.MinioAccessKeyID, constants.MinioSecretAccessKey, ""),
 		Secure: constants.MinioSSL,
 	})
 	if err != nil {
-		hlog.Fatal("minio连接错误: ", err)
+		hlog.Fatal("连接 MinIO 失败: ", err)
 	}
+	hlog.Info("成功连接到 MinIO")
 
-	err := MakeBucket(ctx, constants.MinioImgBucketName)
-	if err != nil {
-		hlog.Fatal("minio初始化失败")
-	} else {
-		hlog.Info("成功连接minio")
+	// 创建 Bucket
+	if err = MakeBucket(ctx, constants.MinioImgBucketName); err != nil {
+		hlog.Fatal("创建 Bucket 失败: ", err)
+	}
+	hlog.Info("成功创建 Bucket")
+
+	// 上传文件
+	imgNames := []string{"mols.jpg", "marisa.jpg"}
+	imgPaths := []string{"static/mols.jpg", "static/marisa.jpg"}
+	for idx, imgPath := range imgPaths {
+		if _, err = PutToBucketByFilePath(ctx, constants.MinioImgBucketName, imgNames[idx], imgPaths[idx]); err != nil {
+			hlog.Fatal("上传文件失败: ", err)
+		}
+		hlog.Infof("成功上传文件: %s", imgPath)
 	}
 }

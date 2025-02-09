@@ -20,7 +20,7 @@ import (
 	"errors"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/qingyggg/blog_server/biz/model/hertz/basic/user"
+	"github.com/qingyggg/blog_server/biz/model/hertz/common"
 	"github.com/qingyggg/blog_server/pkg/errno"
 )
 
@@ -54,7 +54,7 @@ func baseResp(err errno.ErrNo) *BaseResp {
 
 func ErrResp(c *app.RequestContext, err error) {
 	resp := BuildBaseResp(err)
-	c.JSON(consts.StatusInternalServerError, user.UserActionResponse{
+	c.JSON(consts.StatusInternalServerError, common.BaseResponse{
 		StatusCode: resp.StatusCode,
 		StatusMsg:  resp.StatusMsg,
 	})

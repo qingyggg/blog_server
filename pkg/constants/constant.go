@@ -14,6 +14,7 @@ var (
 	RedisAddr            string
 	RedisPassword        string
 	MongoDefaultDSN      string
+	AmqpDSN              string
 )
 
 // UrlInit 调用该函数前，先要加载env
@@ -26,15 +27,14 @@ func UrlInit() {
 	RedisAddr = os.Getenv("RedisUrl")
 	RedisPassword = os.Getenv("RedisPassword")
 	MongoDefaultDSN = "mongodb://" + os.Getenv("MongoUser") + ":" + os.Getenv("MongoPwd") + "@" + os.Getenv("MongoUrl") + "/?connect=direct"
-	println("mongo dsn", MongoDefaultDSN)
+	AmqpDSN = "amqp://" + os.Getenv("MqUser") + ":" + os.Getenv("MqPwd") + "@" + os.Getenv("MqUrl")
 }
 
 // constants in the project
 const (
-	MinioVideoBucketName = "videobucket"
-	MinioImgBucketName   = "imagebucket"
+	MinioImgBucketName = "imagebucket"
 
-	TestSign       = "测试账号！ offer"
-	TestAva        = "avatar/test1.jpg"
-	TestBackground = "background/test1.png"
+	DefaultSign       = "该用户没有留下任何签名"
+	DefaultAva        = "imagebucket/mols.jpg"
+	DefaultBackground = "imagebucket/marisa.jpg"
 )
