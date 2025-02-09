@@ -8,7 +8,7 @@ import (
 	"github.com/qingyggg/blog_server/pkg/utils"
 )
 
-// get uid from jwt
+// GetUHashId get uid from jwt
 func GetUHashId(c *app.RequestContext) string {
 	uid, exist := c.Get("current_user_id")
 	if exist {

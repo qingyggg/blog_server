@@ -10,7 +10,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
-// Ping .
+// Ping 测试服务器连接的接口
 // @Summary 测试服务器连接
 // @Description 测试服务器连接
 // @Tags Ping

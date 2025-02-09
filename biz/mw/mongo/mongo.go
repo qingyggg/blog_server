@@ -36,6 +36,7 @@ func Init() {
 
 	InitComment()
 	InitArticle()
+	InitNotification()
 }
 func CreateIndex(collection *mongo.Collection, field bson.M, needUnique bool) error {
 	// 创建一个索引模型

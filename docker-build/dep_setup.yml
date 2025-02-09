@@ -7,7 +7,7 @@ networks:
 services:
   mariadb:
     image: mariadb:11
-    container_name: mariadb
+    container_name: bs_mariadb
     volumes:
       - mariadb-data:/var/lib/mysql  # 使用命名卷持久化 MySQL 数据
       - ../pkg/configs/sql:/docker-entrypoint-initdb.d  # 初始化 SQL 脚本
@@ -30,7 +30,7 @@ services:
 
   minio:
     image: minio/minio
-    container_name: minio
+    container_name: bs_minio
     ports:
       - "18001:9000"
       - "18002:9001"
@@ -54,7 +54,7 @@ services:
 
   redis:
     image: redis:7
-    container_name: redis
+    container_name: bs_redis
     ports:
       - "18003:6379"
     volumes:
@@ -73,7 +73,7 @@ services:
 
   mongo:
     image: mongo:8.0
-    container_name: mongo
+    container_name: bs_mongo
     ports:
       - "18006:27017"
     environment:
@@ -91,9 +91,26 @@ services:
       retries: 5
       start_period: 30s
 
+  rabbitmq:
+    image: rabbitmq:4.0-management  # 带有管理插件的官方镜像
+    container_name: bs_rabbitmq
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: blog_server        # 默认用户名
+      RABBITMQ_DEFAULT_PASS: blog_server123       # 默认密码
+      RABBITMQ_DEFAULT_VHOST: "/"        # 默认虚拟主机
+    ports:
+      - "18007:5672"   # 应用连接的 AMQP 端口
+      - "15672:15672" # 管理控制台的 Web UI 端口
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq  # 持久化存储
+    restart: always
+    networks:
+      - blog_server
+
   nginx:
     image: nginx:latest
-    container_name: nginx
+    container_name: bs_nginx
     ports:
       - "443:443"  # HTTP 端口
     networks:
@@ -127,3 +144,4 @@ volumes:
   minio-data:    # MinIO 数据持久化卷
   redis-data:    # Redis 数据持久化卷
   mongo-data:    # MongoDB 数据持久化卷
+  rabbitmq_data:

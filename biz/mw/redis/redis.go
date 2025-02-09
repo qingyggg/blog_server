@@ -9,11 +9,12 @@ import (
 var (
 	ExpireTime = time.Hour * 3
 	//ExpireTime  = time.Second
-	rdbCollect  *redis.Client
-	rdbFavorite *redis.Client
-	rdbComment  *redis.Client
-	rdbView     *redis.Client
-	rdbUser     *redis.Client
+	rdbCollect    *redis.Client
+	rdbFavorite   *redis.Client
+	rdbComment    *redis.Client
+	rdbView       *redis.Client
+	rdbUser       *redis.Client
+	rdbUserOnline *redis.Client
 )
 
 func InitRedis() {
@@ -37,9 +38,16 @@ func InitRedis() {
 		Password: constants.RedisPassword,
 		DB:       3,
 	})
+	//uid:uHashId,用以减小请求User数据库的次数
 	rdbUser = redis.NewClient(&redis.Options{
 		Addr:     constants.RedisAddr,
 		Password: constants.RedisPassword,
 		DB:       4,
+	})
+	//uhashId:1
+	rdbUserOnline = redis.NewClient(&redis.Options{
+		Addr:     constants.RedisAddr,
+		Password: constants.RedisPassword,
+		DB:       5,
 	})
 }

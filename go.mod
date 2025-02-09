@@ -28,11 +28,14 @@ require (
 	github.com/go-redis/redis/v7 v7.4.1 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
+	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/gomodule/redigo v1.9.2 // indirect
 	github.com/google/pprof v0.0.0-20211214055906-6f57359322fd // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/googollee/go-socket.io v1.7.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/henrylee2cn/ameda v1.5.1 // indirect
 	github.com/henrylee2cn/goutil v1.0.1 // indirect
@@ -42,6 +45,7 @@ require (
 	github.com/hertz-contrib/logger/logrus v1.0.1 // indirect
 	github.com/hertz-contrib/pprof v0.1.2 // indirect
 	github.com/hertz-contrib/reverseproxy v1.0.6 // indirect
+	github.com/hertz-contrib/sse v0.0.5 // indirect
 	github.com/hertz-contrib/swagger v0.1.0 // indirect
 	github.com/hertz-contrib/websocket v0.1.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
@@ -58,6 +62,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nyaruka/phonenumbers v1.4.0 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
+	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/savsgio/gotils v0.0.0-20240704082632-aef3928b8a38 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect

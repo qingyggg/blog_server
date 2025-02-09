@@ -32,7 +32,7 @@ func (s *PublishService) PublishCreate(req *publish.CreateActionRequest) (err er
 
 	var coverUrl string
 	if req.Payload.Preload.CoverUrl == "" {
-		coverUrl = constants.TestBackground
+		coverUrl = constants.DefaultBackground
 	} else {
 		coverUrl = utils.UrlConvertReverse(s.ctx, req.Payload.Preload.CoverUrl)
 	}
@@ -419,7 +419,20 @@ func (s *PublishService) PublishList(req *publish.CardsRequest) (cards []*common
 	}
 	return cards, nil
 }
-
+func (s *PublishService) TakeTitle(aHashId string) (string, error) {
+	exist, err := db.CheckArticleExistByHashId(aHashId)
+	if err != nil {
+		return "", err
+	}
+	if !exist {
+		return "", errno.ArticleIsNotExistErr
+	}
+	title, err := db.TakeTitle(aHashId)
+	if err != nil {
+		return "", err
+	}
+	return title, nil
+}
 func (s *PublishService) AddViewCount(req *publish.ActionRequest) error {
 	exist, err := db.CheckArticleExistByHashId(req.AHashID)
 	if err != nil {

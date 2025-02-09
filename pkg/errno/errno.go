@@ -26,43 +26,28 @@ const (
 	ServiceErrCode = iota + 10000
 	ParamErrCode
 	AuthorizationFailedErrCode
-
 	UserAlreadyExistErrCode
 	UserIsNotExistErrCode
-
 	FollowRelationAlreadyExistErrCode
 	FollowRelationNotExistErrCode
-
-	FavoriteRelationAlreadyExistErrCode
-	FavoriteRelationNotExistErrCode
-	FavoriteActionErrCode
-
-	MessageAddFailedErrCode
-	FriendListNoPermissionErrCode
-
 	ArticleIsNotExistErrCode
 	CommentIsNotExistErrCode
-	RepliedCommentNotExistErrCode
-
 	CollectAlreadyExistErrCode
 	CollectIsNotExistErrCode
+	NotifyIsNotExistErrCode
 )
 
 const (
-	SuccessMsg               = "Success"
-	ServerErrMsg             = "Service is unable to start successfully"
-	ParamErrMsg              = "Wrong Parameter has been given"
-	UserIsNotExistErrMsg     = "user is not exist"
-	PasswordIsNotVerifiedMsg = "username or password not verified"
-	FavoriteActionErrMsg     = "favorite add failed"
-
-	MessageAddFailedErrMsg       = "message add failed"
-	FriendListNoPermissionMsg    = "You can't query his friend list"
-	ArticleIsNotExistErrMsg      = "article is not exist"
-	CommentIsNotExistErrMsg      = "comment is not exist"
-	RepliedCommentNotExistErrMsg = "replied comment is not exist"
-	CollectAlreadyExistErrMsg    = "collect is already exist"
-	CollectIsNotExistErrMsg      = "collect is not exist"
+	SuccessMsg                = "Success"
+	ServerErrMsg              = "Service is unable to start successfully"
+	ParamErrMsg               = "Wrong Parameter has been given"
+	UserIsNotExistErrMsg      = "user is not exist"
+	PasswordIsNotVerifiedMsg  = "username or password not verified"
+	ArticleIsNotExistErrMsg   = "article is not exist"
+	CommentIsNotExistErrMsg   = "comment is not exist"
+	CollectAlreadyExistErrMsg = "collect is already exist"
+	CollectIsNotExistErrMsg   = "collect is not exist"
+	NotifyIsNotExistErrMsg    = "notify is not exist"
 )
 
 type ErrNo struct {
@@ -84,26 +69,20 @@ func (e ErrNo) WithMessage(msg string) ErrNo {
 }
 
 var (
-	Success                         = NewErrNo(SuccessCode, SuccessMsg)
-	ServiceErr                      = NewErrNo(ServiceErrCode, ServerErrMsg)
-	ParamErr                        = NewErrNo(ParamErrCode, ParamErrMsg)
-	UserAlreadyExistErr             = NewErrNo(UserAlreadyExistErrCode, "User already exists")
-	AuthorizationFailedErr          = NewErrNo(AuthorizationFailedErrCode, "Authorization failed")
-	UserIsNotExistErr               = NewErrNo(UserIsNotExistErrCode, UserIsNotExistErrMsg)
-	PasswordIsNotVerified           = NewErrNo(AuthorizationFailedErrCode, PasswordIsNotVerifiedMsg)
-	FollowRelationAlreadyExistErr   = NewErrNo(FollowRelationAlreadyExistErrCode, "Follow Relation already exist")
-	FollowRelationNotExistErr       = NewErrNo(FollowRelationNotExistErrCode, "Follow Relation does not exist")
-	FavoriteRelationAlreadyExistErr = NewErrNo(FavoriteRelationAlreadyExistErrCode, "Favorite Relation already exist")
-	FavoriteRelationNotExistErr     = NewErrNo(FavoriteRelationNotExistErrCode, "FavoriteRelationNotExistErr")
-	FavoriteActionErr               = NewErrNo(FavoriteActionErrCode, FavoriteActionErrMsg)
-
-	MessageAddFailedErr       = NewErrNo(MessageAddFailedErrCode, MessageAddFailedErrMsg)
-	FriendListNoPermissionErr = NewErrNo(FriendListNoPermissionErrCode, FriendListNoPermissionMsg)
-	ArticleIsNotExistErr      = NewErrNo(ArticleIsNotExistErrCode, ArticleIsNotExistErrMsg)
-	CommentIsNotExistErr      = NewErrNo(CommentIsNotExistErrCode, CommentIsNotExistErrMsg)
-	RepliedCommentNotExistErr = NewErrNo(RepliedCommentNotExistErrCode, RepliedCommentNotExistErrMsg)
-	CollectAlreadyExistErr    = NewErrNo(CollectAlreadyExistErrCode, CollectAlreadyExistErrMsg)
-	CollectIsNotExistErr      = NewErrNo(CollectIsNotExistErrCode, CollectIsNotExistErrMsg)
+	Success                       = NewErrNo(SuccessCode, SuccessMsg)
+	ServiceErr                    = NewErrNo(ServiceErrCode, ServerErrMsg)
+	ParamErr                      = NewErrNo(ParamErrCode, ParamErrMsg)
+	UserAlreadyExistErr           = NewErrNo(UserAlreadyExistErrCode, "User already exists")
+	AuthorizationFailedErr        = NewErrNo(AuthorizationFailedErrCode, "Authorization failed")
+	UserIsNotExistErr             = NewErrNo(UserIsNotExistErrCode, UserIsNotExistErrMsg)
+	PasswordIsNotVerified         = NewErrNo(AuthorizationFailedErrCode, PasswordIsNotVerifiedMsg)
+	FollowRelationAlreadyExistErr = NewErrNo(FollowRelationAlreadyExistErrCode, "Follow Relation already exist")
+	FollowRelationNotExistErr     = NewErrNo(FollowRelationNotExistErrCode, "Follow Relation does not exist")
+	ArticleIsNotExistErr          = NewErrNo(ArticleIsNotExistErrCode, ArticleIsNotExistErrMsg)
+	CommentIsNotExistErr          = NewErrNo(CommentIsNotExistErrCode, CommentIsNotExistErrMsg)
+	CollectAlreadyExistErr        = NewErrNo(CollectAlreadyExistErrCode, CollectAlreadyExistErrMsg)
+	CollectIsNotExistErr          = NewErrNo(CollectIsNotExistErrCode, CollectIsNotExistErrMsg)
+	NotifyIsNotExistErr           = NewErrNo(NotifyIsNotExistErrCode, NotifyIsNotExistErrMsg)
 )
 
 // ConvertErr convert error to Errno

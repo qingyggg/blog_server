@@ -9,15 +9,12 @@ import (
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/hertz-contrib/pprof"
 	"github.com/hertz-contrib/reverseproxy"
-	"github.com/hertz-contrib/swagger"
 	"github.com/qingyggg/blog_server/biz/dal"
 	"github.com/qingyggg/blog_server/biz/mw/jwt"
-	"github.com/qingyggg/blog_server/biz/mw/logger"
 	"github.com/qingyggg/blog_server/biz/mw/minio"
 	_ "github.com/qingyggg/blog_server/docs"
 	"github.com/qingyggg/blog_server/pkg/constants"
 	"github.com/qingyggg/blog_server/pkg/utils"
-	swaggerFiles "github.com/swaggo/files"
 )
 
 //	@title			blog_server tests
@@ -40,26 +37,8 @@ func main() {
 		server.WithHostPorts("0.0.0.0:18005"),
 		server.WithValidateConfig(validateConfig),
 	)
-	//h.Use(gzip.Gzip(gzip.DefaultCompression)) //gzip压缩
 	// default is "debug/pprof"
 	pprof.Register(h, "dev/pprof")
-	//cors config
-	//h.Use(cors.New(cors.Config{
-	//	//AllowWildcard: 	  true,
-	//	//AllowAllOrigins:  true,
-	//	AllowOrigins:     []string{"http://localhost:5173"},
-	//	AllowMethods:     []string{"PUT", "PATCH", "GET", "POST", "DELETE"},
-	//	AllowHeaders:     []string{"Origin", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token, x-token"},
-	//	ExposeHeaders:    []string{"Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type"},
-	//	AllowCredentials: true,
-	//	MaxAge:           12 * time.Hour,
-	//}))
-	//oss
-	h.GET("/src/*name", minioReverseProxy)
-
-	//swagger
-	url := swagger.URL("http://localhost:18005/swagger/doc.json") // The url pointing to API definition
-	h.GET("/swagger/*any", swagger.WrapHandler(swaggerFiles.Handler, url))
 
 	register(h)
 	h.Spin()
@@ -67,21 +46,22 @@ func main() {
 
 // Set up /src/*name route forwarding to access minio from external network
 func minioReverseProxy(c context.Context, ctx *app.RequestContext) {
-	hlog.Info("minioReverProxy called!!!!")
 	proxyUrl := "http://" + constants.MinioEndPoint
 	proxy, _ := reverseproxy.NewSingleHostReverseProxy(proxyUrl)
 	ctx.URI().SetPath(ctx.Param("name"))
-	hlog.CtxInfof(c, string(ctx.Request.URI().Path()))
+	hlog.CtxInfof(c, "minio图片访问==>"+string(ctx.Request.URI().Path()))
 	proxy.ServeHTTP(c, ctx)
 }
 
 func init() {
 	utils.EnvInit()
 	constants.UrlInit()
-	logger.InitLogger()
-	dal.Init()
+	//logger.InitLogger()
+	dal.Init() //数据库初始化
 	jwt.Init()
-	minio.Init()
+	minio.Init() //存储服务初始化
+	//mq.Init()     //消息件初始化
+	//socket.Init() //初始化socket.io
 }
 func GetCustomValidateConfig() *binding.ValidateConfig {
 	//自定义参数校验

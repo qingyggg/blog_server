@@ -3,6 +3,7 @@ package redis
 import (
 	"errors"
 	"github.com/go-redis/redis/v7"
+	"time"
 )
 
 // redis set
@@ -151,4 +152,33 @@ func ngets(c *redis.Client, ks []string, suffix string) (error, map[string]int64
 		resMap[ks[i]] = value
 	}
 	return nil, resMap
+}
+
+// redis string:string
+
+func strGet(c *redis.Client, k string, needEndure bool) string {
+	// 使用 GET 命令获取键对应的值
+	val := c.Get(k).String()
+	if needEndure {
+		// 一年的秒数
+		const secondsInYear = 365 * 24 * 60 * 60 // 365 天
+		tenYears := time.Duration(10*secondsInYear) * time.Second
+		c.Expire(k, tenYears)
+	} else {
+		c.Expire(k, ExpireTime)
+	}
+	return val // 返回获取到的值
+}
+func strSet(c *redis.Client, k string, v string, needEndure bool) error {
+	tx := c.TxPipeline()
+	if needEndure {
+		// 一年的秒数
+		const secondsInYear = 365 * 24 * 60 * 60 // 365 天
+		tenYears := time.Duration(10*secondsInYear) * time.Second
+		tx.Set(k, v, tenYears)
+	} else {
+		tx.Set(k, v, ExpireTime)
+	}
+	_, err := tx.Exec()
+	return err
 }

@@ -44,9 +44,9 @@ func (s *UserService) UserRegister(req *user.UserActionRequest) (uHashId string,
 		UserName:        req.Username,
 		Password:        passWord,
 		HashID:          utils.ConvertStringHashToByte(uHashId),
-		Avatar:          constants.TestAva,
-		BackgroundImage: constants.TestBackground,
-		Signature:       constants.TestSign,
+		Avatar:          constants.DefaultAva,
+		BackgroundImage: constants.DefaultBackground,
+		Signature:       constants.DefaultSign,
 	})
 	if err != nil {
 		return uHashId, err
@@ -122,7 +122,13 @@ func (s *UserService) UserProfileModify(req *user.UserActionProfileModifyRequest
 	}
 	return nil, uHashId
 }
-
+func (s *UserService) QueryUserBase(uHashId string) (*common.UserBase, error) {
+	aUser, err := db.QueryUserByHashId(uHashId)
+	if err != nil {
+		return nil, err
+	}
+	return s.UserAssign(aUser), nil
+}
 func (s *UserService) GetUserInfo(queryUHashId string) (*common.User, error) {
 	u := new(common.User)
 	errChan := make(chan error, 4)
