@@ -25,7 +25,15 @@ import (
 	"github.com/minio/minio-go/v7"
 )
 
+func requireClient(t *testing.T) {
+	t.Helper()
+	if Client == nil {
+		t.Skip("minio client is not initialized; skip integration test")
+	}
+}
+
 func TestBucketExist(t *testing.T) {
+	requireClient(t)
 	ctx := context.Background()
 	exists, err := Client.BucketExists(ctx, constants.MinioVideoBucketName)
 	if err != nil {
@@ -40,6 +48,7 @@ func TestBucketExist(t *testing.T) {
 }
 
 func TestBuckMake(t *testing.T) {
+	requireClient(t)
 	ctx := context.Background()
 	exists, err := Client.BucketExists(ctx, constants.MinioVideoBucketName)
 	if err != nil {
@@ -59,7 +68,7 @@ func TestBuckMake(t *testing.T) {
 }
 
 func TestGetObjURL(t *testing.T) {
-	Init()
+	requireClient(t)
 	ctx := context.Background()
 	url, _ := GetObjURL(ctx, constants.MinioVideoBucketName, "1000.1676403991.mp4")
 	fmt.Println(url.String())

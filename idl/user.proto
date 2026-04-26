@@ -17,6 +17,7 @@ message UserActionResponse {
   string status_msg = 2;
   int64 UserId = 3; // user id
   string UHashId = 4;
+  string Token = 5;
 }
 
 message UserActionPwdModifyRequest {
@@ -64,4 +65,3 @@ service UserHandler {
     option (api.post) = "/blog_server/user/profile_modify";
   }
 }
-

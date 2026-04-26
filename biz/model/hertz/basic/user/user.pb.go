@@ -86,6 +86,7 @@ type UserActionResponse struct {
 	StatusMsg  string `protobuf:"bytes,2,opt,name=status_msg,json=statusMsg,proto3" form:"status_msg" json:"status_msg" query:"status_msg"`
 	UserId     int64  `protobuf:"varint,3,opt,name=UserId,proto3" form:"UserId" json:"UserId" query:"UserId"` // user id
 	UHashId    string `protobuf:"bytes,4,opt,name=UHashId,proto3" form:"UHashId" json:"UHashId" query:"UHashId"`
+	Token      string `protobuf:"bytes,5,opt,name=Token,proto3" form:"Token" json:"Token" query:"Token"`
 }
 
 func (x *UserActionResponse) Reset() {
@@ -144,6 +145,13 @@ func (x *UserActionResponse) GetUserId() int64 {
 func (x *UserActionResponse) GetUHashId() string {
 	if x != nil {
 		return x.UHashId
+	}
+	return ""
+}
+
+func (x *UserActionResponse) GetToken() string {
+	if x != nil {
+		return x.Token
 	}
 	return ""
 }

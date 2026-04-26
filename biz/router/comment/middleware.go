@@ -18,10 +18,7 @@ func _blog_serverMw() []app.HandlerFunc {
 }
 
 func _commentMw() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		jwt.JwtMiddleware.MiddlewareFunc(),
-	}
-
+	return nil
 }
 
 func _actionMw() []app.HandlerFunc {
@@ -29,13 +26,15 @@ func _actionMw() []app.HandlerFunc {
 }
 
 func _commentdelactionMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		jwt.JwtMiddleware.MiddlewareFunc(),
+	}
 }
 
 func _commentactionMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		jwt.JwtMiddleware.MiddlewareFunc(),
+	}
 }
 
 func _listMw() []app.HandlerFunc {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/hertz/pkg/protocol"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/hertz-contrib/jwt"
 	"github.com/qingyggg/blog_server/biz/dal/db"
@@ -21,11 +20,12 @@ var (
 
 func Init() {
 	JwtMiddleware, _ = jwt.New(&jwt.HertzJWTMiddleware{
-		Key:         []byte("mols secret key"),
-		TokenLookup: "cookie:token",
-		Timeout:     24 * time.Hour,
-		MaxRefresh:  time.Hour * 6,
-		IdentityKey: identity,
+		Key:           []byte("mols secret key"),
+		TokenLookup:   "header: Authorization",
+		TokenHeadName: "Bearer",
+		Timeout:       24 * time.Hour,
+		MaxRefresh:    time.Hour * 6,
+		IdentityKey:   identity,
 		// Verify password at login
 		Authenticator: func(ctx context.Context, c *app.RequestContext) (interface{}, error) {
 			//var loginRequest
@@ -56,7 +56,7 @@ func Init() {
 		// build login response if verify password successfully
 		LoginResponse: func(ctx context.Context, c *app.RequestContext, code int, token string, expire time.Time) {
 			hlog.CtxInfof(ctx, "Login success ，token is issued clientIP: "+c.ClientIP())
-			c.SetCookie("token", token, int(24*time.Hour), "/", "mols.site", protocol.CookieSameSiteNoneMode, true, true)
+			c.Set("token", token)
 		},
 		// Verify token and get the id of logged-in user
 		Authorizator: func(data interface{}, ctx context.Context, c *app.RequestContext) bool {

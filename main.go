@@ -7,8 +7,9 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/cloudwego/hertz/pkg/app/server/binding"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/hertz-contrib/cors"
 	"github.com/hertz-contrib/pprof"
-	"github.com/hertz-contrib/reverseproxy"
 	"github.com/hertz-contrib/swagger"
 	"github.com/qingyggg/blog_server/biz/dal"
 	"github.com/qingyggg/blog_server/biz/mw/jwt"
@@ -18,6 +19,8 @@ import (
 	"github.com/qingyggg/blog_server/pkg/constants"
 	"github.com/qingyggg/blog_server/pkg/utils"
 	swaggerFiles "github.com/swaggo/files"
+	"strings"
+	"time"
 )
 
 //	@title			blog_server tests
@@ -43,17 +46,13 @@ func main() {
 	//h.Use(gzip.Gzip(gzip.DefaultCompression)) //gzip压缩
 	// default is "debug/pprof"
 	pprof.Register(h, "dev/pprof")
-	//cors config
-	//h.Use(cors.New(cors.Config{
-	//	//AllowWildcard: 	  true,
-	//	//AllowAllOrigins:  true,
-	//	AllowOrigins:     []string{"http://localhost:5173"},
-	//	AllowMethods:     []string{"PUT", "PATCH", "GET", "POST", "DELETE"},
-	//	AllowHeaders:     []string{"Origin", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token, x-token"},
-	//	ExposeHeaders:    []string{"Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type"},
-	//	AllowCredentials: true,
-	//	MaxAge:           12 * time.Hour,
-	//}))
+	h.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+		AllowMethods:    []string{"PUT", "PATCH", "GET", "POST", "DELETE", "OPTIONS"},
+		AllowHeaders:    []string{"Origin", "Content-Type", "AccessToken", "X-CSRF-Token", "Authorization", "Token", "x-token"},
+		ExposeHeaders:   []string{"Content-Length", "Content-Type"},
+		MaxAge:          12 * time.Hour,
+	}))
 	//oss
 	h.GET("/src/*name", minioReverseProxy)
 
@@ -67,12 +66,22 @@ func main() {
 
 // Set up /src/*name route forwarding to access minio from external network
 func minioReverseProxy(c context.Context, ctx *app.RequestContext) {
-	hlog.Info("minioReverProxy called!!!!")
-	proxyUrl := "http://" + constants.MinioEndPoint
-	proxy, _ := reverseproxy.NewSingleHostReverseProxy(proxyUrl)
-	ctx.URI().SetPath(ctx.Param("name"))
-	hlog.CtxInfof(c, string(ctx.Request.URI().Path()))
-	proxy.ServeHTTP(c, ctx)
+	name := strings.Trim(string(ctx.Param("name")), "/")
+	arr := strings.SplitN(name, "/", 2)
+	if len(arr) != 2 || arr[0] == "" || arr[1] == "" {
+		ctx.String(consts.StatusBadRequest, "invalid object path")
+		return
+	}
+	data, contentType, err := minio.ReadObject(c, arr[0], arr[1])
+	if err != nil {
+		hlog.CtxInfof(c, "read minio object failed: %s", err.Error())
+		ctx.String(consts.StatusNotFound, "object not found")
+		return
+	}
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+	ctx.Data(consts.StatusOK, contentType, data)
 }
 
 func init() {

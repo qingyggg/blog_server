@@ -29,6 +29,30 @@ MongoDB 被用于处理多级评论的数据库操作，采用了闭包表技术
 ### 前置环境
 
 - Docker
+- Go 1.25 或更新版本（后端依赖已按当前工具链做兼容维护）
+
+### 本地答辩演示启动
+
+后端默认读取 `envs/.env` 和 `envs/dev.env`，本地服务端口为 `18005`。先启动依赖：
+
+```bash
+cd aufer_old/blog_server
+docker compose -f docker-build/dep_setup.yml up -d mariadb redis mongo minio
+```
+
+依赖健康后启动后端：
+
+```bash
+go run .
+```
+
+前端默认请求 `http://localhost:18005`，如需覆盖可设置 `VITE_API_BASE_URL`：
+
+```bash
+cd aufer_old/mols_web
+pnpm install
+pnpm dev
+```
 
 ### 部署步骤
 
@@ -52,6 +76,4 @@ MongoDB 被用于处理多级评论的数据库操作，采用了闭包表技术
 
 ## 结语
 作为一名大学生，在没有大量的工作经验的前提下，感谢tiktok demo的作者让我学习到了hertz的项目设计技术，让我在称为合格的后端工程师的路上更近一部，也衷心感谢字节跳动，写了那么多开源项目，以及详细的文档
-
-
 

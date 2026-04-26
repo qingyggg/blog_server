@@ -83,10 +83,12 @@ services:
     image: nginx:latest
     container_name: nginx
     ports:
-      - "443:443"  # HTTP 端口
+      - "80:80"  # HTTP 端口
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
-      - ../pkg/configs/nginx/nginx.conf:/etc/nginx/nginx.conf  # 挂载 Nginx 配置文件
-      - ../pkg/configs/nginx/certs/:/etc/nginx/certs            # 挂载 SSL 证书
+      - ../pkg/configs/nginx/nginx.dev.conf:/etc/nginx/nginx.conf  # 挂载本地开发 Nginx 配置文件
+      - ../../mols_web/dist:/usr/share/nginx/html:ro            # 挂载前端构建产物
     restart: always
 
 volumes:

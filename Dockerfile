@@ -1,4 +1,4 @@
-FROM golang:1.22 as builder
+FROM golang:1.25 as builder
 
 # 配置模块代理
 ENV GO111MODULE=on
@@ -28,5 +28,4 @@ EXPOSE 18005
 
 #执行项目的命令
 CMD ["/app/main"]
-
 

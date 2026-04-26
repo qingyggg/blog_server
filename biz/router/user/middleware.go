@@ -22,10 +22,7 @@ func _userMw() []app.HandlerFunc {
 }
 
 func _user0Mw() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		jwt.JwtMiddleware.MiddlewareFunc(),
-	}
-
+	return nil
 }
 
 func _loginMw() []app.HandlerFunc {

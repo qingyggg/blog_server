@@ -34,6 +34,19 @@ func User(ctx context.Context, c *app.RequestContext) {
 		utils.ErrResp(c, err)
 		return
 	}
+	if req.UHashID == "current" {
+		claims, err := jwt.JwtMiddleware.GetClaimsFromJWT(ctx, c)
+		if err != nil {
+			utils.ErrResp(c, errno.AuthorizationFailedErr)
+			return
+		}
+		uid, ok := claims["user_id"].(float64)
+		if !ok {
+			utils.ErrResp(c, errno.AuthorizationFailedErr)
+			return
+		}
+		c.Set("current_user_id", int64(uid))
+	}
 
 	payload, err := service.NewUserService(ctx, c).UserInfo(req)
 	if err != nil {
@@ -77,11 +90,13 @@ func UserRegister(ctx context.Context, c *app.RequestContext) {
 	jwt.JwtMiddleware.LoginHandler(ctx, c)
 	v, _ := c.Get("user_id")
 	user_id := v.(int64)
+	token, _ := c.Get("token")
 	c.JSON(consts.StatusOK, user.UserActionResponse{
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
 		UserId:     user_id,
 		UHashId:    uHashId,
+		Token:      token.(string),
 	})
 }
 
@@ -117,11 +132,13 @@ func UserLogin(ctx context.Context, c *app.RequestContext) {
 	user_id := v1.(int64)
 	v2, _ := c.Get("uHashId")
 	uHashId := v2.(string)
+	token, _ := c.Get("token")
 	c.JSON(consts.StatusOK, user.UserActionResponse{
 		StatusCode: errno.SuccessCode,
 		StatusMsg:  errno.SuccessMsg,
 		UserId:     user_id,
 		UHashId:    uHashId,
+		Token:      token.(string),
 	})
 }
 

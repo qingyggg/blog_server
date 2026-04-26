@@ -71,7 +71,7 @@ func DeleteArticle(aInfo *orm_gen.Article) (err error) {
 func GetArticleInfos(uid string, offset int) (aInfos []*orm_gen.Article, err error) {
 	var a = query.Article
 	var expr query.IArticleDo
-	if uid != "" {
+	if uid != "" && uid != "0" {
 		expr = a.Where(a.UserID.Eq(utils.ConvertStringHashToByte(uid)))
 	} else {
 		expr = a.Where()

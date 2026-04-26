@@ -35,6 +35,6 @@ const (
 	MinioImgBucketName   = "imagebucket"
 
 	TestSign       = "测试账号！ offer"
-	TestAva        = "avatar/test1.jpg"
-	TestBackground = "background/test1.png"
+	TestAva        = ""
+	TestBackground = ""
 )

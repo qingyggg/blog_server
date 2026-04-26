@@ -135,9 +135,13 @@ func (c *CommentService) getCmtList(cmtList []*mongo.CommentItem, degree int32) 
 		cids = append(cids, cmt.HashID)
 	}
 	curUid := service_utils.GetUid(c.c)
-	user, err := db.QueryUserById(curUid)
-	if err != nil {
-		return err, nil
+	var curUHashId string
+	if curUid != 0 {
+		user, err := db.QueryUserById(curUid)
+		if err != nil {
+			return err, nil
+		}
+		curUHashId = utils.ConvertByteHashToString(user.HashID)
 	}
 
 	go func() {
@@ -151,7 +155,11 @@ func (c *CommentService) getCmtList(cmtList []*mongo.CommentItem, degree int32) 
 	}()
 	go func() {
 		defer wg.Done()
-		err, cInfoMaps := db.GetCmtFavoriteStatusMap(cids, utils.ConvertByteHashToString(user.HashID))
+		if curUHashId == "" {
+			CInfoMaps = make(map[string]int32)
+			return
+		}
+		err, cInfoMaps := db.GetCmtFavoriteStatusMap(cids, curUHashId)
 		if err != nil {
 			errChan <- err
 			return

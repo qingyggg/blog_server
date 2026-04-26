@@ -159,6 +159,7 @@ func (s *UserService) GetUserInfo(queryUHashId string) (*common.User, error) {
 		u.Base.Profile.BackgroundImage = utils.URLconvert(s.ctx, s.c, dbUser.BackgroundImage)
 		u.Base.Profile.Signature = dbUser.Signature
 		u.Base.HashId = utils.ConvertByteHashToString(dbUser.HashID)
+		queryUHashId = u.Base.HashId
 	}
 
 	go func() {
@@ -196,7 +197,7 @@ func (s *UserService) GetUserInfo(queryUHashId string) (*common.User, error) {
 
 	go func() {
 		defer wg.Done()
-		if isLoginedUser {
+		if isLoginedUser || uid == 0 {
 			return
 		}
 		user, err := db.QueryUserById(uid)

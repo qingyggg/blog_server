@@ -7,6 +7,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/qingyggg/blog_server/pkg/constants"
+	"io"
 	"mime/multipart"
 	"net/url"
 	"time"
@@ -35,9 +36,14 @@ func MakeBucket(ctx context.Context, bucketName string) error {
 
 // PutToBucket put the file into the bucket by *multipart.FileHeader
 func PutToBucket(ctx context.Context, bucketName string, file *multipart.FileHeader) (info minio.UploadInfo, err error) {
-	fileObj, _ := file.Open()
-	info, err = Client.PutObject(ctx, bucketName, file.Filename, fileObj, file.Size, minio.PutObjectOptions{})
-	fileObj.Close()
+	fileObj, err := file.Open()
+	if err != nil {
+		return info, err
+	}
+	defer fileObj.Close()
+	info, err = Client.PutObject(ctx, bucketName, file.Filename, fileObj, file.Size, minio.PutObjectOptions{
+		ContentType: file.Header.Get("Content-Type"),
+	})
 	return info, err
 }
 
@@ -48,6 +54,35 @@ func GetObjURL(ctx context.Context, bucketName, filename string) (u *url.URL, er
 	reqParams.Set("Host", "api.marisa.site")
 	u, err = Client.PresignedGetObject(ctx, bucketName, filename, exp, reqParams)
 	return u, err
+}
+
+func ObjectExists(ctx context.Context, bucketName, filename string) (bool, error) {
+	_, err := Client.StatObject(ctx, bucketName, filename, minio.StatObjectOptions{})
+	if err != nil {
+		if minio.ToErrorResponse(err).Code == "NoSuchKey" {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
+func ReadObject(ctx context.Context, bucketName, filename string) ([]byte, string, error) {
+	obj, err := Client.GetObject(ctx, bucketName, filename, minio.GetObjectOptions{})
+	if err != nil {
+		return nil, "", err
+	}
+	defer obj.Close()
+
+	stat, err := obj.Stat()
+	if err != nil {
+		return nil, "", err
+	}
+	data, err := io.ReadAll(obj)
+	if err != nil {
+		return nil, "", err
+	}
+	return data, stat.ContentType, nil
 }
 
 // PutToBucketByBuf put the file into the bucket by *bytes.Buffer
